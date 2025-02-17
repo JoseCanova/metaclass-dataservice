@@ -61,6 +61,7 @@ public class SingleHundredNumericTablePersistenceUnitManagerTest {
 		Query query1 = rm.createQuery("select a from org.nanotek.data.SimpleNumericHundredTable a");
 		List<?> resultList1 = query1.getResultList();
 		assertTrue(resultList1.size()==1);
+		System.err.println(resultList1.get(0).toString());
 		executeDelete(rm);
 		Query query11 = rm.createQuery("select a from org.nanotek.data.SimpleNumericHundredTable a");
 		List<?> resultList11 = query11.getResultList();
@@ -85,7 +86,7 @@ public class SingleHundredNumericTablePersistenceUnitManagerTest {
 		pdKey.getWriteMethod().invoke(simpletable, Integer.valueOf(1000));
 
 		PropertyDescriptor pdValue = BeanUtils.getPropertyDescriptor(clazz, "simpleHundred");
-		pdValue.getWriteMethod().invoke(simpletable, new BigDecimal(999));
+		pdValue.getWriteMethod().invoke(simpletable, new BigDecimal(999.23));
 		
 		rm.persist(simpletable);
 		rm.flush();
