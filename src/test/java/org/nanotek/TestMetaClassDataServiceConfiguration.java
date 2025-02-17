@@ -100,6 +100,25 @@ public class TestMetaClassDataServiceConfiguration {
 		}
 	}
 	
+	void metaClassDate(InjectionClassLoader injectionClassLoader,
+			PersistenceUnityClassesMap persistenceUnitClassesMap) {
+		ObjectMapper objectMapper = new ObjectMapper();
+    	List<JsonNode> list;
+		try {
+			list = objectMapper.readValue
+						(getClass().getResourceAsStream("/meta_class_date.json")
+								, List.class);
+			Object theNode = list.get(0);
+			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
+			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
+			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
+			Class.forName(loaded.getTypeName(), false, injectionClassLoader);
+			persistenceUnitClassesMap.put(loaded.getTypeName(), loaded);
+			} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	@Bean(value="myPersistenceManager")
 	@Qualifier(value="myPersistenceManager")
 	public MergingPersistenceUnitManager myPersistenceManager(@Autowired DataSource dataSource,
@@ -107,6 +126,7 @@ public class TestMetaClassDataServiceConfiguration {
 			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap) {
 		metaClass(injectionClassLoader,persistenceUnitClassesMap);
 		metaClassNumeric(injectionClassLoader,persistenceUnitClassesMap);
+		metaClassDate(injectionClassLoader,persistenceUnitClassesMap);
 		MergingPersistenceUnitManager pum = new  MyMergingPersistenceUnitManager();
 //		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");

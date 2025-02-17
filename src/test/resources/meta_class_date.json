@@ -1,0 +1,123 @@
+[
+    {
+      "identity": {
+        "id": null,
+        "definition": "",
+        "shortName": "simple_date_table.simple_date_table_pkey",
+        "name": "simple_date_table_pkey",
+        "columns": [
+          {
+            "id": null,
+            "name": "simple_key"
+          }
+        ]
+      },
+      "metaAttributes": [
+        {
+          "id": null,
+          "idAliases": null,
+          "partOfId": false,
+          "name": "simpleDate",
+          "isId": false,
+          "clazz": "java.sql.Date",
+          "columnName": "simple_date",
+          "length": "13",
+          "required": true,
+          "sqlType": "date",
+          "attributes": null,
+          "isPartOfIndex": false,
+          "isGenerated": false,
+          "isPartOfForeignKey": false,
+          "scale": 0
+        },
+        {
+          "id": null,
+          "idAliases": null,
+          "partOfId": false,
+          "name": "simpleTimestamp",
+          "isId": false,
+          "clazz": "java.sql.Timestamp",
+          "columnName": "simple_timestamp",
+          "length": "29",
+          "required": true,
+          "sqlType": "timestamp",
+          "attributes": null,
+          "isPartOfIndex": false,
+          "isGenerated": false,
+          "isPartOfForeignKey": false,
+          "scale": 6
+        },
+        {
+          "id": null,
+          "idAliases": null,
+          "partOfId": false,
+          "name": "simpleTime",
+          "isId": false,
+          "clazz": "java.sql.Time",
+          "columnName": "simple_time",
+          "length": "15",
+          "required": true,
+          "sqlType": "time",
+          "attributes": null,
+          "isPartOfIndex": false,
+          "isGenerated": false,
+          "isPartOfForeignKey": false,
+          "scale": 6
+        },
+        {
+          "id": null,
+          "idAliases": null,
+          "partOfId": false,
+          "name": "simpleTimestampZone",
+          "isId": false,
+          "clazz": "java.sql.Timestamp",
+          "columnName": "simple_timestamp_zone",
+          "length": "35",
+          "required": true,
+          "sqlType": "timestamptz",
+          "attributes": null,
+          "isPartOfIndex": false,
+          "isGenerated": false,
+          "isPartOfForeignKey": false,
+          "scale": 6
+        },
+        {
+          "id": null,
+          "idAliases": null,
+          "partOfId": false,
+          "name": "simpleTimesZone",
+          "isId": false,
+          "clazz": "java.sql.Time",
+          "columnName": "simple_times_zone",
+          "length": "21",
+          "required": true,
+          "sqlType": "timetz",
+          "attributes": null,
+          "isPartOfIndex": false,
+          "isGenerated": false,
+          "isPartOfForeignKey": false,
+          "scale": 6
+        },
+        {
+          "id": null,
+          "idAliases": null,
+          "partOfId": true,
+          "name": "simpleKey",
+          "isId": true,
+          "clazz": "java.lang.Integer",
+          "columnName": "simple_key",
+          "length": "10",
+          "required": true,
+          "sqlType": "int4",
+          "attributes": null,
+          "isPartOfIndex": true,
+          "isGenerated": false,
+          "isPartOfForeignKey": false,
+          "scale": 0
+        }
+      ],
+      "hasPrimaryKey": true,
+      "className": "SimpleDateTable",
+      "tableName": "simple_date_table"
+    }
+]
