@@ -1,2 +1,2 @@
 # metaclass-dataservice
-dataservice experiment for generate "entity model" of metaclass-bytebuddy
+dataservice experiment for  "entity model" generation of metaclass-bytebuddy
