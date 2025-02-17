@@ -1,13 +1,10 @@
 package org.nanotek.config;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.Consumer;
 
 import javax.sql.DataSource;
 
-import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
-import org.nanotek.metaclass.bytebuddy.RdbmsEntityBaseBuddy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringBootConfiguration;
@@ -21,9 +18,6 @@ import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -56,51 +50,12 @@ public class MetaClassDataServiceConfiguration {
 		return new PersistenceUnityClassesMap();
 	}
 	
-	void metaClass(InjectionClassLoader injectionClassLoader,
-			PersistenceUnityClassesMap persistenceUnitClassesMap) {
-		ObjectMapper objectMapper = new ObjectMapper();
-    	List<JsonNode> list;
-		try {
-			list = objectMapper.readValue
-						(getClass().getResourceAsStream("/metaclass.json")
-								, List.class);
-			Object theNode = list.get(0);
-			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
-			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
-			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
-			Class.forName(loaded.getTypeName(), false, injectionClassLoader);
-			persistenceUnitClassesMap.put(loaded.getTypeName(), loaded);
-			} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	void metaClassNumeric(InjectionClassLoader injectionClassLoader,
-			PersistenceUnityClassesMap persistenceUnitClassesMap) {
-		ObjectMapper objectMapper = new ObjectMapper();
-    	List<JsonNode> list;
-		try {
-			list = objectMapper.readValue
-						(getClass().getResourceAsStream("/metaclass_numeric.json")
-								, List.class);
-			Object theNode = list.get(0);
-			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
-			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
-			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
-			Class.forName(loaded.getTypeName(), false, injectionClassLoader);
-			persistenceUnitClassesMap.put(loaded.getTypeName(), loaded);
-			} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
 	
 	@Bean(value="myPersistenceManager")
 	@Qualifier(value="myPersistenceManager")
 	public MergingPersistenceUnitManager myPersistenceManager(@Autowired DataSource dataSource,
 			@Autowired InjectionClassLoader injectionClassLoader,
 			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap) {
-		metaClass(injectionClassLoader,persistenceUnitClassesMap);
-		metaClassNumeric(injectionClassLoader,persistenceUnitClassesMap);
 		MergingPersistenceUnitManager pum = new  MyMergingPersistenceUnitManager();
 //		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");
