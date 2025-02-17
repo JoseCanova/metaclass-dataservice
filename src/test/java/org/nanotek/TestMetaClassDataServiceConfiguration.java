@@ -100,6 +100,25 @@ public class TestMetaClassDataServiceConfiguration {
 		}
 	}
 	
+	void metaClassNumericHundred(InjectionClassLoader injectionClassLoader,
+			PersistenceUnityClassesMap persistenceUnitClassesMap) {
+		ObjectMapper objectMapper = new ObjectMapper();
+    	List<JsonNode> list;
+		try {
+			list = objectMapper.readValue
+						(getClass().getResourceAsStream("/metaclass_hundred_numeric.json")
+								, List.class);
+			Object theNode = list.get(0);
+			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
+			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
+			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
+			Class.forName(loaded.getTypeName(), false, injectionClassLoader);
+			persistenceUnitClassesMap.put(loaded.getTypeName(), loaded);
+			} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	void metaClassDate(InjectionClassLoader injectionClassLoader,
 			PersistenceUnityClassesMap persistenceUnitClassesMap) {
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -127,6 +146,7 @@ public class TestMetaClassDataServiceConfiguration {
 		metaClass(injectionClassLoader,persistenceUnitClassesMap);
 		metaClassNumeric(injectionClassLoader,persistenceUnitClassesMap);
 		metaClassDate(injectionClassLoader,persistenceUnitClassesMap);
+		metaClassNumericHundred(injectionClassLoader,persistenceUnitClassesMap);
 		MergingPersistenceUnitManager pum = new  MyMergingPersistenceUnitManager();
 //		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");

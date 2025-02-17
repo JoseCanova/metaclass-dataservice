@@ -49,7 +49,7 @@
          }
        ],
        "hasPrimaryKey": true,
-       "className": "simple_numeric_hundred_table",
+       "className": "SimpleNumericHundredTable",
        "tableName": "simple_numeric_hundred_table"
      }
 ]
