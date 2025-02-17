@@ -1,0 +1,55 @@
+[
+    {
+       "identity": {
+         "id": null,
+         "definition": "",
+         "shortName": "simple_numeric_hundred_table.simple_numeric_hundred_table_pkey",
+         "name": "simple_numeric_hundred_table_pkey",
+         "columns": [
+           {
+             "id": null,
+             "name": "simple_key"
+           }
+         ]
+       },
+       "metaAttributes": [
+         {
+           "id": null,
+           "idAliases": null,
+           "partOfId": true,
+           "name": "simpleKey",
+           "isId": true,
+           "clazz": "java.lang.Integer",
+           "columnName": "simple_key",
+           "length": "10",
+           "required": true,
+           "sqlType": "int4",
+           "attributes": null,
+           "isPartOfIndex": true,
+           "isGenerated": false,
+           "isPartOfForeignKey": false,
+           "scale": 0
+         },
+         {
+           "id": null,
+           "idAliases": null,
+           "partOfId": false,
+           "name": "simpleHundred",
+           "isId": false,
+           "clazz": "java.math.BigDecimal",
+           "columnName": "simple_hundred",
+           "length": "5",
+           "required": true,
+           "sqlType": "numeric",
+           "attributes": null,
+           "isPartOfIndex": false,
+           "isGenerated": false,
+           "isPartOfForeignKey": false,
+           "scale": 2
+         }
+       ],
+       "hasPrimaryKey": true,
+       "className": "simple_numeric_hundred_table",
+       "tableName": "simple_numeric_hundred_table"
+     }
+]

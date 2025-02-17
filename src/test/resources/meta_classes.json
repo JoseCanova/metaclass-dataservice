@@ -1,0 +1,505 @@
+[
+  {
+    "identity": {
+      "id": null,
+      "definition": "",
+      "shortName": "simple_date_table.simple_date_table_pkey",
+      "name": "simple_date_table_pkey",
+      "columns": [
+        {
+          "id": null,
+          "name": "simple_key"
+        }
+      ]
+    },
+    "metaAttributes": [
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": false,
+        "name": "simpleDate",
+        "isId": false,
+        "clazz": "java.sql.Date",
+        "columnName": "simple_date",
+        "length": "13",
+        "required": true,
+        "sqlType": "date",
+        "attributes": null,
+        "isPartOfIndex": false,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 0
+      },
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": false,
+        "name": "simpleTimestamp",
+        "isId": false,
+        "clazz": "java.sql.Timestamp",
+        "columnName": "simple_timestamp",
+        "length": "29",
+        "required": true,
+        "sqlType": "timestamp",
+        "attributes": null,
+        "isPartOfIndex": false,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 6
+      },
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": false,
+        "name": "simpleTime",
+        "isId": false,
+        "clazz": "java.sql.Time",
+        "columnName": "simple_time",
+        "length": "15",
+        "required": true,
+        "sqlType": "time",
+        "attributes": null,
+        "isPartOfIndex": false,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 6
+      },
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": false,
+        "name": "simpleTimestampZone",
+        "isId": false,
+        "clazz": "java.sql.Timestamp",
+        "columnName": "simple_timestamp_zone",
+        "length": "35",
+        "required": true,
+        "sqlType": "timestamptz",
+        "attributes": null,
+        "isPartOfIndex": false,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 6
+      },
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": false,
+        "name": "simpleTimesZone",
+        "isId": false,
+        "clazz": "java.sql.Time",
+        "columnName": "simple_times_zone",
+        "length": "21",
+        "required": true,
+        "sqlType": "timetz",
+        "attributes": null,
+        "isPartOfIndex": false,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 6
+      },
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": true,
+        "name": "simpleKey",
+        "isId": true,
+        "clazz": "java.lang.Integer",
+        "columnName": "simple_key",
+        "length": "10",
+        "required": true,
+        "sqlType": "int4",
+        "attributes": null,
+        "isPartOfIndex": true,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 0
+      }
+    ],
+    "hasPrimaryKey": true,
+    "className": "simple_date_table",
+    "tableName": "simple_date_table"
+  },
+  {
+    "identity": {
+      "id": null,
+      "definition": "",
+      "shortName": "simple_numeric_hundred_table.simple_numeric_hundred_table_pkey",
+      "name": "simple_numeric_hundred_table_pkey",
+      "columns": [
+        {
+          "id": null,
+          "name": "simple_key"
+        }
+      ]
+    },
+    "metaAttributes": [
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": true,
+        "name": "simpleKey",
+        "isId": true,
+        "clazz": "java.lang.Integer",
+        "columnName": "simple_key",
+        "length": "10",
+        "required": true,
+        "sqlType": "int4",
+        "attributes": null,
+        "isPartOfIndex": true,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 0
+      },
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": false,
+        "name": "simpleHundred",
+        "isId": false,
+        "clazz": "java.math.BigDecimal",
+        "columnName": "simple_hundred",
+        "length": "5",
+        "required": true,
+        "sqlType": "numeric",
+        "attributes": null,
+        "isPartOfIndex": false,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 2
+      }
+    ],
+    "hasPrimaryKey": true,
+    "className": "simple_numeric_hundred_table",
+    "tableName": "simple_numeric_hundred_table"
+  },
+  {
+    "identity": {
+      "id": null,
+      "definition": "",
+      "shortName": "simple_numeric_table.simple_numeric_table_pkey",
+      "name": "simple_numeric_table_pkey",
+      "columns": [
+        {
+          "id": null,
+          "name": "simple_numeric_key"
+        }
+      ]
+    },
+    "metaAttributes": [
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": false,
+        "name": "simpleSmallintColumn",
+        "isId": false,
+        "clazz": "java.lang.Integer",
+        "columnName": "simple_smallint_column",
+        "length": "5",
+        "required": true,
+        "sqlType": "int2",
+        "attributes": null,
+        "isPartOfIndex": false,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 0
+      },
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": false,
+        "name": "simpleIntegerColumn",
+        "isId": false,
+        "clazz": "java.lang.Integer",
+        "columnName": "simple_integer_column",
+        "length": "10",
+        "required": true,
+        "sqlType": "int4",
+        "attributes": null,
+        "isPartOfIndex": false,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 0
+      },
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": false,
+        "name": "simpleNumericZeroedColumn",
+        "isId": false,
+        "clazz": "java.math.BigDecimal",
+        "columnName": "simple_numeric_zeroed_column",
+        "length": "19",
+        "required": true,
+        "sqlType": "numeric",
+        "attributes": null,
+        "isPartOfIndex": false,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 0
+      },
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": false,
+        "name": "simpleNumericFloat",
+        "isId": false,
+        "clazz": "java.lang.Float",
+        "columnName": "simple_numeric_float",
+        "length": "8",
+        "required": true,
+        "sqlType": "float4",
+        "attributes": null,
+        "isPartOfIndex": false,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 8
+      },
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": false,
+        "name": "simpleNumericInteger",
+        "isId": false,
+        "clazz": "java.lang.Integer",
+        "columnName": "simple_numeric_integer",
+        "length": "10",
+        "required": true,
+        "sqlType": "int4",
+        "attributes": null,
+        "isPartOfIndex": false,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 0
+      },
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": false,
+        "name": "simpleNumericSmallint",
+        "isId": false,
+        "clazz": "java.lang.Integer",
+        "columnName": "simple_numeric_smallint",
+        "length": "5",
+        "required": true,
+        "sqlType": "int2",
+        "attributes": null,
+        "isPartOfIndex": false,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 0
+      },
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": false,
+        "name": "simpleNumericBoolean",
+        "isId": false,
+        "clazz": "java.lang.Boolean",
+        "columnName": "simple_numeric_boolean",
+        "length": "1",
+        "required": true,
+        "sqlType": "bool",
+        "attributes": null,
+        "isPartOfIndex": false,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 0
+      },
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": false,
+        "name": "simpleNumericBigint",
+        "isId": false,
+        "clazz": "java.lang.Long",
+        "columnName": "simple_numeric_bigint",
+        "length": "19",
+        "required": true,
+        "sqlType": "int8",
+        "attributes": null,
+        "isPartOfIndex": false,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 0
+      },
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": true,
+        "name": "simpleNumericKey",
+        "isId": true,
+        "clazz": "java.lang.Integer",
+        "columnName": "simple_numeric_key",
+        "length": "10",
+        "required": true,
+        "sqlType": "int4",
+        "attributes": null,
+        "isPartOfIndex": true,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 0
+      }
+    ],
+    "hasPrimaryKey": true,
+    "className": "simple_numeric_table",
+    "tableName": "simple_numeric_table"
+  },
+  {
+    "identity": {
+      "id": null,
+      "definition": "",
+      "shortName": "simple_table.simple_table_pkey",
+      "name": "simple_table_pkey",
+      "columns": [
+        {
+          "id": null,
+          "name": "simple_key"
+        }
+      ]
+    },
+    "metaAttributes": [
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": true,
+        "name": "simpleKey",
+        "isId": true,
+        "clazz": "java.lang.String",
+        "columnName": "simple_key",
+        "length": "200",
+        "required": true,
+        "sqlType": "varchar",
+        "attributes": null,
+        "isPartOfIndex": true,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 0
+      },
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": false,
+        "name": "simpleColumn",
+        "isId": false,
+        "clazz": "java.lang.String",
+        "columnName": "simple_column",
+        "length": "200",
+        "required": true,
+        "sqlType": "varchar",
+        "attributes": null,
+        "isPartOfIndex": false,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 0
+      },
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": false,
+        "name": "simpleDate",
+        "isId": false,
+        "clazz": "java.sql.Date",
+        "columnName": "simple_date",
+        "length": "13",
+        "required": false,
+        "sqlType": "date",
+        "attributes": null,
+        "isPartOfIndex": false,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 0
+      },
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": false,
+        "name": "simpleTimestamp",
+        "isId": false,
+        "clazz": "java.sql.Timestamp",
+        "columnName": "simple_timestamp",
+        "length": "29",
+        "required": false,
+        "sqlType": "timestamp",
+        "attributes": null,
+        "isPartOfIndex": false,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 6
+      }
+    ],
+    "hasPrimaryKey": true,
+    "className": "simple_table",
+    "tableName": "simple_table"
+  },
+  {
+    "identity": {
+      "id": null,
+      "definition": "",
+      "shortName": "simple_foreign_table.simple_foreign_table_pkey",
+      "name": "simple_foreign_table_pkey",
+      "columns": [
+        {
+          "id": null,
+          "name": "simple_foreign_key"
+        }
+      ]
+    },
+    "metaAttributes": [
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": true,
+        "name": "simpleForeignKey",
+        "isId": true,
+        "clazz": "java.lang.String",
+        "columnName": "simple_foreign_key",
+        "length": "25",
+        "required": true,
+        "sqlType": "varchar",
+        "attributes": null,
+        "isPartOfIndex": true,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 0
+      },
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": false,
+        "name": "simpleForeignColumn",
+        "isId": false,
+        "clazz": "java.lang.String",
+        "columnName": "simple_foreign_column",
+        "length": "250",
+        "required": true,
+        "sqlType": "varchar",
+        "attributes": null,
+        "isPartOfIndex": false,
+        "isGenerated": false,
+        "isPartOfForeignKey": false,
+        "scale": 0
+      },
+      {
+        "id": null,
+        "idAliases": null,
+        "partOfId": false,
+        "name": "simpleKey",
+        "isId": false,
+        "clazz": "java.lang.String",
+        "columnName": "simple_key",
+        "length": "200",
+        "required": true,
+        "sqlType": "varchar",
+        "attributes": null,
+        "isPartOfIndex": false,
+        "isGenerated": false,
+        "isPartOfForeignKey": true,
+        "scale": 0
+      }
+    ],
+    "hasPrimaryKey": true,
+    "className": "simple_foreign_table",
+    "tableName": "simple_foreign_table"
+  }
+]
