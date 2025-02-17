@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.Session;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Test;
+import org.nanotek.TestMetaClassDataServiceConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jpa.support.MergingPersistenceUnitManager;
@@ -21,7 +21,7 @@ import jakarta.persistence.Query;
 import jakarta.persistence.metamodel.Metamodel;
 import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 
-@SpringBootTest
+@SpringBootTest(classes = {TestMetaClassDataServiceConfiguration.class})
 public class SingleTablePersistenceUnitManagerTest {
 
 	@Autowired
