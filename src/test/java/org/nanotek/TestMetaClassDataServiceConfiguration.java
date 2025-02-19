@@ -82,13 +82,6 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 		return new PersistenceUnityClassesMap();
 	}
 	
-	@Bean
-	@Primary
-	RepositoryClassesMap repositoryClassesConfig() {
-		return new RepositoryClassesMap();
-	}
-	
-	
 	void metaClass(InjectionClassLoader injectionClassLoader,
 			PersistenceUnityClassesMap persistenceUnitClassesMap) {
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -168,15 +161,18 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 	@Bean
 	@Primary
 	@DependsOn("entityManagerFactory")
+	@Qualifier(value="repositoryClassesMap")
 	RepositoryClassesMap repositoryClassesMap(
 			@Autowired InjectionClassLoader classLoader , 
 			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap,
-			@Autowired @Qualifier("myBf") DefaultListableBeanFactory defaultListableBeanFactory) {
+			@Autowired @Qualifier("myBf") DefaultListableBeanFactory defaultListableBeanFactory,
+			@Autowired EntityManagerFactory entityManagerFactory) {
 		var repositoryClassesMap = new RepositoryClassesMap();
 		persistenceUnitClassesMap.forEach((x,y)->{
 			Class<?> idClass = getIdClass(y);
 			Class <?> repClass = repositoryClassesMap.prepareReppositoryForClass(y, idClass, classLoader);
-			configureRepositoryBean(defaultListableBeanFactory , y , y.getSimpleName() , repClass , classLoader);
+			System.err.println(y.getSimpleName());
+			configureRepositoryBean(defaultListableBeanFactory , y , y.getSimpleName().replace("Repository", "") , repClass , classLoader,entityManagerFactory);
 		});
 		return repositoryClassesMap;
 	}
@@ -194,11 +190,12 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 	}
 	
 	private void configureRepositoryBean(DefaultListableBeanFactory defaultListableBeanFactory, Class<?> c,
-			String sNmae2, Class<?> repClass, InjectionClassLoader classLoader) {
+			String sNmae2, Class<?> repClass, InjectionClassLoader classLoader, EntityManagerFactory entityManagerFactory) {
 		SimpleEntityPathResolver pr = new SimpleEntityPathResolver(sNmae2);
-		GenericBeanDefinition bd = new GenericBeanDefinition();
+		//TODO: verify the need to replace for RootBeanDefinition
+		 GenericBeanDefinition  bd = new  GenericBeanDefinition ();
 		bd.setBeanClass(MetaClassJpaRepositoryComponentBean.class);
-		bd.setLazyInit(true);
+		bd.setLazyInit(false);
 		ConstructorArgumentValues cav = new ConstructorArgumentValues();
 		cav.addGenericArgumentValue(new ValueHolder(repClass));
 		bd.setConstructorArgumentValues(cav);
@@ -208,11 +205,15 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 				.add("beanClassLoader", classLoader)
 				.add("beanFactory", defaultListableBeanFactory)
 				.add("repositoryBaseClass", EntityBaseRepositoryImpl.class)
-				.add("entityClass", c));
+				.add("entityClass", c)
+				.add("entityManagerFactory", entityManagerFactory));
 
 		bd.addQualifier(new AutowireCandidateQualifier(repClass.getSimpleName()));
+		bd.setAutowireCandidate(true);
+		System.err.println(repClass.getSimpleName());
 		defaultListableBeanFactory.registerBeanDefinition(repClass.getSimpleName(), bd);
-		
+		System.err.println(defaultListableBeanFactory.hashCode());
+
 	}
 	
 	private Class<?> getIdClass(Class<?> y) {
@@ -260,12 +261,6 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 		factory.setPersistenceProviderClass(SpringHibernateJpaPersistenceProvider.class);
 		HibernateJpaVendorAdapter vendorAdapter = new CustomHibernateJpaVendorAdapter(classLoader,persistenceUnitClassesMap);
 		factory.setJpaVendorAdapter(vendorAdapter);
-//		factory.setJpaVendorAdapter(new JpaVendorAdapter() {
-//			
-//			@Override
-//			public PersistenceProvider getPersistenceProvider() {
-//				return new SpringHibernateJpaPersistenceProvider(classLoader, persistenceUnitClassesMap);
-//			}});
 		factory.setEntityManagerInitializer(initializer);
 		factory.setConfig(persistenceUnitClassesMap);
 //		factory.setJpaPropertyMap(buddyJpaPropertie());

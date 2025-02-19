@@ -3,8 +3,11 @@ package org.nanotek.repository.data;
 import org.nanotek.Base;
 import org.nanotek.config.PersistenceUnityClassesMap;
 import org.nanotek.config.RepositoryClassesMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.query.JpaQueryMethodFactory;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.querydsl.EntityPathResolver;
@@ -12,6 +15,7 @@ import org.springframework.data.repository.core.EntityInformation;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 
 
 public class MetaClassJpaRepositoryComponentBean<T extends MetaClassBaseEntityRepository<K, ID>, K extends Base<?>, ID> 
@@ -23,6 +27,9 @@ extends JpaRepositoryFactoryBean<T,K,ID> {
 	@Autowired 
 	RepositoryClassesMap repoConfig;
 	
+	@Autowired
+	EntityManagerFactory entityManagerFactory;
+	
 	private Class<?> entityClass;
 
 	private ObjectProvider<EntityPathResolver> resolver;
@@ -31,14 +38,19 @@ extends JpaRepositoryFactoryBean<T,K,ID> {
 	
 	protected Class<? extends T> entityRepositoryInterface;
 	
+	private static Logger logger = LoggerFactory.getLogger(MetaClassJpaRepositoryComponentBean.class);
+	
 	public MetaClassJpaRepositoryComponentBean(Class<? extends T> repositoryInterface) {
 		super(repositoryInterface);
+		logger.debug("MetaClassJpaRepositoryComponentBean instantiated");
 	}
 	
 	
 	@Override
 	public void afterPropertiesSet() {
+		setEntityManager(entityManagerFactory.createEntityManager());
 		super.afterPropertiesSet();
+		logger.debug("MetaClassJpaRepositoryComponentBean afterPropertiesSet");
 	}
 	
 	@Override
@@ -113,6 +125,16 @@ extends JpaRepositoryFactoryBean<T,K,ID> {
 
 	public void setEntityRepositoryInterface(Class<? extends T> entityRepositoryInterface) {
 		this.entityRepositoryInterface = entityRepositoryInterface;
+	}
+
+
+	public EntityManagerFactory getEntityManagerFactory() {
+		return entityManagerFactory;
+	}
+
+
+	public void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
+		this.entityManagerFactory = entityManagerFactory;
 	}
 
 }
