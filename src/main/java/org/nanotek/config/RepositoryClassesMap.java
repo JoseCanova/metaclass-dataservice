@@ -35,11 +35,11 @@ import net.bytebuddy.description.annotation.AnnotationDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.description.type.TypeDescription.Generic;
 
-public class RepositoryClassesConfig   {
+public class RepositoryClassesMap   {
 
 	private ConcurrentHashMap<String, Class<?>> entityStore;
 
-	public RepositoryClassesConfig(){
+	public RepositoryClassesMap(){
 		constructMap() ;
 	}
 
