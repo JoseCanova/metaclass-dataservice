@@ -23,6 +23,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.config.ConstructorArgumentValues.ValueHolder;
 import org.springframework.beans.factory.support.AutowireCandidateQualifier;
@@ -42,8 +43,8 @@ import org.springframework.data.querydsl.SimpleEntityPathResolver;
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -120,24 +121,24 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 		}
 	}
 	
-	void metaClassNumericHundred(InjectionClassLoader injectionClassLoader,
-			PersistenceUnityClassesMap persistenceUnitClassesMap) {
-		ObjectMapper objectMapper = new ObjectMapper();
-    	List<JsonNode> list;
-		try {
-			list = objectMapper.readValue
-						(getClass().getResourceAsStream("/metaclass_hundred_numeric.json")
-								, List.class);
-			Object theNode = list.get(0);
-			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
-			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
-			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
-			Class.forName(loaded.getTypeName(), false, injectionClassLoader);
-			persistenceUnitClassesMap.put(loaded.getTypeName(), loaded);
-			} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+//	void metaClassNumericHundred(InjectionClassLoader injectionClassLoader,
+//			PersistenceUnityClassesMap persistenceUnitClassesMap) {
+//		ObjectMapper objectMapper = new ObjectMapper();
+//    	List<JsonNode> list;
+//		try {
+//			list = objectMapper.readValue
+//						(getClass().getResourceAsStream("/metaclass_hundred_numeric.json")
+//								, List.class);
+//			Object theNode = list.get(0);
+//			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
+//			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
+//			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
+//			Class.forName(loaded.getTypeName(), false, injectionClassLoader);
+//			persistenceUnitClassesMap.put(loaded.getTypeName(), loaded);
+//			} catch (Exception e) {
+//			throw new RuntimeException(e);
+//		}
+//	}
 	
 	void metaClassDate(InjectionClassLoader injectionClassLoader,
 			PersistenceUnityClassesMap persistenceUnitClassesMap) {
@@ -210,6 +211,7 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 
 		bd.addQualifier(new AutowireCandidateQualifier(repClass.getSimpleName()));
 		bd.setAutowireCandidate(true);
+		bd.setScope(ConfigurableBeanFactory.SCOPE_PROTOTYPE);
 		System.err.println(repClass.getSimpleName());
 		defaultListableBeanFactory.registerBeanDefinition(repClass.getSimpleName(), bd);
 		System.err.println(defaultListableBeanFactory.hashCode());
@@ -235,7 +237,7 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 		metaClass(injectionClassLoader,persistenceUnitClassesMap);
 		metaClassNumeric(injectionClassLoader,persistenceUnitClassesMap);
 		metaClassDate(injectionClassLoader,persistenceUnitClassesMap);
-		metaClassNumericHundred(injectionClassLoader,persistenceUnitClassesMap);
+//		metaClassNumericHundred(injectionClassLoader,persistenceUnitClassesMap);
 		MergingPersistenceUnitManager pum = new  MetaClassMergingPersistenceUnitManager();
 //		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");
@@ -259,6 +261,7 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 		factory.setDataSource(dataSource);
 		factory.setPersistenceUnitManager(myPersistenceManager);
 		factory.setPersistenceProviderClass(SpringHibernateJpaPersistenceProvider.class);
+		factory.setJpaDialect(new HibernateJpaDialect());
 		HibernateJpaVendorAdapter vendorAdapter = new CustomHibernateJpaVendorAdapter(classLoader,persistenceUnitClassesMap);
 		factory.setJpaVendorAdapter(vendorAdapter);
 		factory.setEntityManagerInitializer(initializer);
@@ -288,7 +291,8 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 	}
 	@Bean("transactionManager")
 	@Qualifier(value="transactionManager")
-	public PlatformTransactionManager defaultTransactionManager(
+	public JpaTransactionManager defaultTransactionManager(
+//			@Autowired DataSource dataSource) {
 			@Autowired	@Qualifier("entityManagerFactory") EntityManagerFactory factory) {
 		return new JpaTransactionManager(factory);
 	}

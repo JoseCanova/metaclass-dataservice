@@ -2,19 +2,19 @@ package org.nanotek.test.jpa.repositories;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.util.stream.Stream;
-
+import org.instancio.Instancio;
 import org.junit.jupiter.api.Test;
+import org.nanotek.Base;
 import org.nanotek.TestMetaClassDataServiceConfiguration;
 import org.nanotek.config.RepositoryClassesMap;
-import org.nanotek.repository.data.EntityBaseRepositoryImpl;
+import org.nanotek.repository.data.EntityBaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.orm.hibernate5.HibernateTransactionManager;
 
 /**
  * SimpleNumericTableRepository
@@ -49,24 +49,30 @@ public class TestJpaRepositoryBean {
 	public TestJpaRepositoryBean() {
 	}
 	
+	
 	@Test
 	void testRepositoryBeanFactory(){
 		assertNotNull(defaultListableBeanFactory);
 		//Object bean = beanFactory.getBean("SimpleNumericTableRepository");
 		assertNotNull(applicationContext);
 		
-		Stream.of(defaultListableBeanFactory.getBeanDefinitionNames())
-		.forEach(n -> {
-			BeanDefinition bd = defaultListableBeanFactory.getBeanDefinition(n);
-			System.err.println(n + ": " +bd.getBeanClassName());
+		repositoryClassesMap
+		.forEach((n,y) -> {
+			BeanDefinition bd = defaultListableBeanFactory.getBeanDefinition(n+"Repository");
+			System.err.println(n + ": " + bd.getBeanClassName());
 			try {
-				Class<?> beanClass = Class.forName("org.nanotek.data.entity.mb.buddy.repositories."+n , true , defaultListableBeanFactory.getBeanClassLoader());
-//				defaultListableBeanFactory.createBean(beanClass, 0, false);
-				JpaRepository<?,?> obj = (JpaRepository) defaultListableBeanFactory.getBean(beanClass);
+				Class<?> beanClass = Class.forName("org.nanotek.data.entity.mb.buddy.repositories."+n+"Repository" , true , defaultListableBeanFactory.getBeanClassLoader());
+				Class<Base<?>> entityClass = (Class<Base<?>>) Class.forName("org.nanotek.data."+n, true , defaultListableBeanFactory.getBeanClassLoader());
+
+				//				defaultListableBeanFactory.createBean(beanClass, 0, false);
+				EntityBaseRepository<Base<?>,?> obj = (EntityBaseRepository) defaultListableBeanFactory.getBean(beanClass);
 				assertNotNull(obj);
 				obj.findAll();
+				Object instance = Instancio.create(entityClass);
+				obj.saveAndFlush(entityClass.cast(instance));
+				obj.deleteAll();
 			} catch (Exception e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 			
 			
@@ -76,5 +82,6 @@ public class TestJpaRepositoryBean {
 		System.err.println(defaultListableBeanFactory.hashCode());
 //		assertNotNull(repository);
 	}
+
 
 }

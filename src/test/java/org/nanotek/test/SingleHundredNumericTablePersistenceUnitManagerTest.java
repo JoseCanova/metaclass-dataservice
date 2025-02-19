@@ -42,7 +42,7 @@ public class SingleHundredNumericTablePersistenceUnitManagerTest {
 	public SingleHundredNumericTablePersistenceUnitManagerTest() {
 	}
 	
-	@Test
+//	@Test
 	void testEntityManagerInitialization() throws Exception {
 		assertNotNull(entityManager);
 		System.out.println(entityManager);

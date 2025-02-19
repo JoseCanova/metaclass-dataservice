@@ -4,12 +4,14 @@ import org.springframework.data.jpa.provider.PersistenceProvider;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaMetamodelEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceUnitUtil;
 import jakarta.persistence.metamodel.Metamodel;
 
 @SuppressWarnings({"rawtypes","unchecked"})
+@Transactional(transactionManager = "transactionManager" , readOnly = false)
 public class EntityBaseRepositoryImpl extends SimpleJpaRepository {
 
 	private EntityBaseRepository repository;
@@ -119,6 +121,14 @@ public class EntityBaseRepositoryImpl extends SimpleJpaRepository {
 		this.em = em;
 	}
 
+	@Override
+	public Object saveAndFlush(Object entity) {
+		return super.saveAndFlush(entity);
+	}
 
+	@Override
+	public void deleteAll() {
+		super.deleteAll();
+	}
 	
 }
