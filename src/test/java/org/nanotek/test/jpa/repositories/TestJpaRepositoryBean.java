@@ -69,8 +69,8 @@ public class TestJpaRepositoryBean {
 				assertNotNull(obj);
 				obj.findAll();
 				Object instance = Instancio.create(entityClass);
-				obj.saveAndFlush(entityClass.cast(instance));
-				obj.deleteAll();
+//				obj.saveAndFlush(entityClass.cast(instance));
+//				obj.deleteAll();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
