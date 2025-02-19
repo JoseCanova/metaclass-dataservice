@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 import org.nanotek.config.MyLocalContainerEntityManagerFactoryBean;
 import org.nanotek.config.MyMergingPersistenceUnitManager;
 import org.nanotek.config.PersistenceUnityClassesMap;
+import org.nanotek.config.RepositoryClassesConfig;
 import org.nanotek.config.SpringHibernateJpaPersistenceProvider;
 import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
 import org.nanotek.metaclass.bytebuddy.RdbmsEntityBaseBuddy;
@@ -18,6 +19,7 @@ import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
 import org.springframework.data.jpa.support.MergingPersistenceUnitManager;
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
@@ -39,12 +41,15 @@ import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
 
 @SpringBootConfiguration
 @EnableAutoConfiguration
+@EnableJpaRepositories(
+		basePackages = 
+	{"org.nanotek.data.entity.mb.buddy.repositories"}
+		, transactionManagerRef = "transactionManager")
 public class TestMetaClassDataServiceConfiguration {
 
 	public TestMetaClassDataServiceConfiguration() {
 	}
 	
-	//TODO: Builder a Stream of classloader to avoid duplicity classloader on MultipleParentClassLoader
 	@Bean
 	@Primary
 	InjectionClassLoader injectionClassLoader() {
@@ -61,6 +66,13 @@ public class TestMetaClassDataServiceConfiguration {
 	PersistenceUnityClassesMap persistenceUnitClassesMap() {
 		return new PersistenceUnityClassesMap();
 	}
+	
+	@Bean
+	@Primary
+	RepositoryClassesConfig repositoryClassesConfig() {
+		return new RepositoryClassesConfig();
+	}
+	
 	
 	void metaClass(InjectionClassLoader injectionClassLoader,
 			PersistenceUnityClassesMap persistenceUnitClassesMap) {
