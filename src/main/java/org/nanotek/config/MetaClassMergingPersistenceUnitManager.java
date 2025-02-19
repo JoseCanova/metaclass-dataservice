@@ -2,9 +2,9 @@ package org.nanotek.config;
 
 import org.springframework.data.jpa.support.MergingPersistenceUnitManager;
 
-public 	class MyMergingPersistenceUnitManager extends MergingPersistenceUnitManager {
+public 	class MetaClassMergingPersistenceUnitManager extends MergingPersistenceUnitManager {
 	
-	public MyMergingPersistenceUnitManager() {
+	public MetaClassMergingPersistenceUnitManager() {
 		super();
 	}
 	

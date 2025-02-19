@@ -56,7 +56,7 @@ public class MetaClassDataServiceConfiguration {
 	public MergingPersistenceUnitManager myPersistenceManager(@Autowired DataSource dataSource,
 			@Autowired InjectionClassLoader injectionClassLoader,
 			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap) {
-		MergingPersistenceUnitManager pum = new  MyMergingPersistenceUnitManager();
+		MergingPersistenceUnitManager pum = new  MetaClassMergingPersistenceUnitManager();
 //		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");
 		pum.setPackagesToScan("org.nanotek.data");
@@ -71,11 +71,11 @@ public class MetaClassDataServiceConfiguration {
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(
 			@Autowired DataSource dataSource ,
 			@Autowired  @Qualifier("myPersistenceManager") 
-			MyMergingPersistenceUnitManager myPersistenceManager,
+			MetaClassMergingPersistenceUnitManager myPersistenceManager,
 			@Autowired InjectionClassLoader classLoader , 
 			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap,
 			@Autowired Initializer initializer) {
-		MyLocalContainerEntityManagerFactoryBean factory = new MyLocalContainerEntityManagerFactoryBean(classLoader);
+		MetaClassLocalContainerEntityManagerFactoryBean factory = new MetaClassLocalContainerEntityManagerFactoryBean(classLoader);
 		factory.setDataSource(dataSource);
 		factory.setPersistenceUnitManager(myPersistenceManager);
 		factory.setPersistenceProviderClass(SpringHibernateJpaPersistenceProvider.class);

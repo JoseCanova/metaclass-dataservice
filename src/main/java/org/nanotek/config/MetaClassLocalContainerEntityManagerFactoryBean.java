@@ -10,7 +10,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceException;
 import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 
-public class MyLocalContainerEntityManagerFactoryBean extends LocalContainerEntityManagerFactoryBean{
+public class MetaClassLocalContainerEntityManagerFactoryBean extends LocalContainerEntityManagerFactoryBean{
 
 	@Autowired 
 	InjectionClassLoader  inkectionClassLoader;
@@ -22,7 +22,7 @@ public class MyLocalContainerEntityManagerFactoryBean extends LocalContainerEnti
 	
 	SpringHibernateJpaPersistenceProvider provider;
 	
-	public MyLocalContainerEntityManagerFactoryBean(InjectionClassLoader inkectionClassLoader2) {
+	public MetaClassLocalContainerEntityManagerFactoryBean(InjectionClassLoader inkectionClassLoader2) {
 		this.inkectionClassLoader = inkectionClassLoader2;
 	}
 	public void afterPropertiesSet2() throws PersistenceException {

@@ -6,8 +6,9 @@ import java.util.function.Consumer;
 
 import javax.sql.DataSource;
 
-import org.nanotek.config.MyLocalContainerEntityManagerFactoryBean;
-import org.nanotek.config.MyMergingPersistenceUnitManager;
+import org.nanotek.config.CustomHibernateJpaVendorAdapter;
+import org.nanotek.config.MetaClassLocalContainerEntityManagerFactoryBean;
+import org.nanotek.config.MetaClassMergingPersistenceUnitManager;
 import org.nanotek.config.PersistenceUnityClassesMap;
 import org.nanotek.config.RepositoryClassesConfig;
 import org.nanotek.config.SpringHibernateJpaPersistenceProvider;
@@ -159,7 +160,7 @@ public class TestMetaClassDataServiceConfiguration {
 		metaClassNumeric(injectionClassLoader,persistenceUnitClassesMap);
 		metaClassDate(injectionClassLoader,persistenceUnitClassesMap);
 		metaClassNumericHundred(injectionClassLoader,persistenceUnitClassesMap);
-		MergingPersistenceUnitManager pum = new  MyMergingPersistenceUnitManager();
+		MergingPersistenceUnitManager pum = new  MetaClassMergingPersistenceUnitManager();
 //		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");
 		pum.setPackagesToScan("org.nanotek.data");
@@ -174,21 +175,22 @@ public class TestMetaClassDataServiceConfiguration {
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(
 			@Autowired DataSource dataSource ,
 			@Autowired  @Qualifier("myPersistenceManager") 
-			MyMergingPersistenceUnitManager myPersistenceManager,
+			MetaClassMergingPersistenceUnitManager myPersistenceManager,
 			@Autowired InjectionClassLoader classLoader , 
 			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap,
 			@Autowired Initializer initializer) {
-		MyLocalContainerEntityManagerFactoryBean factory = new MyLocalContainerEntityManagerFactoryBean(classLoader);
+		MetaClassLocalContainerEntityManagerFactoryBean factory = new MetaClassLocalContainerEntityManagerFactoryBean(classLoader);
 		factory.setDataSource(dataSource);
 		factory.setPersistenceUnitManager(myPersistenceManager);
 		factory.setPersistenceProviderClass(SpringHibernateJpaPersistenceProvider.class);
-		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+		HibernateJpaVendorAdapter vendorAdapter = new CustomHibernateJpaVendorAdapter(classLoader,persistenceUnitClassesMap);
 		factory.setJpaVendorAdapter(vendorAdapter);
-		factory.setJpaVendorAdapter(new JpaVendorAdapter() {
-			@Override
-			public PersistenceProvider getPersistenceProvider() {
-				return new SpringHibernateJpaPersistenceProvider(classLoader, persistenceUnitClassesMap);
-			}});
+//		factory.setJpaVendorAdapter(new JpaVendorAdapter() {
+//			
+//			@Override
+//			public PersistenceProvider getPersistenceProvider() {
+//				return new SpringHibernateJpaPersistenceProvider(classLoader, persistenceUnitClassesMap);
+//			}});
 		factory.setEntityManagerInitializer(initializer);
 		factory.setConfig(persistenceUnitClassesMap);
 //		factory.setJpaPropertyMap(buddyJpaPropertie());
