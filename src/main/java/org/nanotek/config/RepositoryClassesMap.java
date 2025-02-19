@@ -69,7 +69,8 @@ public class RepositoryClassesMap   {
 				.make()
 				.load(classLoader).getLoaded();
 		System.out.println(cd.toGenericString());
-		return 	put(theEntity.name(), cd);
+		put(theEntity.name(), cd);
+		return cd;
 	}
 
 	public int size() {

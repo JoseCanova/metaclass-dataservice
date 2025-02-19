@@ -2,7 +2,7 @@ package org.nanotek.repository.data;
 
 import org.nanotek.Base;
 import org.nanotek.config.PersistenceUnityClassesMap;
-import org.nanotek.config.RepositoryClassesConfig;
+import org.nanotek.config.RepositoryClassesMap;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.query.JpaQueryMethodFactory;
@@ -21,7 +21,7 @@ extends JpaRepositoryFactoryBean<T,K,ID> {
 	PersistenceUnityClassesMap classesCondig;
 	
 	@Autowired 
-	RepositoryClassesConfig repoConfig;
+	RepositoryClassesMap repoConfig;
 	
 	private Class<?> entityClass;
 
@@ -55,11 +55,11 @@ extends JpaRepositoryFactoryBean<T,K,ID> {
 		this.classesCondig = classesCondig;
 	}
 
-	public RepositoryClassesConfig getRepoConfig() {
+	public RepositoryClassesMap getRepoConfig() {
 		return repoConfig;
 	}
 
-	public void setRepoConfig(RepositoryClassesConfig repoConfig) {
+	public void setRepoConfig(RepositoryClassesMap repoConfig) {
 		this.repoConfig = repoConfig;
 	}
 
