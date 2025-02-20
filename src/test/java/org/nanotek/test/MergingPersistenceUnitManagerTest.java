@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
-import org.nanotek.TestMetaClassDataServiceConfiguration;
+import org.nanotek.test.config.TestMetaClassDataServiceConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jpa.support.MergingPersistenceUnitManager;

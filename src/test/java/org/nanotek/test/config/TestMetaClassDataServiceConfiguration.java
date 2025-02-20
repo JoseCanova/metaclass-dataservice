@@ -1,4 +1,4 @@
-package org.nanotek;
+package org.nanotek.test.config;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import javax.sql.DataSource;
 
+import org.hibernate.SessionFactory;
 import org.nanotek.config.CustomHibernateJpaVendorAdapter;
 import org.nanotek.config.MetaClassLocalContainerEntityManagerFactoryBean;
 import org.nanotek.config.MetaClassMergingPersistenceUnitManager;
@@ -41,6 +42,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
 import org.springframework.data.jpa.support.MergingPersistenceUnitManager;
 import org.springframework.data.querydsl.SimpleEntityPathResolver;
+import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -48,7 +50,6 @@ import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.transaction.interceptor.TransactionProxyFactoryBean;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -60,7 +61,7 @@ import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
 
 @SpringBootConfiguration
-@EnableTransactionManagement
+@EnableTransactionManagement 
 @EnableAutoConfiguration(exclude = {TransactionAutoConfiguration.class })
 @EnableJpaRepositories(
 		basePackages = 
@@ -216,7 +217,7 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 
 		bd.addQualifier(new AutowireCandidateQualifier(repClass.getSimpleName()));
 		bd.setAutowireCandidate(true);
-		bd.setScope(ConfigurableBeanFactory.SCOPE_PROTOTYPE);
+		bd.setScope(ConfigurableBeanFactory.SCOPE_SINGLETON);
 		System.err.println(repClass.getSimpleName());
 		defaultListableBeanFactory.registerBeanDefinition(repClass.getSimpleName(), bd);
 		System.err.println(defaultListableBeanFactory.hashCode());
@@ -309,10 +310,18 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 	      JpaTransactionManager transactionManager = new JpaTransactionManager();
 	      transactionManager.setEntityManagerFactory(factory);
 
-		//return new HibernateTransactionManager(factory.unwrap(SessionFactory.class));
-		return transactionManager;
+//		return new HibernateTransactionManager(factory.unwrap(SessionFactory.class));
+		return transactionManager;//new DataSourceTransactionManager(dataSource);
 	}
 
+//	@Bean 
+//	@DependsOn("transactionManager")
+//	public TransactionProxyFactoryBean transactionProxyFactoryBean(@Autowired PlatformTransactionManager transactionManager) {
+//		TransactionProxyFactoryBean transactionProxyFactoryBean = new TransactionProxyFactoryBean();
+//		transactionProxyFactoryBean.setTransactionManager(transactionManager);
+//		return transactionProxyFactoryBean;
+//	}
+	
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.context = applicationContext;

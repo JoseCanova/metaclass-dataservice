@@ -125,7 +125,7 @@ public class EntityBaseRepositoryImpl extends SimpleJpaRepository {
 	}
 
 	@Override
-	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
+//	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
 	public Object  save(Object entity) {
 
 		Assert.notNull(entity, "ENTITY_MUST_NOT_BE_NULL");
@@ -139,7 +139,7 @@ public class EntityBaseRepositoryImpl extends SimpleJpaRepository {
 	}
 
 	@Override
-	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
+//	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
 	public Object saveAndFlush(Object entity) {
 
 			    Object result = save(entity);
@@ -149,14 +149,14 @@ public class EntityBaseRepositoryImpl extends SimpleJpaRepository {
 	}
 
 	@Override
-	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.SUPPORTS)
+//	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.SUPPORTS)
 	public void flush() {
 		em.flush();
 	}
 	
 	
 	@Override
-	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
+//	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
 	public void deleteAll() {
 		super.deleteAll();
 	}

@@ -1,74 +1,71 @@
-package org.nanotek.test.jpa.repositories;
+package org.nanotek.test.config;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.instancio.Instancio;
-import org.junit.jupiter.api.Test;
 import org.nanotek.Base;
 import org.nanotek.config.RepositoryClassesMap;
 import org.nanotek.repository.data.EntityBaseRepository;
-import org.nanotek.test.config.TestMetaClassDataServiceConfiguration;
+import org.nanotek.test.jpa.repositories.TestJpaRepositoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.SpringApplicationRunListener;
+import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-/**
- * SimpleNumericTableRepository
-   SimpleNumericHundredTableRepository
-   SimpleDateTableRepository
-   SimpleTableRepository
- */
+@SpringBootConfiguration(proxyBeanMethods = false)
+@Import({ TestMetaClassDataServiceConfiguration.class})
+public class TestMetaClassDataServiceApplication 
+implements SpringApplicationRunListener , 
+ApplicationRunner{
 
-@SpringBootTest(classes = {TestMetaClassDataServiceConfiguration.class})
-@Transactional(propagation = Propagation.NOT_SUPPORTED)
-public class TestJpaRepositoryBean {
-
-	private static final Logger logger = LoggerFactory.getLogger(TestJpaRepositoryBean.class);
 	
+	private static final Logger logger = LoggerFactory.getLogger(TestJpaRepositoryBean.class);
+
 	@Autowired
 	@Qualifier("myBf")
 	DefaultListableBeanFactory defaultListableBeanFactory;
 	
-	@Autowired 
-	ApplicationContext applicationContext; 
-	
 	@Autowired
 	@Qualifier("repositoryClassesMap")
 	RepositoryClassesMap repositoryClassesMap;
-	
 	
 	private TransactionTemplate transactionTemplate;
 
 	@Autowired
 	PlatformTransactionManager transactionManager;
 	
-//	@Autowired
-//	@Qualifier("SimpleTableRepository")
-//	EntityBaseRepositoryImpl repository;
-
 	
-	public TestJpaRepositoryBean() {
+	public TestMetaClassDataServiceApplication() {
 	}
 	
+	public static void main(String[] args) {
+		ApplicationContext context = SpringApplication.run(TestMetaClassDataServiceApplication.class, args);
+	}
+
+	@Override
+	public void run(ApplicationArguments args) throws Exception {
+		if (transactionManager == null)
+			throw new RuntimeException();
+		
+		testRepositoryBeanFactory();
+	}
 	
-	@Test
 	void testRepositoryBeanFactory(){
-		assertNotNull(transactionManager);
 		this.transactionTemplate = new TransactionTemplate(transactionManager);
-		assertNotNull(defaultListableBeanFactory);
 		//Object bean = beanFactory.getBean("SimpleNumericTableRepository");
-		assertNotNull(applicationContext);
 		repositoryClassesMap
 		.forEach((n,y) -> {
 			BeanDefinition bd = defaultListableBeanFactory.getBeanDefinition(n+"Repository");
@@ -113,5 +110,4 @@ public class TestJpaRepositoryBean {
 			}
 		});
 	}
-	
 }
