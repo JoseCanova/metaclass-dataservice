@@ -4,14 +4,17 @@ import org.springframework.data.jpa.provider.PersistenceProvider;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaMetamodelEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceUnitUtil;
 import jakarta.persistence.metamodel.Metamodel;
 
+@Repository
 @SuppressWarnings({"rawtypes","unchecked"})
-@Transactional(transactionManager = "transactionManager" , readOnly = false)
 public class EntityBaseRepositoryImpl extends SimpleJpaRepository {
 
 	private EntityBaseRepository repository;
@@ -122,11 +125,38 @@ public class EntityBaseRepositoryImpl extends SimpleJpaRepository {
 	}
 
 	@Override
-	public Object saveAndFlush(Object entity) {
-		return super.saveAndFlush(entity);
+	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
+	public Object  save(Object entity) {
+
+		Assert.notNull(entity, "ENTITY_MUST_NOT_BE_NULL");
+
+		if (entityInformation.isNew(entity)) {
+			em.persist(entity);
+			return entity;
+		} else {
+			return em.merge(entity);
+		}
 	}
 
 	@Override
+	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
+	public Object saveAndFlush(Object entity) {
+
+			    Object result = save(entity);
+				flush();
+
+		return result;
+	}
+
+	@Override
+	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.SUPPORTS)
+	public void flush() {
+		em.flush();
+	}
+	
+	
+	@Override
+	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
 	public void deleteAll() {
 		super.deleteAll();
 	}

@@ -14,7 +14,9 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
-import org.springframework.orm.hibernate5.HibernateTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionProxyFactoryBean;
 
 /**
  * SimpleNumericTableRepository
@@ -37,10 +39,6 @@ public class TestJpaRepositoryBean {
 	@Qualifier("repositoryClassesMap")
 	RepositoryClassesMap repositoryClassesMap;
 	
-	@Autowired
-	
-	
-	
 //	@Autowired
 //	@Qualifier("SimpleTableRepository")
 //	EntityBaseRepositoryImpl repository;
@@ -55,7 +53,6 @@ public class TestJpaRepositoryBean {
 		assertNotNull(defaultListableBeanFactory);
 		//Object bean = beanFactory.getBean("SimpleNumericTableRepository");
 		assertNotNull(applicationContext);
-		
 		repositoryClassesMap
 		.forEach((n,y) -> {
 			BeanDefinition bd = defaultListableBeanFactory.getBeanDefinition(n+"Repository");
@@ -65,12 +62,12 @@ public class TestJpaRepositoryBean {
 				Class<Base<?>> entityClass = (Class<Base<?>>) Class.forName("org.nanotek.data."+n, true , defaultListableBeanFactory.getBeanClassLoader());
 
 				//				defaultListableBeanFactory.createBean(beanClass, 0, false);
-				EntityBaseRepository<Base<?>,?> obj = (EntityBaseRepository) defaultListableBeanFactory.getBean(beanClass);
+				EntityBaseRepository<Base<?>,?> obj = (EntityBaseRepository<Base<?>, ?>) defaultListableBeanFactory.getBean(beanClass);
 				assertNotNull(obj);
-				obj.findAll();
+//				obj.findAll();
 				Object instance = Instancio.create(entityClass);
-//				obj.saveAndFlush(entityClass.cast(instance));
-//				obj.deleteAll();
+				obj.saveAndFlush(entityClass.cast(instance));
+				obj.deleteAll();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

@@ -31,6 +31,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
@@ -45,6 +46,9 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.interceptor.TransactionProxyFactoryBean;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,7 +60,8 @@ import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
 
 @SpringBootConfiguration
-@EnableAutoConfiguration
+@EnableTransactionManagement
+@EnableAutoConfiguration(exclude = {TransactionAutoConfiguration.class })
 @EnableJpaRepositories(
 		basePackages = 
 	{"org.nanotek.data.entity.mb.buddy.repositories"}
@@ -231,7 +236,7 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 
 	@Bean(value="myPersistenceManager")
 	@Qualifier(value="myPersistenceManager")
-	public MergingPersistenceUnitManager myPersistenceManager(@Autowired DataSource dataSource,
+	public synchronized MergingPersistenceUnitManager myPersistenceManager(@Autowired DataSource dataSource,
 			@Autowired InjectionClassLoader injectionClassLoader,
 			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap) {
 		metaClass(injectionClassLoader,persistenceUnitClassesMap);
@@ -250,13 +255,18 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 	
 	@Bean(name = "entityManagerFactory")
 	@Qualifier(value="entityManagerFactory")
+	@DependsOn("myPersistenceManager")
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(
 			@Autowired DataSource dataSource ,
-			@Autowired  @Qualifier("myPersistenceManager") 
-			MetaClassMergingPersistenceUnitManager myPersistenceManager,
 			@Autowired InjectionClassLoader classLoader , 
 			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap,
-			@Autowired Initializer initializer) {
+			@Autowired Initializer initializer, 
+			@Autowired MergingPersistenceUnitManager myPersistenceManager) {
+		
+//		MergingPersistenceUnitManager myPersistenceManager = myPersistenceManager( dataSource,
+//				classLoader,
+//				 persistenceUnitClassesMap);
+		
 		MetaClassLocalContainerEntityManagerFactoryBean factory = new MetaClassLocalContainerEntityManagerFactoryBean(classLoader);
 		factory.setDataSource(dataSource);
 		factory.setPersistenceUnitManager(myPersistenceManager);
@@ -289,12 +299,18 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 		}
 
 	}
+
+	@Primary
 	@Bean("transactionManager")
 	@Qualifier(value="transactionManager")
-	public JpaTransactionManager defaultTransactionManager(
+	public PlatformTransactionManager transactionManager(
 //			@Autowired DataSource dataSource) {
 			@Autowired	@Qualifier("entityManagerFactory") EntityManagerFactory factory) {
-		return new JpaTransactionManager(factory);
+	      JpaTransactionManager transactionManager = new JpaTransactionManager();
+	      transactionManager.setEntityManagerFactory(factory);
+
+		//return new HibernateTransactionManager(factory.unwrap(SessionFactory.class));
+		return transactionManager;
 	}
 
 	@Override

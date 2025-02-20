@@ -1,5 +1,13 @@
 debug: true
 
+logging:
+    level:
+     root: debug
+     org.springframework: debug
+     org.hibernate: error
+
+
+
 server:
   servlet:
     context-path: /
@@ -23,6 +31,7 @@ spring:
   hikari:
     connectionTimeout: 30000
     maximumPoolSize: 250
+    auto-commit: false
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
