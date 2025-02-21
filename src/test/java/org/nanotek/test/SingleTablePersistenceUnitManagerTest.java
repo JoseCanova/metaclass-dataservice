@@ -55,10 +55,12 @@ public class SingleTablePersistenceUnitManagerTest {
 		assertNotNull(resultList);
 		assertNotNull(classLoader);
 		executeInsert(rm);
+		rm = entityManagerFactory.createEntityManager();
 		Query query1 = rm.createQuery("select a from org.nanotek.data.SimpleTable a");
 		List<?> resultList1 = query1.getResultList();
 		assertTrue(resultList1.size()==1);
 		executeDelete(rm);
+		rm = entityManagerFactory.createEntityManager();
 		Query query11 = rm.createQuery("select a from org.nanotek.data.SimpleTable a");
 		List<?> resultList11 = query11.getResultList();
 		assertTrue(resultList11.size()==0);

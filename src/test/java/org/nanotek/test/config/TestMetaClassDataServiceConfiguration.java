@@ -8,7 +8,6 @@ import java.util.stream.Stream;
 
 import javax.sql.DataSource;
 
-import org.hibernate.SessionFactory;
 import org.nanotek.config.CustomHibernateJpaVendorAdapter;
 import org.nanotek.config.MetaClassLocalContainerEntityManagerFactoryBean;
 import org.nanotek.config.MetaClassMergingPersistenceUnitManager;
@@ -19,6 +18,7 @@ import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
 import org.nanotek.metaclass.bytebuddy.RdbmsEntityBaseBuddy;
 import org.nanotek.repository.data.EntityBaseRepositoryImpl;
 import org.nanotek.repository.data.MetaClassJpaRepositoryComponentBean;
+import org.nanotek.repository.data.MetaClassJpaTransactionManager;
 import org.nanotek.repository.data.SimpleObjectProvider;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
@@ -32,27 +32,27 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
 import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
 import org.springframework.data.jpa.support.MergingPersistenceUnitManager;
 import org.springframework.data.querydsl.SimpleEntityPathResolver;
-import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
-import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.DefaultJpaDialect;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zaxxer.hikari.HikariConfig;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -61,12 +61,12 @@ import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
 
 @SpringBootConfiguration
-@EnableTransactionManagement 
-@EnableAutoConfiguration(exclude = {TransactionAutoConfiguration.class })
-@EnableJpaRepositories(
-		basePackages = 
-	{"org.nanotek.data.entity.mb.buddy.repositories"}
-		, transactionManagerRef = "transactionManager")
+//@EnableTransactionManagement
+@EnableAutoConfiguration(exclude= {JpaRepositoriesAutoConfiguration.class,TransactionAutoConfiguration.class})
+//@EnableJpaRepositories(
+//		basePackages = 
+//	{"org.nanotek.data.entity.mb.buddy.repositories"}
+//		, transactionManagerRef = "transactionManager")
 public class TestMetaClassDataServiceConfiguration implements ApplicationContextAware{
 
 	public TestMetaClassDataServiceConfiguration() {
@@ -235,9 +235,25 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 		return Stream.of(f.getAnnotations()).filter(a ->a.annotationType().equals(jakarta.persistence.Id.class)).count()==1;
 	}
 
+	@Bean
+	@Primary
+	@ConfigurationProperties(prefix = "spring.datasource")
+	public HikariConfig hikariConfig() {
+		return new HikariConfig();
+	}
+
+//	@Bean
+//	@Primary
+//	@DependsOn("hikariConfig")
+//	public DataSource dataSource() {
+//		return new HikariDataSource(hikariConfig());
+//	}
+//	
+//	
 	@Bean(value="myPersistenceManager")
 	@Qualifier(value="myPersistenceManager")
-	public synchronized MergingPersistenceUnitManager myPersistenceManager(@Autowired DataSource dataSource,
+	@DependsOn("dataSource")
+	public MergingPersistenceUnitManager myPersistenceManager(@Autowired DataSource dataSource,
 			@Autowired InjectionClassLoader injectionClassLoader,
 			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap) {
 		metaClass(injectionClassLoader,persistenceUnitClassesMap);
@@ -269,6 +285,7 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 //				 persistenceUnitClassesMap);
 		
 		MetaClassLocalContainerEntityManagerFactoryBean factory = new MetaClassLocalContainerEntityManagerFactoryBean(classLoader);
+//		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 		factory.setDataSource(dataSource);
 		factory.setPersistenceUnitManager(myPersistenceManager);
 		factory.setPersistenceProviderClass(SpringHibernateJpaPersistenceProvider.class);
@@ -277,9 +294,9 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 		factory.setJpaVendorAdapter(vendorAdapter);
 		factory.setEntityManagerInitializer(initializer);
 		factory.setConfig(persistenceUnitClassesMap);
-//		factory.setJpaPropertyMap(buddyJpaPropertie());
 		factory.setPersistenceUnitName("buddyPU");
 		factory.afterPropertiesSet2();
+//		factory.afterPropertiesSet();
 		return factory;
 	}
 	
@@ -304,11 +321,20 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 	@Primary
 	@Bean("transactionManager")
 	@Qualifier(value="transactionManager")
+	@DependsOn("entityManagerFactory")
 	public PlatformTransactionManager transactionManager(
-//			@Autowired DataSource dataSource) {
-			@Autowired	@Qualifier("entityManagerFactory") EntityManagerFactory factory) {
-	      JpaTransactionManager transactionManager = new JpaTransactionManager();
-	      transactionManager.setEntityManagerFactory(factory);
+			@Autowired DataSource dataSource ,
+			@Autowired	@Qualifier("entityManagerFactory") LocalContainerEntityManagerFactoryBean factory) {
+			MetaClassJpaTransactionManager transactionManager = new MetaClassJpaTransactionManager();
+	      transactionManager.setEntityManagerFactory(factory.getObject());
+	      transactionManager.setJpaDialect(new HibernateJpaDialect());
+	      transactionManager.setJpaPropertyMap(factory.getObject().getProperties());
+	      transactionManager.setDataSource(dataSource);
+	      transactionManager.setNestedTransactionAllowed(true);
+//	      SessionFactoryImpl sessionFactory = factory.getObject().unwrap(SessionFactoryImpl.class);
+//
+//	      EventListenerRegistry registry = sessionFactory.getServiceRegistry().getService(EventListenerRegistry.class);
+//	      registry.getEventListenerGroup(EventType.FLUSH).appendListener(new DefaultFlushEventListener());
 
 //		return new HibernateTransactionManager(factory.unwrap(SessionFactory.class));
 		return transactionManager;//new DataSourceTransactionManager(dataSource);

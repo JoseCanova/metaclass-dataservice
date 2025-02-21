@@ -125,21 +125,22 @@ public class EntityBaseRepositoryImpl extends SimpleJpaRepository {
 	}
 
 	@Override
-//	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
+	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
 	public Object  save(Object entity) {
 
 		Assert.notNull(entity, "ENTITY_MUST_NOT_BE_NULL");
 
-		if (entityInformation.isNew(entity)) {
+//		if (entityInformation.isNew(entity)) {
 			em.persist(entity);
+			em.flush();
 			return entity;
-		} else {
-			return em.merge(entity);
-		}
+//		} else {
+//			return em.merge(entity);
+//		}
 	}
 
 	@Override
-//	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
+	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
 	public Object saveAndFlush(Object entity) {
 
 			    Object result = save(entity);
@@ -156,7 +157,7 @@ public class EntityBaseRepositoryImpl extends SimpleJpaRepository {
 	
 	
 	@Override
-//	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
+	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
 	public void deleteAll() {
 		super.deleteAll();
 	}

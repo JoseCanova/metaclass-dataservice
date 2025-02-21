@@ -4,10 +4,4 @@ import org.springframework.data.jpa.repository.support.JpaRepositoryImplementati
 import org.springframework.data.repository.query.QueryByExampleExecutor;
 
 public interface EntityRepository<T,ID> extends JpaRepositoryImplementation<T, ID> , QueryByExampleExecutor<T> {
-	
-	@Override
-	default <S extends T> S save(S entity) {
-		return null;
-	}
-	
 }

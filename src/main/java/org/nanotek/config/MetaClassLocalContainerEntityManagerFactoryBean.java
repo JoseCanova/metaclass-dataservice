@@ -1,13 +1,17 @@
 package org.nanotek.config;
 
 
+import java.util.Optional;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.util.ClassUtils;
 
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceException;
+import jakarta.persistence.spi.PersistenceProvider;
 import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 
 public class MetaClassLocalContainerEntityManagerFactoryBean extends LocalContainerEntityManagerFactoryBean{
@@ -27,10 +31,7 @@ public class MetaClassLocalContainerEntityManagerFactoryBean extends LocalContai
 	}
 	public void afterPropertiesSet2() throws PersistenceException {
 		setBeanClassLoader(inkectionClassLoader);
-		super.afterPropertiesSet();
-	}
-	@Override
-	public void afterPropertiesSet() throws PersistenceException {
+		providerClassName=SpringHibernateJpaPersistenceProvider.class.getName();
 	}
 	
 	@Override
@@ -38,21 +39,14 @@ public class MetaClassLocalContainerEntityManagerFactoryBean extends LocalContai
 		return inkectionClassLoader ;
 	}
 	
+	
 	@Override
 	protected EntityManagerFactory createNativeEntityManagerFactory() throws PersistenceException {
-
-		provider = SpringHibernateJpaPersistenceProvider.class.cast(getPersistenceProvider());
-		if (provider == null) {
-			this.providerClassName = this.getPersistenceUnitInfo() .getPersistenceProviderClassName();
-			if (providerClassName == null) {
-				throw new IllegalArgumentException(
-						"No PersistenceProvider specified in EntityManagerFactory configuration, " +
-						"and chosen PersistenceUnitInfo does not specify a provider class name either");
-			}
-			Class<?> providerClass = ClassUtils.resolveClassName(providerClassName, getBeanClassLoader());
-			provider = (SpringHibernateJpaPersistenceProvider) BeanUtils.instantiateClass(providerClass);
-		}
-
+//		getPersistenceProvider()
+		Class<?> providerClass = ClassUtils.resolveClassName(providerClassName, getBeanClassLoader());
+		provider = (SpringHibernateJpaPersistenceProvider) BeanUtils.instantiateClass(providerClass);
+		this.setPersistenceProvider(provider);
+		
 		if (logger.isDebugEnabled()) {
 			logger.debug("Building JPA container EntityManagerFactory for persistence unit '" +
 					this.getPersistenceUnitInfo().getPersistenceUnitName() + "'");

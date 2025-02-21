@@ -93,6 +93,10 @@ public class SpringHibernateJpaPersistenceProvider extends HibernatePersistenceP
 		map.put("hibernate.bytecode.provider", "bytebuddy");
 		map.put("hibernate.max_fetch_depth", "1");
 		map.put("hibernate.jpa.compliance.transaction" , true);
+		map.put("hibernate.transaction.flush_before_completion"  , true);
+		map.put("hibernate.transaction.auto_close_session" , true);
+		map.put("hibernate.current_session_context_class" , "thread" );
+		map.put("hibernate.enable_lazy_load_no_trans" , true);
 		
 //		map.put("hibernate.enable_lazy_load_no_trans", "true");
 		properties
