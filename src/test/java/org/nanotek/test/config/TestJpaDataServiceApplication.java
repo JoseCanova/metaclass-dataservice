@@ -4,17 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.instancio.Instancio;
 import org.nanotek.Base;
-import org.nanotek.config.RepositoryClassesMap;
 import org.nanotek.repository.data.EntityBaseRepository;
 import org.nanotek.test.jpa.repositories.TestJpaRepositoryBean;
-import org.nantek.test.entity.SimpleTableEntity;
-import org.nantek.test.repository.SimpleTableEntityRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -24,6 +20,7 @@ import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,10 +70,13 @@ ApplicationContextAware{
 			try {
 //				interceptor.setTransactionManager(transactionManager);
 				//				defaultListableBeanFactory.createBean(beanClass, 0, false);
-				SimpleTableEntityRepository obj = applicationContext.getBean(SimpleTableEntityRepository.class);
+				Class<?> clazz = Class.forName("org.nanotek.data.repositories.SimpleTableRepository");
+				Class<?> clazz1 = Class.forName("org.nanotek.data.SimpleTable");
+
+				JpaRepository obj = (JpaRepository) applicationContext.getBean(clazz);
 				assertNotNull(obj);
 //				obj.findAll();
-				someAnnotatedTransactionalServiceMethod(obj , SimpleTableEntity.class);
+				someAnnotatedTransactionalServiceMethod(obj , clazz1);
 //				Object instance = Instancio.create(entityClass);
 //				obj.saveAndFlush(entityClass.cast(instance));
 //				obj.deleteAll();
@@ -91,7 +91,7 @@ ApplicationContextAware{
 
 	
 	@Transactional
-	public Object someAnnotatedTransactionalServiceMethod(SimpleTableEntityRepository obj , Class<SimpleTableEntity> class1) {
+	public Object someAnnotatedTransactionalServiceMethod(JpaRepository obj , Class<?> class1) {
 				Object instance = Instancio.create(class1);
 					obj.saveAndFlush(class1.cast(instance));
 //					obj.deleteAll();

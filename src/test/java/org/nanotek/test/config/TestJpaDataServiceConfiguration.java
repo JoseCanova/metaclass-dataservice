@@ -58,7 +58,7 @@ import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
 @EnableAutoConfiguration(exclude= {JpaRepositoriesAutoConfiguration.class,TransactionAutoConfiguration.class})
 @EnableJpaRepositories(
 		basePackages = 
-	{"org.nantek.test.repository"}
+	{"org.nanotek.data.repositories"}
 		, transactionManagerRef = "transactionManager")
 public class TestJpaDataServiceConfiguration implements ApplicationContextAware{
 
@@ -124,7 +124,7 @@ public class TestJpaDataServiceConfiguration implements ApplicationContextAware{
 		MergingPersistenceUnitManager pum = new  MetaClassMergingPersistenceUnitManager();
 //		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");
-		pum.setPackagesToScan("org.nantek.test.entity");
+		pum.setPackagesToScan("org.nanotek.data");
 		pum.setDefaultDataSource(dataSource);
 //		pum.setPersistenceUnitPostProcessors(myProcessor());
 		pum.preparePersistenceUnitInfos();

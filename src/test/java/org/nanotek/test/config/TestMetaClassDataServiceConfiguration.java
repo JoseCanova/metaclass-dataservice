@@ -1,5 +1,8 @@
 package org.nanotek.test.config;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +23,7 @@ import org.nanotek.repository.data.EntityBaseRepositoryImpl;
 import org.nanotek.repository.data.MetaClassJpaRepositoryComponentBean;
 import org.nanotek.repository.data.MetaClassJpaTransactionManager;
 import org.nanotek.repository.data.SimpleObjectProvider;
+import org.nanotek.test.config.TestJpaDataServiceConfiguration.Initializer;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +48,6 @@ import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
 import org.springframework.data.jpa.support.MergingPersistenceUnitManager;
 import org.springframework.data.querydsl.SimpleEntityPathResolver;
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
-import org.springframework.orm.jpa.DefaultJpaDialect;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -101,13 +104,24 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
 			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
 			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
-			Class.forName(loaded.getTypeName(), false, injectionClassLoader);
-			persistenceUnitClassesMap.put(loaded.getTypeName(), loaded);
+			Class<?> clazz =  Class.forName(loaded.getTypeName(), false, injectionClassLoader);
+			saveClazz(clazz , injectionClassLoader,eb.getBytes());
+			persistenceUnitClassesMap.put(loaded.getTypeName(), loaded );
 			} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
+	private void saveClazz(Class<?> clazz , ClassLoader classLoader, byte[] bs) throws IOException {
+		String fileLocation = "/home/jose/git/metaclass-dataservice/target/classes/org/nanotek/data/";
+		String fileName = fileLocation.concat(clazz.getSimpleName().concat(".class"));
+		String classPath = clazz.getTypeName().replace('.', '/');// + ".class";
+        InputStream classStream = classLoader.getResourceAsStream(classPath);
+        try (FileOutputStream outputStream = new FileOutputStream(fileName)) {
+            outputStream.write(bs);
+        }
+	}
+
 	void metaClassNumeric(InjectionClassLoader injectionClassLoader,
 			PersistenceUnityClassesMap persistenceUnitClassesMap) {
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -120,8 +134,9 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
 			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
 			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
-			Class.forName(loaded.getTypeName(), false, injectionClassLoader);
+			Class<?> clazz =  Class.forName(loaded.getTypeName(), false, injectionClassLoader);
 			persistenceUnitClassesMap.put(loaded.getTypeName(), loaded);
+			saveClazz(clazz , injectionClassLoader,eb.getBytes());
 			} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -158,8 +173,9 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
 			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
 			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
-			Class.forName(loaded.getTypeName(), false, injectionClassLoader);
+			Class<?> clazz = Class.forName(loaded.getTypeName(), false, injectionClassLoader);
 			persistenceUnitClassesMap.put(loaded.getTypeName(), loaded);
+			saveClazz(clazz , injectionClassLoader,eb.getBytes());
 			} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

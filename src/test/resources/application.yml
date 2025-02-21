@@ -3,10 +3,10 @@ debug: true
 logging:
     level:
      root: debug
-     org.springframework: debug
-     org.hibernate: error
-
-
+     org.springframework: info
+     org.hibernate: debug
+     org.springframework.transaction.interceptor: debug
+     org.springframework.data.jpa.repository.support: debug
 
 server:
   servlet:
@@ -14,6 +14,8 @@ server:
   port: 8086
   
 spring:
+  main:
+    allow-circular-references: true
   jmx:
     enabled: true
   boot:
