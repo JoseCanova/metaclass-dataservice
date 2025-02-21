@@ -15,7 +15,7 @@ import jakarta.persistence.metamodel.Metamodel;
 
 @Repository
 @SuppressWarnings({"rawtypes","unchecked"})
-public class EntityBaseRepositoryImpl extends SimpleJpaRepository {
+public class EntityBaseRepositoryImpl<T, ID>  extends SimpleJpaRepository<T, ID>  {
 
 	private EntityBaseRepository repository;
 	private EntityManager proxy;
@@ -61,8 +61,6 @@ public class EntityBaseRepositoryImpl extends SimpleJpaRepository {
 			public void setMutableEntity(Class<?> mutableEntity) {
 				this.mutableEntity = mutableEntity;
 			}
-			
-			 
 			
 		};
 	}
