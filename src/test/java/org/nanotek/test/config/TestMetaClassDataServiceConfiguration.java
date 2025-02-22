@@ -89,11 +89,18 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 	@Bean
 	@Primary
 	PersistenceUnityClassesMap persistenceUnitClassesMap() {
-		return new PersistenceUnityClassesMap();
+		PersistenceUnityClassesMap persistenceUnitClassesMap = new PersistenceUnityClassesMap();
+		InjectionClassLoader injectionClassLoader = injectionClassLoader();
+		Class<?> clazz = metaClass(injectionClassLoader);
+		persistenceUnitClassesMap.put(clazz.getTypeName(),clazz);
+		Class<?> clazz1 = metaClassNumeric(injectionClassLoader);
+		persistenceUnitClassesMap.put(clazz1.getTypeName(),clazz1);
+		Class<?> clazz2 = metaClassDate(injectionClassLoader);
+		persistenceUnitClassesMap.put(clazz2.getTypeName(),clazz2);
+		return persistenceUnitClassesMap;
 	}
 	
-	void metaClass(InjectionClassLoader injectionClassLoader,
-			PersistenceUnityClassesMap persistenceUnitClassesMap) {
+	Class<?> metaClass(InjectionClassLoader injectionClassLoader) {
 		ObjectMapper objectMapper = new ObjectMapper();
     	List<JsonNode> list;
 		try {
@@ -104,10 +111,10 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
 			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
 			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
-			Class<?> clazz =  Class.forName(loaded.getTypeName(), false, injectionClassLoader);
-			saveClazz(clazz , injectionClassLoader,eb.getBytes());
-			persistenceUnitClassesMap.put(loaded.getTypeName(), loaded );
-			} catch (Exception e) {
+			
+			return  Class.forName(loaded.getTypeName(), false, injectionClassLoader);	
+		
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -122,8 +129,7 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
         }
 	}
 
-	void metaClassNumeric(InjectionClassLoader injectionClassLoader,
-			PersistenceUnityClassesMap persistenceUnitClassesMap) {
+	Class<?> metaClassNumeric(InjectionClassLoader injectionClassLoader) {
 		ObjectMapper objectMapper = new ObjectMapper();
     	List<JsonNode> list;
 		try {
@@ -134,9 +140,8 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
 			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
 			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
-			Class<?> clazz =  Class.forName(loaded.getTypeName(), false, injectionClassLoader);
-			persistenceUnitClassesMap.put(loaded.getTypeName(), loaded);
-			saveClazz(clazz , injectionClassLoader,eb.getBytes());
+		
+			return  Class.forName(loaded.getTypeName(), false, injectionClassLoader);	
 			} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -161,8 +166,7 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 //		}
 //	}
 	
-	void metaClassDate(InjectionClassLoader injectionClassLoader,
-			PersistenceUnityClassesMap persistenceUnitClassesMap) {
+	Class<?> metaClassDate(InjectionClassLoader injectionClassLoader) {
 		ObjectMapper objectMapper = new ObjectMapper();
     	List<JsonNode> list;
 		try {
@@ -173,10 +177,8 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
 			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
 			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
-			Class<?> clazz = Class.forName(loaded.getTypeName(), false, injectionClassLoader);
-			persistenceUnitClassesMap.put(loaded.getTypeName(), loaded);
-			saveClazz(clazz , injectionClassLoader,eb.getBytes());
-			} catch (Exception e) {
+			return  Class.forName(loaded.getTypeName(), false, injectionClassLoader);		
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -269,14 +271,11 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 	@Bean(value="myPersistenceManager")
 	@Qualifier(value="myPersistenceManager")
 	@DependsOn("dataSource")
-	public MergingPersistenceUnitManager myPersistenceManager(@Autowired DataSource dataSource,
+	public MetaClassMergingPersistenceUnitManager myPersistenceManager(@Autowired DataSource dataSource,
 			@Autowired InjectionClassLoader injectionClassLoader,
 			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap) {
-		metaClass(injectionClassLoader,persistenceUnitClassesMap);
-		metaClassNumeric(injectionClassLoader,persistenceUnitClassesMap);
-		metaClassDate(injectionClassLoader,persistenceUnitClassesMap);
 //		metaClassNumericHundred(injectionClassLoader,persistenceUnitClassesMap);
-		MergingPersistenceUnitManager pum = new  MetaClassMergingPersistenceUnitManager();
+		MetaClassMergingPersistenceUnitManager pum = new  MetaClassMergingPersistenceUnitManager(persistenceUnitClassesMap);
 //		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");
 		pum.setPackagesToScan("org.nanotek.data");
@@ -292,9 +291,8 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(
 			@Autowired DataSource dataSource ,
 			@Autowired InjectionClassLoader classLoader , 
-			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap,
 			@Autowired Initializer initializer, 
-			@Autowired MergingPersistenceUnitManager myPersistenceManager) {
+			@Autowired MetaClassMergingPersistenceUnitManager myPersistenceManager) {
 		
 //		MergingPersistenceUnitManager myPersistenceManager = myPersistenceManager( dataSource,
 //				classLoader,
@@ -306,10 +304,10 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 		factory.setPersistenceUnitManager(myPersistenceManager);
 		factory.setPersistenceProviderClass(SpringHibernateJpaPersistenceProvider.class);
 		factory.setJpaDialect(new HibernateJpaDialect());
-		HibernateJpaVendorAdapter vendorAdapter = new CustomHibernateJpaVendorAdapter(classLoader,persistenceUnitClassesMap);
+		HibernateJpaVendorAdapter vendorAdapter = new CustomHibernateJpaVendorAdapter(classLoader,myPersistenceManager.getPersistenceUnitClassesMap());
 		factory.setJpaVendorAdapter(vendorAdapter);
 		factory.setEntityManagerInitializer(initializer);
-		factory.setConfig(persistenceUnitClassesMap);
+		factory.setConfig(myPersistenceManager.getPersistenceUnitClassesMap());
 		factory.setPersistenceUnitName("buddyPU");
 		factory.afterPropertiesSet2();
 //		factory.afterPropertiesSet();
