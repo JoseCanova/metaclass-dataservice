@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceUnitUtil;
 import jakarta.persistence.metamodel.Metamodel;
 
@@ -123,14 +124,17 @@ public class EntityBaseRepositoryImpl<T, ID>  extends SimpleJpaRepository<T, ID>
 	}
 
 	@Override
-	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
+//	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
 	public Object  save(Object entity) {
 
 		Assert.notNull(entity, "ENTITY_MUST_NOT_BE_NULL");
-
-//		if (entityInformation.isNew(entity)) {
+		 EntityTransaction tx = em.getTransaction();
+	        tx.begin();
 			em.persist(entity);
 			em.flush();
+			tx.commit();
+//		if (entityInformation.isNew(entity)) {
+//			em.persist(entity);
 			return entity;
 //		} else {
 //			return em.merge(entity);

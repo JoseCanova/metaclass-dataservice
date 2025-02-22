@@ -45,6 +45,8 @@ public class MetaClassLocalContainerEntityManagerFactoryBean extends LocalContai
 //		getPersistenceProvider()
 		Class<?> providerClass = ClassUtils.resolveClassName(providerClassName, getBeanClassLoader());
 		provider = (SpringHibernateJpaPersistenceProvider) BeanUtils.instantiateClass(providerClass);
+		provider.setPersistenceUnityClassesConfig(persistenceUnityClassesConfig);
+		provider.setClassLoader(inkectionClassLoader);
 		this.setPersistenceProvider(provider);
 		
 		if (logger.isDebugEnabled()) {

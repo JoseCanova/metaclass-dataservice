@@ -1,11 +1,10 @@
 package org.nanotek.config;
 
 
-import java.util.Enumeration;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentHashMap.KeySetView;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -13,46 +12,70 @@ import java.util.function.Function;
 import net.bytebuddy.TypeCache;
 import net.bytebuddy.TypeCache.Sort;
 
-@SuppressWarnings("serial")
-public class PersistenceUnityClassesMap extends HashMap<String , Class<?>>{
+public class PersistenceUnityClassesMap implements Map<String , Class<?>>{
 
-	private ConcurrentHashMap<String, Class<?>> entityStore;
+	private Map<String, Class<?>> entityStore=new HashMap<String , Class<?>>();
 	
 	TypeCache<String> typeCache ;
 	
 	public PersistenceUnityClassesMap() {
 		typeCache = new TypeCache.WithInlineExpunction<>(Sort.SOFT); 
-		constructMap();
 	}
 
-	private void constructMap() {
-		entityStore = new ConcurrentHashMap<>(1000);
+	public int size() {
+		return entityStore.size();
 	}
 
-	public Class<?> create(String key) {
-		return Optional.ofNullable(entityStore.get(key)).orElse(null);
+	public boolean isEmpty() {
+		return entityStore.isEmpty();
 	}
 
+	public boolean containsKey(Object key) {
+		return entityStore.containsKey(key);
+	}
+
+	public boolean containsValue(Object value) {
+		return entityStore.containsValue(value);
+	}
+
+	public Class<?> get(Object key) {
+		return entityStore.get(key);
+	}
 
 	public Class<?> put(String key, Class<?> value) {
 		return entityStore.put(key, value);
 	}
 
+	public Class<?> remove(Object key) {
+		return entityStore.remove(key);
+	}
 
-	public KeySetView<String, Class<?>> keySet() {
+	public void putAll(Map<? extends String, ? extends Class<?>> m) {
+		entityStore.putAll(m);
+	}
+
+	public void clear() {
+		entityStore.clear();
+	}
+
+	public Set<String> keySet() {
 		return entityStore.keySet();
 	}
 
-	public boolean remove(Object key, Object value) {
-		return entityStore.remove(key, value);
+	public Collection<Class<?>> values() {
+		return entityStore.values();
 	}
 
-	public boolean replace(String key, Class<?> oldValue, Class<?> newValue) {
-		return entityStore.replace(key, oldValue, newValue);
+	public Set<Entry<String, Class<?>>> entrySet() {
+		return entityStore.entrySet();
 	}
 
-	public Class<?> replace(String key, Class<?> value) {
-		return entityStore.replace(key, value);
+	public boolean equals(Object o) {
+		return entityStore.equals(o);
+	}
+
+	public int hashCode() {
+		return entityStore.hashCode();
 	}
 
 	public Class<?> getOrDefault(Object key, Class<?> defaultValue) {
@@ -67,34 +90,41 @@ public class PersistenceUnityClassesMap extends HashMap<String , Class<?>>{
 		entityStore.replaceAll(function);
 	}
 
-	public Enumeration<String> keys() {
-		return entityStore.keys();
+	public Class<?> putIfAbsent(String key, Class<?> value) {
+		return entityStore.putIfAbsent(key, value);
 	}
 
-	public KeySetView<String, Class<?>> keySet(Class<?> mappedValue) {
-		return entityStore.keySet(mappedValue);
+	public boolean remove(Object key, Object value) {
+		return entityStore.remove(key, value);
 	}
 
-	public <U> U search(long parallelismThreshold,
-			BiFunction<? super String, ? super Class<?>, ? extends U> searchFunction) {
-		return entityStore.search(parallelismThreshold, searchFunction);
+	public boolean replace(String key, Class<?> oldValue, Class<?> newValue) {
+		return entityStore.replace(key, oldValue, newValue);
 	}
 
-	public <U> U searchKeys(long parallelismThreshold, Function<? super String, ? extends U> searchFunction) {
-		return entityStore.searchKeys(parallelismThreshold, searchFunction);
+	public Class<?> replace(String key, Class<?> value) {
+		return entityStore.replace(key, value);
 	}
 
-	public <U> U searchValues(long parallelismThreshold, Function<? super Class<?>, ? extends U> searchFunction) {
-		return entityStore.searchValues(parallelismThreshold, searchFunction);
+	public Class<?> computeIfAbsent(String key, Function<? super String, ? extends Class<?>> mappingFunction) {
+		return entityStore.computeIfAbsent(key, mappingFunction);
 	}
 
-	public <U> U searchEntries(long parallelismThreshold,
-			Function<Entry<String, Class<?>>, ? extends U> searchFunction) {
-		return entityStore.searchEntries(parallelismThreshold, searchFunction);
+	public Class<?> computeIfPresent(String key,
+			BiFunction<? super String, ? super Class<?>, ? extends Class<?>> remappingFunction) {
+		return entityStore.computeIfPresent(key, remappingFunction);
 	}
 
-	public TypeCache<String> getTypeCache() {
-		return typeCache;
+	public Class<?> compute(String key,
+			BiFunction<? super String, ? super Class<?>, ? extends Class<?>> remappingFunction) {
+		return entityStore.compute(key, remappingFunction);
 	}
+
+	public Class<?> merge(String key, Class<?> value,
+			BiFunction<? super Class<?>, ? super Class<?>, ? extends Class<?>> remappingFunction) {
+		return entityStore.merge(key, value, remappingFunction);
+	}
+
+
 
 }

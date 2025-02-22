@@ -1,21 +1,18 @@
 package org.nanotek.config;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+import org.hibernate.jpa.HibernatePersistenceProvider;
+import org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl;
+import org.nanotek.config.hibernate.MetaClassPersistenceUnitInfoDescriptor;
+import org.springframework.orm.jpa.persistenceunit.SmartPersistenceUnitInfo;
 
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.spi.PersistenceUnitInfo;
 import jakarta.persistence.spi.ProviderUtil;
-
-import org.hibernate.jpa.HibernatePersistenceProvider;
-import org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl;
-import org.hibernate.jpa.boot.internal.PersistenceUnitInfoDescriptor;
-import org.springframework.orm.jpa.persistenceunit.SmartPersistenceUnitInfo;
-
 import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
 
@@ -27,7 +24,6 @@ public class SpringHibernateJpaPersistenceProvider extends HibernatePersistenceP
 	public SpringHibernateJpaPersistenceProvider() {
 		super();
 	}
-
 
 	public SpringHibernateJpaPersistenceProvider(InjectionClassLoader classLoader,
 			PersistenceUnityClassesMap persistenceUnityClassesConfig) {
@@ -45,7 +41,6 @@ public class SpringHibernateJpaPersistenceProvider extends HibernatePersistenceP
 	
 	
 	@Override
-	@SuppressWarnings("rawtypes")
 	public EntityManagerFactory createContainerEntityManagerFactory(PersistenceUnitInfo info, Map properties) {
 		final List<String> mergedClassesAndPackages = new ArrayList<>(info.getManagedClassNames());
 		if (info instanceof SmartPersistenceUnitInfo) {
@@ -58,28 +53,7 @@ public class SpringHibernateJpaPersistenceProvider extends HibernatePersistenceP
 		}
 		
 		return new EntityManagerFactoryBuilderImpl(
-				new PersistenceUnitInfoDescriptor(info) {
-					
-					@Override
-					public String getProviderClassName() {
-						return getProvideClassName();
-					}
-					
-					@Override
-					public ClassLoader getClassLoader() {
-						return getInjectedClassLoader();
-					}
-					
-					@Override
-					public boolean isExcludeUnlistedClasses() {
-						return false;
-					}
-					
-					@Override
-					public List<String> getManagedClassNames() {
-						return mergedClassesAndPackages;
-					}
-				}, weavingProperties(properties) , classLoader !=null ? classLoader : new MultipleParentClassLoader(getClass().getClassLoader() , new ArrayList<>(), false))
+				new MetaClassPersistenceUnitInfoDescriptor(info , this,mergedClassesAndPackages), weavingProperties(properties) , classLoader !=null ? classLoader : new MultipleParentClassLoader(getClass().getClassLoader() , new ArrayList<>(), false))
 				.build();
 	}
 
@@ -132,6 +106,26 @@ public class SpringHibernateJpaPersistenceProvider extends HibernatePersistenceP
 	
 	public String getProvideClassName() {
 		return SpringHibernateJpaPersistenceProvider.class.getName();
+	}
+
+
+	public InjectionClassLoader getClassLoader() {
+		return classLoader;
+	}
+
+
+	public void setClassLoader(InjectionClassLoader classLoader) {
+		this.classLoader = classLoader;
+	}
+
+
+	public PersistenceUnityClassesMap getPersistenceUnityClassesConfig() {
+		return persistenceUnityClassesConfig;
+	}
+
+
+	public void setPersistenceUnityClassesConfig(PersistenceUnityClassesMap persistenceUnityClassesConfig) {
+		this.persistenceUnityClassesConfig = persistenceUnityClassesConfig;
 	}
 
 	
