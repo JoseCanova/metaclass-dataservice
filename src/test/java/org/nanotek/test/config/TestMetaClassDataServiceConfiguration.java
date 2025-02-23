@@ -228,6 +228,7 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 		bd.setPropertyValues(new MutablePropertyValues().add("entityPathResolver", 
 				new SimpleObjectProvider<>(pr))
 				.add("beanClassLoader", classLoader)
+				.add("classLoader", classLoader)
 				.add("beanFactory", defaultListableBeanFactory)
 				.add("repositoryBaseClass", EntityBaseRepositoryImpl.class)
 				.add("entityClass", c)

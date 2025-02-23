@@ -88,6 +88,7 @@ ApplicationContextAware{
 				assertNotNull(obj);
 //				obj.findAll();
 				someAnnotatedTransactionalServiceMethod(obj , entityClass);
+				obj.deleteAll();
 //				Object instance = Instancio.create(entityClass);
 //				obj.saveAndFlush(entityClass.cast(instance));
 //				obj.deleteAll();
@@ -104,7 +105,6 @@ ApplicationContextAware{
 	}
 
 	
-	@Transactional
 	public Object someAnnotatedTransactionalServiceMethod(EntityBaseRepository<Base<?>,?> obj , Class<Base<?>> entityClass) {
 				Object instance = Instancio.create(entityClass);
 					obj.save(entityClass.cast(instance));

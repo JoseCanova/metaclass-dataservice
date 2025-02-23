@@ -146,7 +146,6 @@ public class EntityBaseRepositoryImpl<T, ID>  extends SimpleJpaRepository<T, ID>
 	public Object saveAndFlush(Object entity) {
 
 			    Object result = save(entity);
-				flush();
 
 		return result;
 	}
@@ -154,7 +153,10 @@ public class EntityBaseRepositoryImpl<T, ID>  extends SimpleJpaRepository<T, ID>
 	@Override
 //	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.SUPPORTS)
 	public void flush() {
+		EntityTransaction tx = em.getTransaction();
+        tx.begin();
 		em.flush();
+		tx.commit();
 	}
 	
 	
@@ -162,6 +164,7 @@ public class EntityBaseRepositoryImpl<T, ID>  extends SimpleJpaRepository<T, ID>
 	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
 	public void deleteAll() {
 		super.deleteAll();
+		flush();
 	}
 	
 }

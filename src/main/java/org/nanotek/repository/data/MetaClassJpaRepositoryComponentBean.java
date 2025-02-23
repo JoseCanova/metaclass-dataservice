@@ -38,6 +38,9 @@ extends JpaRepositoryFactoryBean<T,K,ID> {
 	
 	protected Class<? extends T> entityRepositoryInterface;
 	
+	private ClassLoader classLoader;
+	
+	
 	private static Logger logger = LoggerFactory.getLogger(MetaClassJpaRepositoryComponentBean.class);
 	
 	public MetaClassJpaRepositoryComponentBean(Class<? extends T> repositoryInterface) {
@@ -108,6 +111,7 @@ extends JpaRepositoryFactoryBean<T,K,ID> {
 
 		MyJpaRepositoryFactory jpaRepositoryFactory = new MyJpaRepositoryFactory(entityManager);
 		jpaRepositoryFactory.setEntityPathResolver(resolver.getIfAvailable());
+		jpaRepositoryFactory.setBeanClassLoader(classLoader);
 //		jpaRepositoryFactory.setEscapeCharacter(escapeCharacter);
 
 		EntityInformation<? , ?> ei = jpaRepositoryFactory.getEntityInformation(getEntityClass());
@@ -136,5 +140,16 @@ extends JpaRepositoryFactoryBean<T,K,ID> {
 	public void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
 		this.entityManagerFactory = entityManagerFactory;
 	}
+
+
+	public ClassLoader getClassLoader() {
+		return classLoader;
+	}
+
+
+	public void setClassLoader(ClassLoader classLoader) {
+		this.classLoader = classLoader;
+	}
+	
 
 }

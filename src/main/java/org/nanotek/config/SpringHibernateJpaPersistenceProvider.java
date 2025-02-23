@@ -61,14 +61,15 @@ public class SpringHibernateJpaPersistenceProvider extends HibernatePersistenceP
 		Map<String,Object> map = new HashMap<>();
 		
 //		map.put("hibernate.default_entity_mode", "pojo");
-		map.put("hibernate.use_sql_comments", "true");
+		map.put("hibernate.use_sql_comments", true);
 		map.put("hibernate.jpa.compliance.query", false);
 		map.put("hibernate.id.sequence.increment_size_mismatch_strategy", "true");
 		map.put("hibernate.bytecode.provider", "bytebuddy");
 		map.put("hibernate.max_fetch_depth", "1");
+		map.put("hibernate.flushMode",org.hibernate.FlushMode.MANUAL);
 		map.put("hibernate.jpa.compliance.transaction" , true);
 		map.put("hibernate.transaction.flush_before_completion"  , true);
-		map.put("hibernate.transaction.auto_close_session" , true);
+		map.put("hibernate.transaction.auto_close_session" , false);
 		map.put("hibernate.current_session_context_class" , "thread" );
 		map.put("hibernate.enable_lazy_load_no_trans" , true);
 		
