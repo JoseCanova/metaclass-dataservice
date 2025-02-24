@@ -3,8 +3,6 @@ package org.nanotek.test.config.entity;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.instancio.Instancio;
-import org.nanotek.Base;
-import org.nanotek.repository.data.EntityBaseRepository;
 import org.nanotek.test.entity.data.SimpleTableEntity;
 import org.nanotek.test.entity.repositories.SimpleTableEntityRepository;
 import org.nanotek.test.jpa.repositories.TestJpaRepositoryBean;
@@ -24,9 +22,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 @SpringBootConfiguration(proxyBeanMethods = false)

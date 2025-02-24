@@ -77,131 +77,20 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 	public TestMetaClassDataServiceConfiguration() {
 	}
 	
-	@Bean
-	@Primary
-	InjectionClassLoader injectionClassLoader() {
-		InjectionClassLoader ic = new  MultipleParentClassLoader(Thread.currentThread().getContextClassLoader() 
-				, Arrays.asList(getClass().getClassLoader() , 
-						CrudMethodMetadata.class.getClassLoader() , 
-						AbstractEntityManagerFactoryBean.class.getClassLoader())  , 
-				false);
-		return ic;
-	}
+	
 	
 	@Bean
 	@Primary
-	PersistenceUnityClassesMap persistenceUnitClassesMap() {
-		PersistenceUnityClassesMap persistenceUnitClassesMap = new PersistenceUnityClassesMap();
-		InjectionClassLoader injectionClassLoader = injectionClassLoader();
-		Class<?> clazz = metaClass(injectionClassLoader);
-		persistenceUnitClassesMap.put(clazz.getTypeName(),clazz);
-		Class<?> clazz1 = metaClassNumeric(injectionClassLoader);
-		persistenceUnitClassesMap.put(clazz1.getTypeName(),clazz1);
-		Class<?> clazz2 = metaClassDate(injectionClassLoader);
-		persistenceUnitClassesMap.put(clazz2.getTypeName(),clazz2);
-		return persistenceUnitClassesMap;
-	}
-	
-	Class<?> metaClass(InjectionClassLoader injectionClassLoader) {
-		ObjectMapper objectMapper = new ObjectMapper();
-    	List<JsonNode> list;
-		try {
-			list = objectMapper.readValue
-						(getClass().getResourceAsStream("/metaclass.json")
-								, List.class);
-			Object theNode = list.get(0);
-			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
-			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
-			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
-			
-			return  Class.forName(loaded.getTypeName(), false, injectionClassLoader);	
-		
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	private void saveClazz(Class<?> clazz , ClassLoader classLoader, byte[] bs) throws IOException {
-		String fileLocation = "/home/jose/git/metaclass-dataservice/target/classes/org/nanotek/data/";
-		String fileName = fileLocation.concat(clazz.getSimpleName().concat(".class"));
-		String classPath = clazz.getTypeName().replace('.', '/');// + ".class";
-        InputStream classStream = classLoader.getResourceAsStream(classPath);
-        try (FileOutputStream outputStream = new FileOutputStream(fileName)) {
-            outputStream.write(bs);
-        }
-	}
-
-	Class<?> metaClassNumeric(InjectionClassLoader injectionClassLoader) {
-		ObjectMapper objectMapper = new ObjectMapper();
-    	List<JsonNode> list;
-		try {
-			list = objectMapper.readValue
-						(getClass().getResourceAsStream("/metaclass_numeric.json")
-								, List.class);
-			Object theNode = list.get(0);
-			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
-			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
-			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
-		
-			return  Class.forName(loaded.getTypeName(), false, injectionClassLoader);	
-			} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-//	void metaClassNumericHundred(InjectionClassLoader injectionClassLoader,
-//			PersistenceUnityClassesMap persistenceUnitClassesMap) {
-//		ObjectMapper objectMapper = new ObjectMapper();
-//    	List<JsonNode> list;
-//		try {
-//			list = objectMapper.readValue
-//						(getClass().getResourceAsStream("/metaclass_hundred_numeric.json")
-//								, List.class);
-//			Object theNode = list.get(0);
-//			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
-//			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
-//			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
-//			Class.forName(loaded.getTypeName(), false, injectionClassLoader);
-//			persistenceUnitClassesMap.put(loaded.getTypeName(), loaded);
-//			} catch (Exception e) {
-//			throw new RuntimeException(e);
-//		}
-//	}
-	
-	Class<?> metaClassDate(InjectionClassLoader injectionClassLoader) {
-		ObjectMapper objectMapper = new ObjectMapper();
-    	List<JsonNode> list;
-		try {
-			list = objectMapper.readValue
-						(getClass().getResourceAsStream("/meta_class_date.json")
-								, List.class);
-			Object theNode = list.get(0);
-			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
-			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
-			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
-			return  Class.forName(loaded.getTypeName(), false, injectionClassLoader);		
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	@Bean
-	@Primary
-	@DependsOn("entityManagerFactory")
 	@Qualifier(value="repositoryClassesMap")
 	RepositoryClassesMap repositoryClassesMap(
 			@Autowired InjectionClassLoader classLoader , 
-			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap,
-			@Autowired @Qualifier("myBf") DefaultListableBeanFactory defaultListableBeanFactory,
-			@Autowired EntityManagerFactory entityManagerFactory) {
+			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap) {
 		var repositoryClassesMap = new RepositoryClassesMap();
 		persistenceUnitClassesMap.forEach((x,y)->{
 			Class<?> idClass = getIdClass(y);
 			Class <?> repClass = repositoryClassesMap.prepareReppositoryForClass(y, idClass, classLoader);
 			System.err.println(y.getSimpleName());
-			configureRepositoryBean(defaultListableBeanFactory , y , y.getSimpleName().replace("Repository", "") , repClass , classLoader,entityManagerFactory);
 		});
-		configureEntityRepositoryBean(defaultListableBeanFactory ,classLoader,entityManagerFactory);
 		return repositoryClassesMap;
 	}
 	
@@ -260,8 +149,8 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 				new SimpleObjectProvider<>(pr))
 				.add("beanClassLoader", classLoader)
 				.add("beanFactory", defaultListableBeanFactory)
-				.add("repositoryBaseClass", EntityBaseRepositoryImpl.class));
-//				.add("entityManager", entityManagerFactory.createEntityManager())
+				.add("repositoryBaseClass", EntityBaseRepositoryImpl.class)
+				.add("entityManager", entityManagerFactory.createEntityManager()));
 //				.add("entityClass", SimpleTableEntity.class)
 //				.add("entityManagerFactory", entityManagerFactory));
 

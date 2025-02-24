@@ -1,4 +1,4 @@
-package org.nanotek.test.config.entity;
+package org.nanotek.test.config;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -42,27 +42,11 @@ import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
 
 @SpringBootConfiguration
 //@EnableTransactionManagement
-@EnableAutoConfiguration(exclude= {JpaRepositoriesAutoConfiguration.class,TransactionAutoConfiguration.class})
-@EnableJpaRepositories(
-		basePackages = 
-	{"org.nanotek.test.entity.repositories"}
-		, transactionManagerRef = "transactionManager")
-public class TestJpaDataServiceConfiguration implements ApplicationContextAware{
+@EnableAutoConfiguration(exclude= {JpaRepositoriesAutoConfiguration.class , TransactionAutoConfiguration.class})
+public class MetaClassJpaDataServiceConfiguration implements ApplicationContextAware{
 
-	public TestJpaDataServiceConfiguration() {
+	public MetaClassJpaDataServiceConfiguration() {
 	}
-	
-	@Bean
-	@Primary
-	InjectionClassLoader injectionClassLoader() {
-		InjectionClassLoader ic = new  MultipleParentClassLoader(Thread.currentThread().getContextClassLoader() 
-				, Arrays.asList(getClass().getClassLoader() , 
-						CrudMethodMetadata.class.getClassLoader() , 
-						AbstractEntityManagerFactoryBean.class.getClassLoader())  , 
-				false);
-		return ic;
-	}
-	
 	
 	ApplicationContext context;
 	
@@ -75,8 +59,6 @@ public class TestJpaDataServiceConfiguration implements ApplicationContextAware{
 		v.setBeanClassLoader(classLoader);
 		return v;
 	}
-	
-	
 
 	private Boolean hasIdAnnotation(Field f) {
 		return Stream.of(f.getAnnotations()).filter(a ->a.annotationType().equals(jakarta.persistence.Id.class)).count()==1;
@@ -105,7 +87,7 @@ public class TestJpaDataServiceConfiguration implements ApplicationContextAware{
 		MergingPersistenceUnitManager pum = new  MetaClassMergingPersistenceUnitManager();
 //		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");
-		pum.setPackagesToScan("org.nanotek.test.entity.data");
+		pum.setPackagesToScan("org.nanotek.data");
 		pum.setDefaultDataSource(dataSource);
 //		pum.setPersistenceUnitPostProcessors(myProcessor());
 		pum.preparePersistenceUnitInfos();

@@ -32,7 +32,7 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 @SpringBootConfiguration(proxyBeanMethods = false)
-@Import({ TestMetaClassDataServiceConfiguration.class})
+@Import({ MetaClassCustomBean.class,  TestMetaClassDataServiceConfiguration.class})
 public class TestMetaClassDataServiceApplication 
 implements SpringApplicationRunListener , 
 ApplicationRunner, 
@@ -54,6 +54,8 @@ ApplicationContextAware{
 	@Autowired
 	PlatformTransactionManager transactionManager;
 
+	
+	
 	private ApplicationContext applicationContext;
 	
 	
