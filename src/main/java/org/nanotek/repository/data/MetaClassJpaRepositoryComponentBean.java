@@ -141,7 +141,6 @@ extends JpaRepositoryFactoryBean<T,K,ID> {
 		this.entityManagerFactory = entityManagerFactory;
 	}
 
-
 	public ClassLoader getClassLoader() {
 		return classLoader;
 	}

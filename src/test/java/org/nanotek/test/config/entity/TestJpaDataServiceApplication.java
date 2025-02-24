@@ -1,10 +1,9 @@
-package org.nanotek.test.config;
+package org.nanotek.test.config.entity;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.instancio.Instancio;
 import org.nanotek.Base;
-import org.nanotek.config.RepositoryClassesMap;
 import org.nanotek.repository.data.EntityBaseRepository;
 import org.nanotek.test.entity.data.SimpleTableEntity;
 import org.nanotek.test.entity.repositories.SimpleTableEntityRepository;
@@ -14,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -32,8 +30,8 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 @SpringBootConfiguration(proxyBeanMethods = false)
-@Import({ TestMetaClassDataServiceConfiguration.class})
-public class TestMetaClassDataServiceApplication 
+@Import({ TestJpaDataServiceConfiguration.class})
+public class TestJpaDataServiceApplication 
 implements SpringApplicationRunListener , 
 ApplicationRunner, 
 ApplicationContextAware{
@@ -45,9 +43,6 @@ ApplicationContextAware{
 	@Qualifier("myBf")
 	DefaultListableBeanFactory defaultListableBeanFactory;
 	
-	@Autowired
-	@Qualifier("repositoryClassesMap")
-	RepositoryClassesMap repositoryClassesMap;
 	
 	private TransactionTemplate transactionTemplate;
 
@@ -57,12 +52,12 @@ ApplicationContextAware{
 	private ApplicationContext applicationContext;
 	
 	
-	public TestMetaClassDataServiceApplication() {
+	public TestJpaDataServiceApplication() {
 	}
 	
 	public static void main(String[] args) {
-		ApplicationContext context = SpringApplication.run(TestMetaClassDataServiceApplication.class, args);
-		TestMetaClassDataServiceApplication bean = context.getBean(TestMetaClassDataServiceApplication.class);
+		ApplicationContext context = SpringApplication.run(TestJpaDataServiceApplication.class, args);
+		TestJpaDataServiceApplication bean = context.getBean(TestJpaDataServiceApplication.class);
 		bean.testRepositoryBeanFactory();
 	}
 
@@ -74,51 +69,31 @@ ApplicationContextAware{
 	
 	void testRepositoryBeanFactory(){
 		this.transactionTemplate = new TransactionTemplate(transactionManager);
-		//Object bean = beanFactory.getBean("SimpleNumericTableRepository");
-		repositoryClassesMap
-		.forEach((n,y) -> {
-			BeanDefinition bd = defaultListableBeanFactory.getBeanDefinition(n+"Repository");
-			System.err.println(n + ": " + bd.getBeanClassName());
 			try {
-				Class<?> beanClass = Class.forName("org.nanotek.data.entity.mb.buddy.repositories."+n+"Repository" , true , defaultListableBeanFactory.getBeanClassLoader());
-				Class<Base<?>> entityClass = (Class<Base<?>>) Class.forName("org.nanotek.data."+n, true , defaultListableBeanFactory.getBeanClassLoader());
-//				TransactionInterceptor interceptor = applicationContext.getBean(TransactionInterceptor.class);
 //				interceptor.setTransactionManager(transactionManager);
 				//				defaultListableBeanFactory.createBean(beanClass, 0, false);
-				EntityBaseRepository<Base<?>,?> obj = (EntityBaseRepository<Base<?>, ?>) defaultListableBeanFactory.getBean(beanClass);
+
+				JpaRepository obj = (JpaRepository) applicationContext.getBean(SimpleTableEntityRepository.class);
 				assertNotNull(obj);
 //				obj.findAll();
-				someAnnotatedTransactionalServiceMethod(obj , entityClass);
-				obj.deleteAll();
+				someAnnotatedTransactionalServiceMethod(obj , SimpleTableEntity.class);
 //				Object instance = Instancio.create(entityClass);
 //				obj.saveAndFlush(entityClass.cast(instance));
 //				obj.deleteAll();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
-			}
-			
-			
-		}); 
+			} 
 		;
-		JpaRepository<SimpleTableEntity,String> obj = (JpaRepository<SimpleTableEntity,String>) 
-															defaultListableBeanFactory.getBean(SimpleTableEntityRepository.class);
-		someAnnotatedTransactionalServiceMethod(obj);
+		
 		System.err.println(defaultListableBeanFactory.hashCode());
 //		assertNotNull(repository);
 	}
 
-	@Transactional(readOnly=false)
-	public Object someAnnotatedTransactionalServiceMethod(JpaRepository<SimpleTableEntity,String>  obj) {
-		SimpleTableEntity instance = Instancio.create(SimpleTableEntity.class);
-			obj.saveAndFlush(instance);
-//			obj.deleteAll();
-		return instance;
-	}
-
 	
-	public Object someAnnotatedTransactionalServiceMethod(EntityBaseRepository<Base<?>,?> obj , Class<Base<?>> entityClass) {
-				Object instance = Instancio.create(entityClass);
-					obj.save(entityClass.cast(instance));
+	@Transactional
+	public Object someAnnotatedTransactionalServiceMethod(JpaRepository obj , Class<?> class1) {
+				Object instance = Instancio.create(class1);
+					obj.saveAndFlush(class1.cast(instance));
 //					obj.deleteAll();
 				return instance;
 			}

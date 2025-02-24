@@ -23,7 +23,7 @@ import org.nanotek.repository.data.EntityBaseRepositoryImpl;
 import org.nanotek.repository.data.MetaClassJpaRepositoryComponentBean;
 import org.nanotek.repository.data.MetaClassJpaTransactionManager;
 import org.nanotek.repository.data.SimpleObjectProvider;
-import org.nanotek.test.config.TestJpaDataServiceConfiguration.Initializer;
+import org.nanotek.test.entity.repositories.SimpleTableEntityRepository;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
-import org.springframework.data.jpa.support.MergingPersistenceUnitManager;
+import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.querydsl.SimpleEntityPathResolver;
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -199,6 +200,7 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 			System.err.println(y.getSimpleName());
 			configureRepositoryBean(defaultListableBeanFactory , y , y.getSimpleName().replace("Repository", "") , repClass , classLoader,entityManagerFactory);
 		});
+		configureEntityRepositoryBean(defaultListableBeanFactory ,classLoader,entityManagerFactory);
 		return repositoryClassesMap;
 	}
 	
@@ -240,7 +242,34 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 		System.err.println(repClass.getSimpleName());
 		defaultListableBeanFactory.registerBeanDefinition(repClass.getSimpleName(), bd);
 		System.err.println(defaultListableBeanFactory.hashCode());
+	}
+	
+	private void configureEntityRepositoryBean(DefaultListableBeanFactory defaultListableBeanFactory, 
+			InjectionClassLoader classLoader, EntityManagerFactory entityManagerFactory) {
+		SimpleEntityPathResolver pr = new SimpleEntityPathResolver(SimpleTableEntityRepository.class.getSimpleName());
+		//TODO: verify the need to replace for RootBeanDefinition
+		 GenericBeanDefinition  bd = new  GenericBeanDefinition ();
+		bd.setBeanClass(JpaRepositoryFactoryBean.class);
+		bd.setLazyInit(false);
+		ConstructorArgumentValues cav = new ConstructorArgumentValues();
+		cav.addGenericArgumentValue(new ValueHolder(SimpleTableEntityRepository.class));
+		bd.setConstructorArgumentValues(cav);
 
+		bd.setPropertyValues(new MutablePropertyValues().add("entityPathResolver", 
+				new SimpleObjectProvider<>(pr))
+				.add("beanClassLoader", classLoader)
+				.add("beanFactory", defaultListableBeanFactory)
+				.add("repositoryBaseClass", SimpleJpaRepository.class)
+				.add("entityManager", entityManagerFactory.createEntityManager()));
+//				.add("entityClass", SimpleTableEntity.class)
+//				.add("entityManagerFactory", entityManagerFactory));
+
+		bd.addQualifier(new AutowireCandidateQualifier(SimpleTableEntityRepository.class));
+		bd.setAutowireCandidate(true);
+		bd.setScope(ConfigurableBeanFactory.SCOPE_SINGLETON);
+		System.err.println(SimpleTableEntityRepository.class.getSimpleName());
+		defaultListableBeanFactory.registerBeanDefinition(SimpleTableEntityRepository.class.getName(), bd);
+		System.err.println(defaultListableBeanFactory.hashCode());
 	}
 	
 	private Class<?> getIdClass(Class<?> y) {
@@ -279,7 +308,7 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 		MetaClassMergingPersistenceUnitManager pum = new  MetaClassMergingPersistenceUnitManager(persistenceUnitClassesMap);
 //		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");
-		pum.setPackagesToScan("org.nanotek.data");
+		pum.setPackagesToScan("org.nanotek.data","org.nanotek.test.entity.data");
 		pum.setDefaultDataSource(dataSource);
 //		pum.setPersistenceUnitPostProcessors(myProcessor());
 		pum.preparePersistenceUnitInfos();
