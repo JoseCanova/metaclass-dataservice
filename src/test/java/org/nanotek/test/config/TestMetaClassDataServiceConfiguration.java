@@ -23,9 +23,11 @@ import org.nanotek.repository.data.EntityBaseRepositoryImpl;
 import org.nanotek.repository.data.MetaClassJpaRepositoryComponentBean;
 import org.nanotek.repository.data.MetaClassJpaTransactionManager;
 import org.nanotek.repository.data.SimpleObjectProvider;
+import org.nanotek.test.entity.data.SimpleTableEntity;
 import org.nanotek.test.entity.repositories.SimpleTableEntityRepository;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -46,7 +48,6 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.querydsl.SimpleEntityPathResolver;
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -248,7 +249,7 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 			InjectionClassLoader classLoader, EntityManagerFactory entityManagerFactory) {
 		SimpleEntityPathResolver pr = new SimpleEntityPathResolver(SimpleTableEntityRepository.class.getSimpleName());
 		//TODO: verify the need to replace for RootBeanDefinition
-		 GenericBeanDefinition  bd = new  GenericBeanDefinition ();
+		AnnotatedGenericBeanDefinition  bd = new  AnnotatedGenericBeanDefinition (JpaRepositoryFactoryBean.class);
 		bd.setBeanClass(JpaRepositoryFactoryBean.class);
 		bd.setLazyInit(false);
 		ConstructorArgumentValues cav = new ConstructorArgumentValues();
@@ -259,8 +260,8 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 				new SimpleObjectProvider<>(pr))
 				.add("beanClassLoader", classLoader)
 				.add("beanFactory", defaultListableBeanFactory)
-				.add("repositoryBaseClass", SimpleJpaRepository.class)
-				.add("entityManager", entityManagerFactory.createEntityManager()));
+				.add("repositoryBaseClass", EntityBaseRepositoryImpl.class));
+//				.add("entityManager", entityManagerFactory.createEntityManager())
 //				.add("entityClass", SimpleTableEntity.class)
 //				.add("entityManagerFactory", entityManagerFactory));
 
