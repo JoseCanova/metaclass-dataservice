@@ -98,23 +98,6 @@ ApplicationContextAware{
 				return instance;
 			}
 	
-	public Object someProgramaticServiceMethod(EntityBaseRepository<Base<?>,?> obj , Class<Base<?>> entityClass) {
-		return transactionTemplate.execute(new TransactionCallback() {
-			// the code in this method runs in a transactional context
-			public Object doInTransaction(TransactionStatus status) {
-				Object instance = Instancio.create(entityClass);
-				try {
-					obj.save(entityClass.cast(instance));
-					obj.deleteAll();
-				} catch (Exception ex) {
-					status.setRollbackOnly();
-					logger.info("problem on test" , ex);
-				}
-				return instance;
-			}
-		});
-	}
-
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
