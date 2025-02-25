@@ -3,8 +3,9 @@ package org.nanotek.test.config;
 import java.lang.reflect.Field;
 import java.util.stream.Stream;
 
+import org.nanotek.config.MetaClassClassesStore;
 import org.nanotek.config.PersistenceUnityClassesMap;
-import org.nanotek.config.RepositoryClassesMap;
+import org.nanotek.config.RepositoryClassesBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -16,15 +17,26 @@ public class MetaClassCustomRepositoryBean {
 
 
 	@Bean
+	RepositoryClassesBuilder repositoryClassesBuilder() {
+		
+		return new RepositoryClassesBuilder();
+	}
+	
+	
+	@Bean
 	@Primary
 	@Qualifier(value="repositoryClassesMap")
-	RepositoryClassesMap repositoryClassesMap(
+	MetaClassClassesStore  repositoryClassesMap(
 			@Autowired InjectionClassLoader classLoader , 
-			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap) {
-		var repositoryClassesMap = new RepositoryClassesMap();
+			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap, 
+			@Autowired RepositoryClassesBuilder repositoryClassesBuilder) {
+		var repositoryClassesMap = new  MetaClassClassesStore  ();
 		persistenceUnitClassesMap.forEach((x,y)->{
 			Class<?> idClass = getIdClass(y);
-			Class <?> repClass = repositoryClassesMap.prepareReppositoryForClass(y, idClass, classLoader);
+			Class <?> repClass = repositoryClassesBuilder.prepareReppositoryForClass(y, idClass, classLoader);
+			
+			repositoryClassesMap.put(repClass.getTypeName() , repClass);
+			
 			System.err.println(y.getSimpleName());
 		});
 		return repositoryClassesMap;

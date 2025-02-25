@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.nanotek.config.PersistenceUnityClassesMap;
-import org.nanotek.config.RepositoryClassesMap;
+import org.nanotek.config.RepositoryClassesBuilder;
 import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
 import org.nanotek.metaclass.bytebuddy.RdbmsEntityBaseBuddy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,10 +95,10 @@ public class MetaClassCustomBean {
 	@Bean
 	@Primary
 	@Qualifier(value="repositoryClassesMap")
-	RepositoryClassesMap repositoryClassesMap(
+	RepositoryClassesBuilder repositoryClassesMap(
 			@Autowired InjectionClassLoader classLoader , 
 			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap) {
-		var repositoryClassesMap = new RepositoryClassesMap();
+		var repositoryClassesMap = new RepositoryClassesBuilder();
 		persistenceUnitClassesMap.forEach((x,y)->{
 			Class<?> idClass = getIdClass(y);
 			Class <?> repClass = repositoryClassesMap.prepareReppositoryForClass(y, idClass, classLoader);
