@@ -4,60 +4,21 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.RepositoryDefinition;
-import org.springframework.stereotype.Repository;
-
-import jakarta.persistence.Entity;
-import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.ClassFileVersion;
-import net.bytebuddy.description.annotation.AnnotationDescription;
-import net.bytebuddy.description.type.TypeDescription;
-import net.bytebuddy.description.type.TypeDescription.Generic;
-
-public class RepositoryClassesBuilder   {
+public class MetaClassClassesStore  {
 
 	private HashMap<String, Class<?>> entityStore;
 
-	public RepositoryClassesBuilder(){
+	public MetaClassClassesStore(){
 		constructMap() ;
 	}
 
 	private void constructMap() {
 		entityStore = new HashMap<>();
-	}
-
-
-	public Class<?> prepareReppositoryForClass(Class<?> clazz , Class<?> idClass, ClassLoader classLoader){
-		Generic typeDescription = TypeDescription.Generic.Builder.parameterizedType(JpaRepository.class, clazz , idClass).build().asGenericType();
-		Entity theEntity = clazz.getAnnotation(Entity.class);
-		Optional.ofNullable(theEntity).orElseThrow();
-		Class<?> cd =   new ByteBuddy(ClassFileVersion.JAVA_V22)
-//				.makeInterface(EntityBaseRepository.class)
-				.makeInterface(typeDescription)
-				.name( "org.nanotek.test.config.repositories." + theEntity.name() +"Repository")
-				.annotateType( AnnotationDescription.Builder.ofType(Repository.class)
-						.build())
-				.annotateType( AnnotationDescription.Builder.ofType(Qualifier.class)
-						.define("value",  theEntity.name()+"Repository")
-						.build())
-//				.annotateType(AnnotationDescription.Builder.ofType(RepositoryDefinition.class)
-//						.define("domainClass",clazz)
-//						.define("idClass", idClass)
-//						.build()
-//						)
-				.make()
-				.load(classLoader).getLoaded();
-		System.out.println(cd.toGenericString());
-		put(theEntity.name(), cd);
-		return cd;
 	}
 
 	public int size() {
