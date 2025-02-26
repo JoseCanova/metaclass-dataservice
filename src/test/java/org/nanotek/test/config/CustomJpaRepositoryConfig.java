@@ -14,10 +14,6 @@ import jakarta.persistence.EntityManagerFactory;
 import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 
 @SpringBootConfiguration
-@EnableJpaRepositories(
-		basePackages = 
-	{"org.nanotek.test.config"}
-		, transactionManagerRef = "transactionManager")
 public class CustomJpaRepositoryConfig {
 	
 	@Autowired InjectionClassLoader classLoader;

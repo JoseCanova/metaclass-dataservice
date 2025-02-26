@@ -8,7 +8,7 @@ import java.util.List;
 import org.instancio.Instancio;
 import org.nanotek.Base;
 import org.nanotek.config.RepositoryClassesBuilder;
-import org.nanotek.config.VFSClassLoader;
+import org.nanotek.config.MetaClassVFSURLClassLoader;
 import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
 import org.nanotek.metaclass.bytebuddy.RdbmsEntityBaseBuddy;
 import org.nanotek.test.jpa.repositories.TestJpaRepositoryBean;
@@ -63,8 +63,8 @@ ApplicationContextAware{
 	
 	@Bean
 	@Primary
-	VFSClassLoader vfsClassLoader(@Autowired InjectionClassLoader injectionClassLoader) throws Exception{
-		VFSClassLoader vfsClassLoader = VFSClassLoader.createVFSClassLoader("ram://", injectionClassLoader);
+	MetaClassVFSURLClassLoader vfsClassLoader(@Autowired InjectionClassLoader injectionClassLoader) throws Exception{
+		MetaClassVFSURLClassLoader vfsClassLoader = MetaClassVFSURLClassLoader.createVFSClassLoader("ram://", injectionClassLoader);
 		return vfsClassLoader;
 	}
 	
@@ -83,7 +83,7 @@ ApplicationContextAware{
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		InjectionClassLoader injectionClassLoader = applicationContext.getBean(InjectionClassLoader.class);
-		VFSClassLoader vfsClassLoader = applicationContext.getBean(VFSClassLoader.class);
+		MetaClassVFSURLClassLoader vfsClassLoader = applicationContext.getBean(MetaClassVFSURLClassLoader.class);
 //		context.setClassLoader(customClassLoader);
         
         TestMetaClassDataServiceApplication2 bean = applicationContext.getBean(TestMetaClassDataServiceApplication2.class);
@@ -92,7 +92,7 @@ ApplicationContextAware{
 	
 	
 	public void runApplicationContext (AnnotationConfigApplicationContext context , 
-			InjectionClassLoader injectionClassLoader , VFSClassLoader vfsClassLoader ) {
+			InjectionClassLoader injectionClassLoader , MetaClassVFSURLClassLoader vfsClassLoader ) {
         
 		AnnotationConfigApplicationContext childContext = new AnnotationConfigApplicationContext();
         childContext.setClassLoader(vfsClassLoader);

@@ -7,8 +7,10 @@ import java.util.stream.Stream;
 
 import javax.sql.DataSource;
 
+import org.nanotek.config.MetaClassClassesStore;
 import org.nanotek.config.MetaClassMergingPersistenceUnitManager;
 import org.nanotek.config.SpringHibernateJpaPersistenceProvider;
+import org.nanotek.config.MetaClassVFSURLClassLoader;
 import org.nanotek.repository.data.MetaClassJpaTransactionManager;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,13 +44,18 @@ import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
 
 @SpringBootConfiguration
 //@EnableTransactionManagement
-@EnableAutoConfiguration(exclude= {JpaRepositoriesAutoConfiguration.class , TransactionAutoConfiguration.class})
+@EnableAutoConfiguration(exclude= {TransactionAutoConfiguration.class})
+@EnableJpaRepositories(
+		basePackages = 
+	{"org.nanotek.test.config"}
+		, transactionManagerRef = "transactionManager")
 public class MetaClassJpaDataServiceConfiguration implements ApplicationContextAware{
 
 	public MetaClassJpaDataServiceConfiguration() {
 	}
 	
 	ApplicationContext context;
+	
 	
 	@Bean 
 	@Qualifier(value="myBf")

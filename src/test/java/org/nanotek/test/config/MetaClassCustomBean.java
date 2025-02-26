@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 
 import org.nanotek.config.MetaClassClassesStore;
 import org.nanotek.config.RepositoryClassesBuilder;
-import org.nanotek.config.VFSClassLoader;
+import org.nanotek.config.MetaClassVFSURLClassLoader;
 import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
 import org.nanotek.metaclass.bytebuddy.RdbmsEntityBaseBuddy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class MetaClassCustomBean {
 
 	@Bean
 	@Primary
-	MetaClassClassesStore persistenceUnitClassesMap(@Autowired VFSClassLoader injectionClassLoader) {
+	MetaClassClassesStore persistenceUnitClassesMap(@Autowired MetaClassVFSURLClassLoader injectionClassLoader) {
 		MetaClassClassesStore persistenceUnitClassesMap = new MetaClassClassesStore();
 		Class<?> clazz = metaClass(injectionClassLoader);
 		persistenceUnitClassesMap.put(clazz.getTypeName(),clazz);
@@ -37,7 +37,7 @@ public class MetaClassCustomBean {
 		return persistenceUnitClassesMap;
 	}
 	
-	Class<?> metaClass(VFSClassLoader injectionClassLoader) {
+	Class<?> metaClass(MetaClassVFSURLClassLoader injectionClassLoader) {
 		ObjectMapper objectMapper = new ObjectMapper();
     	List<JsonNode> list;
 		try {
@@ -57,7 +57,7 @@ public class MetaClassCustomBean {
 		}
 	}
 	
-	Class<?> metaClassNumeric(VFSClassLoader injectionClassLoader) {
+	Class<?> metaClassNumeric(MetaClassVFSURLClassLoader injectionClassLoader) {
 		ObjectMapper objectMapper = new ObjectMapper();
     	List<JsonNode> list;
 		try {
@@ -75,7 +75,7 @@ public class MetaClassCustomBean {
 		}
 	}
 	
-	Class<?> metaClassDate(VFSClassLoader injectionClassLoader) {
+	Class<?> metaClassDate(MetaClassVFSURLClassLoader injectionClassLoader) {
 		ObjectMapper objectMapper = new ObjectMapper();
     	List<JsonNode> list;
 		try {
@@ -99,7 +99,7 @@ public class MetaClassCustomBean {
 	@Primary
 	@Qualifier(value="repositoryClassesMap")
 	RepositoryClassesBuilder repositoryClassesMap(
-			@Autowired InjectionClassLoader classLoader , 
+			@Autowired MetaClassVFSURLClassLoader classLoader , 
 			@Autowired MetaClassClassesStore persistenceUnitClassesMap) {
 		var repositoryClassesMap = new RepositoryClassesBuilder();
 		persistenceUnitClassesMap.forEach((x,y)->{

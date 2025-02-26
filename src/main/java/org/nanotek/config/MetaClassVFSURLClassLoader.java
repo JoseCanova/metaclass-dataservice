@@ -18,25 +18,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 
-public class VFSClassLoader extends URLClassLoader {
+public class MetaClassVFSURLClassLoader extends URLClassLoader {
 
 	static FileSystemManager fsManager;
 	static FileObject fileObject; 
 	static String baseUrl="/home/jose/git/metaclass-dataservice/target/test-classes/";
 	
-    public VFSClassLoader(URL[] urls) {
+    public MetaClassVFSURLClassLoader(URL[] urls) {
         super(urls);
     }
 
-    public VFSClassLoader(URL[] urls, InjectionClassLoader injectionClassLoader) {
+    public MetaClassVFSURLClassLoader(URL[] urls, InjectionClassLoader injectionClassLoader) {
     	super(urls,injectionClassLoader);
     }
 
-	public static VFSClassLoader createVFSClassLoader(String vfsUrl, InjectionClassLoader injectionClassLoader) throws Exception {
+	public static MetaClassVFSURLClassLoader createVFSClassLoader(String vfsUrl, InjectionClassLoader injectionClassLoader) throws Exception {
         fsManager = VFS.getManager();
         fileObject = fsManager.resolveFile(vfsUrl);
         URL url = fileObject.getURL();
-        return new VFSClassLoader(new URL[]{url},injectionClassLoader);
+        return new MetaClassVFSURLClassLoader(new URL[]{url},injectionClassLoader);
     }
 
 	public URL getBaseURl() {

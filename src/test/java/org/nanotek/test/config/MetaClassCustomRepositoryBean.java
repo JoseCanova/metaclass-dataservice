@@ -4,14 +4,12 @@ import java.lang.reflect.Field;
 import java.util.stream.Stream;
 
 import org.nanotek.config.MetaClassClassesStore;
-import org.nanotek.config.MetaClassClassesStore;
 import org.nanotek.config.RepositoryClassesBuilder;
+import org.nanotek.config.MetaClassVFSURLClassLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-
-import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 
 public class MetaClassCustomRepositoryBean {
 
@@ -27,7 +25,7 @@ public class MetaClassCustomRepositoryBean {
 	@Primary
 	@Qualifier(value="repositoryClassesMap")
 	MetaClassClassesStore  repositoryClassesMap(
-			@Autowired InjectionClassLoader classLoader , 
+			@Autowired MetaClassVFSURLClassLoader classLoader , 
 			@Autowired MetaClassClassesStore persistenceUnitClassesMap, 
 			@Autowired RepositoryClassesBuilder repositoryClassesBuilder) {
 		var repositoryClassesMap = new  MetaClassClassesStore  ();

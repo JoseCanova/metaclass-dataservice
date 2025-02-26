@@ -1,29 +1,22 @@
 package org.nanotek.test.config;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import javax.sql.DataSource;
 
+import org.nanotek.config.MetaClassVFSURLClassLoader;
 import org.nanotek.config.CustomHibernateJpaVendorAdapter;
+import org.nanotek.config.MetaClassClassesStore;
 import org.nanotek.config.MetaClassLocalContainerEntityManagerFactoryBean;
 import org.nanotek.config.MetaClassMergingPersistenceUnitManager;
-import org.nanotek.config.MetaClassClassesStore;
 import org.nanotek.config.RepositoryClassesBuilder;
 import org.nanotek.config.SpringHibernateJpaPersistenceProvider;
-import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
-import org.nanotek.metaclass.bytebuddy.RdbmsEntityBaseBuddy;
 import org.nanotek.repository.data.EntityBaseRepositoryImpl;
 import org.nanotek.repository.data.MetaClassJpaRepositoryComponentBean;
 import org.nanotek.repository.data.MetaClassJpaTransactionManager;
 import org.nanotek.repository.data.SimpleObjectProvider;
-import org.nanotek.test.entity.data.SimpleTableEntity;
 import org.nanotek.test.entity.repositories.SimpleTableEntityRepository;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
@@ -46,24 +39,19 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.querydsl.SimpleEntityPathResolver;
-import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariConfig;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.metamodel.Metamodel;
 import net.bytebuddy.dynamic.loading.InjectionClassLoader;
-import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
 
 @SpringBootConfiguration
 //@EnableTransactionManagement
@@ -83,7 +71,7 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 	@Primary
 	@Qualifier(value="repositoryClassesMap")
 	RepositoryClassesBuilder repositoryClassesMap(
-			@Autowired InjectionClassLoader classLoader , 
+			@Autowired MetaClassVFSURLClassLoader classLoader , 
 			@Autowired MetaClassClassesStore persistenceUnitClassesMap) {
 		var repositoryClassesMap = new RepositoryClassesBuilder();
 		persistenceUnitClassesMap.forEach((x,y)->{

@@ -1,5 +1,6 @@
 package org.nanotek.config;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +13,6 @@ import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.RepositoryDefinition;
 import org.springframework.stereotype.Repository;
 
 import jakarta.persistence.Entity;
@@ -21,6 +21,7 @@ import net.bytebuddy.ClassFileVersion;
 import net.bytebuddy.description.annotation.AnnotationDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.description.type.TypeDescription.Generic;
+import net.bytebuddy.dynamic.DynamicType;
 
 public class RepositoryClassesBuilder   {
 
@@ -35,11 +36,11 @@ public class RepositoryClassesBuilder   {
 	}
 
 
-	public Class<?> prepareReppositoryForClass(Class<?> clazz , Class<?> idClass, ClassLoader classLoader){
+	public Class<?> prepareReppositoryForClass(Class<?> clazz , Class<?> idClass, MetaClassVFSURLClassLoader classLoader){
 		Generic typeDescription = TypeDescription.Generic.Builder.parameterizedType(JpaRepository.class, clazz , idClass).build().asGenericType();
 		Entity theEntity = clazz.getAnnotation(Entity.class);
 		Optional.ofNullable(theEntity).orElseThrow();
-		Class<?> cd =   new ByteBuddy(ClassFileVersion.JAVA_V22)
+		DynamicType.Unloaded<?> unloaded =   new ByteBuddy(ClassFileVersion.JAVA_V22)
 //				.makeInterface(EntityBaseRepository.class)
 				.makeInterface(typeDescription)
 				.name( "org.nanotek.test.config.repositories." + theEntity.name() +"Repository")
@@ -53,8 +54,14 @@ public class RepositoryClassesBuilder   {
 //						.define("idClass", idClass)
 //						.build()
 //						)
-				.make()
-				.load(classLoader).getLoaded();
+				.make();
+				
+		Class<?> cd =			unloaded.load(classLoader).getLoaded();
+		try {
+			classLoader.saveClassFile(cd.getTypeName(), unloaded.getBytes());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		System.out.println(cd.toGenericString());
 		put(theEntity.name(), cd);
 		return cd;
