@@ -72,7 +72,7 @@ public class MetaClassDataServiceConfiguration {
 			@Autowired DataSource dataSource ,
 			@Autowired  @Qualifier("myPersistenceManager") 
 			MetaClassMergingPersistenceUnitManager myPersistenceManager,
-			@Autowired InjectionClassLoader classLoader , 
+			@Autowired MetaClassVFSURLClassLoader classLoader , 
 			@Autowired MetaClassClassesStore persistenceUnitClassesMap,
 			@Autowired Initializer initializer) {
 		MetaClassLocalContainerEntityManagerFactoryBean factory = new MetaClassLocalContainerEntityManagerFactoryBean(classLoader);

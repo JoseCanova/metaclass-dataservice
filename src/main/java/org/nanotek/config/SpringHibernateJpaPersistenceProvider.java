@@ -18,14 +18,14 @@ import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
 
 public class SpringHibernateJpaPersistenceProvider extends HibernatePersistenceProvider {
 
-	private InjectionClassLoader classLoader = null;
+	private MetaClassVFSURLClassLoader classLoader = null;
 	private MetaClassClassesStore persistenceUnityClassesConfig;
 
 	public SpringHibernateJpaPersistenceProvider() {
 		super();
 	}
 
-	public SpringHibernateJpaPersistenceProvider(InjectionClassLoader classLoader,
+	public SpringHibernateJpaPersistenceProvider(MetaClassVFSURLClassLoader classLoader,
 			MetaClassClassesStore persistenceUnityClassesConfig) {
 		super();
 		this.classLoader = classLoader;
@@ -85,14 +85,14 @@ public class SpringHibernateJpaPersistenceProvider extends HibernatePersistenceP
 
 
 	public EntityManagerFactory createContainerEntityManagerFactory(PersistenceUnitInfo persistenceUnitInfo,
-			Map<String, Object> jpaPropertyMap, InjectionClassLoader inkectionClassLoader) {
+			Map<String, Object> jpaPropertyMap, MetaClassVFSURLClassLoader inkectionClassLoader) {
 		this.classLoader  = inkectionClassLoader;
 		return createContainerEntityManagerFactory( persistenceUnitInfo,  jpaPropertyMap);
 	}
 
 
 	public EntityManagerFactory createContainerEntityManagerFactory(PersistenceUnitInfo persistenceUnitInfo,
-			Map<String, Object> jpaPropertyMap, InjectionClassLoader inkectionClassLoader,
+			Map<String, Object> jpaPropertyMap, MetaClassVFSURLClassLoader inkectionClassLoader,
 			MetaClassClassesStore persistenceUnityClassesConfig2) {
 		// TODO Auto-generated method stub
 		this.persistenceUnityClassesConfig = persistenceUnityClassesConfig2;
@@ -101,7 +101,7 @@ public class SpringHibernateJpaPersistenceProvider extends HibernatePersistenceP
 	}
 
 
-	public InjectionClassLoader getInjectedClassLoader() {
+	public MetaClassVFSURLClassLoader getInjectedClassLoader() {
 		return classLoader;
 	}
 	
@@ -110,12 +110,12 @@ public class SpringHibernateJpaPersistenceProvider extends HibernatePersistenceP
 	}
 
 
-	public InjectionClassLoader getClassLoader() {
+	public MetaClassVFSURLClassLoader getClassLoader() {
 		return classLoader;
 	}
 
 
-	public void setClassLoader(InjectionClassLoader classLoader) {
+	public void setClassLoader(MetaClassVFSURLClassLoader classLoader) {
 		this.classLoader = classLoader;
 	}
 

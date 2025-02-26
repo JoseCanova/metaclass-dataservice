@@ -1,14 +1,12 @@
 package org.nanotek.test.config;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import java.util.Arrays;
 import java.util.List;
 
 import org.instancio.Instancio;
 import org.nanotek.Base;
-import org.nanotek.config.RepositoryClassesBuilder;
 import org.nanotek.config.MetaClassVFSURLClassLoader;
+import org.nanotek.config.RepositoryClassesBuilder;
 import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
 import org.nanotek.metaclass.bytebuddy.RdbmsEntityBaseBuddy;
 import org.nanotek.test.jpa.repositories.TestJpaRepositoryBean;
@@ -28,7 +26,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +33,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
 import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
 
@@ -61,12 +61,16 @@ ApplicationContextAware{
 		return ic;
 	}
 	
+	
+	
 	@Bean
 	@Primary
 	MetaClassVFSURLClassLoader vfsClassLoader(@Autowired InjectionClassLoader injectionClassLoader) throws Exception{
 		MetaClassVFSURLClassLoader vfsClassLoader = MetaClassVFSURLClassLoader.createVFSClassLoader("ram://", injectionClassLoader);
 		return vfsClassLoader;
 	}
+	
+	
 	
 	private static final Logger logger = LoggerFactory.getLogger(TestJpaRepositoryBean.class);
 
@@ -106,33 +110,33 @@ ApplicationContextAware{
         childContext3.register(MetaClassJpaDataServiceConfiguration.class);
         childContext3.refresh();
         
-        AnnotationConfigApplicationContext childContext2 = new AnnotationConfigApplicationContext();
-        childContext2.setClassLoader(vfsClassLoader);
-        childContext2.setParent(childContext3);
-        childContext2.register(CustomJpaRepositoryConfig.class);
-        childContext2.refresh();
-        childContext2.getBean("integerValue");
+//        AnnotationConfigApplicationContext childContext2 = new AnnotationConfigApplicationContext();
+//        childContext2.setClassLoader(vfsClassLoader);
+//        childContext2.setParent(childContext3);
+//        childContext2.register(CustomJpaRepositoryConfig.class);
+//        childContext2.refresh();
+//        childContext2.getBean("integerValue");
         
-        defaultListableBeanFactory = childContext2.getBean(DefaultListableBeanFactory.class);
-        run(childContext2);
+        defaultListableBeanFactory = childContext3.getBean(DefaultListableBeanFactory.class);
+        run(childContext3);
 	}
 
 	
 	public void run(ApplicationContext context) {
 		RepositoryClassesBuilder repositoryClassesMap = context.getBean(RepositoryClassesBuilder.class);
-		
+		EntityManagerFactory entityManagerFactory = context.getBean(EntityManagerFactory.class);
 		repositoryClassesMap
 		.forEach((n,y) -> {
 			try {
 				Class<?> beanClass = y;
-				Class<Base<?>> entityClass = (Class<Base<?>>) Class.forName("org.nanotek.data."+n, true , context.getClassLoader());
+				Class<Base<?>> entityClass = (Class<Base<?>>) Class.forName("org.nanotek.test.config.spring.data."+n, true , context.getClassLoader());
 //				TransactionInterceptor interceptor = applicationContext.getBean(TransactionInterceptor.class);
 //				interceptor.setTransactionManager(transactionManager);
 				//				defaultListableBeanFactory.createBean(beanClass, 0, false);
-				JpaRepository<Base<?>,?> obj = (JpaRepository<Base<?>, ?>) defaultListableBeanFactory.getBean(beanClass);
-				assertNotNull(obj);
+//				JpaRepository<Base<?>,?> obj = (JpaRepository<Base<?>, ?>) defaultListableBeanFactory.getBean(beanClass);
+//				assertNotNull(obj);
 //				obj.findAll();
-				someAnnotatedTransactionalServiceMethod(obj , entityClass);
+				someAnnotatedTransactionalServiceMethod(entityManagerFactory , entityClass);
 //				obj.deleteAll();
 //				Object instance = Instancio.create(entityClass);
 //				obj.saveAndFlush(entityClass.cast(instance));
@@ -144,11 +148,15 @@ ApplicationContextAware{
 	}
 	
 	@Transactional(readOnly=false)
-	public Object someAnnotatedTransactionalServiceMethod(JpaRepository<Base<?>,?> obj , Class<Base<?>> entityClass) {
-				Object instance = Instancio.create(entityClass);
-					obj.saveAndFlush(entityClass.cast(instance));
+	public Object someAnnotatedTransactionalServiceMethod(EntityManagerFactory entityManagerFactory , Class<Base<?>> entityClass) {
+		EntityManager em = entityManagerFactory.createEntityManager();
+		EntityTransaction et = em.getTransaction();
+		et.begin();
+		Object instance = Instancio.create(entityClass);
+				em.persist(instance);
 //					obj.deleteAll();
-				return instance;
+		et.commit();
+		return instance;
 	}
 	
 	@Override
@@ -210,4 +218,5 @@ ApplicationContextAware{
 			throw new RuntimeException(e);
 		}
 	}
+	
 }

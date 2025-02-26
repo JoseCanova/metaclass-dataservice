@@ -14,24 +14,18 @@ import org.springframework.context.annotation.Primary;
 public class MetaClassCustomRepositoryBean {
 
 
-	@Bean
-	RepositoryClassesBuilder repositoryClassesBuilder() {
-		
-		return new RepositoryClassesBuilder();
-	}
 	
 	
 	@Bean
 	@Primary
 	@Qualifier(value="repositoryClassesMap")
-	MetaClassClassesStore  repositoryClassesMap(
+	RepositoryClassesBuilder  repositoryClassesMap(
 			@Autowired MetaClassVFSURLClassLoader classLoader , 
-			@Autowired MetaClassClassesStore persistenceUnitClassesMap, 
-			@Autowired RepositoryClassesBuilder repositoryClassesBuilder) {
-		var repositoryClassesMap = new  MetaClassClassesStore  ();
+			@Autowired MetaClassClassesStore persistenceUnitClassesMap) {
+		var repositoryClassesMap = new  RepositoryClassesBuilder  ();
 		persistenceUnitClassesMap.forEach((x,y)->{
 			Class<?> idClass = getIdClass(y);
-			Class <?> repClass = repositoryClassesBuilder.prepareReppositoryForClass(y, idClass, classLoader);
+			Class <?> repClass = repositoryClassesMap.prepareReppositoryForClass(y, idClass, classLoader);
 			
 			repositoryClassesMap.put(repClass.getTypeName() , repClass);
 			

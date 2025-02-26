@@ -1,24 +1,30 @@
 package org.nanotek.test.config;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import javax.sql.DataSource;
 
+import org.nanotek.config.CustomHibernateJpaVendorAdapter;
 import org.nanotek.config.MetaClassClassesStore;
+import org.nanotek.config.MetaClassLocalContainerEntityManagerFactoryBean;
 import org.nanotek.config.MetaClassMergingPersistenceUnitManager;
-import org.nanotek.config.SpringHibernateJpaPersistenceProvider;
 import org.nanotek.config.MetaClassVFSURLClassLoader;
+import org.nanotek.config.RepositoryClassesBuilder;
+import org.nanotek.config.SpringHibernateJpaPersistenceProvider;
+import org.nanotek.repository.data.MetaClassJpaRepositoryComponentBean;
 import org.nanotek.repository.data.MetaClassJpaTransactionManager;
+import org.nanotek.test.config.TestMetaClassDataServiceConfiguration.Initializer;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
+import org.springframework.beans.factory.config.ConstructorArgumentValues.ValueHolder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
 import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -27,10 +33,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
 import org.springframework.data.jpa.support.MergingPersistenceUnitManager;
-import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.persistenceunit.MutablePersistenceUnitInfo;
+import org.springframework.orm.jpa.persistenceunit.PersistenceUnitPostProcessor;
 import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -38,9 +44,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import com.zaxxer.hikari.HikariConfig;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.ValidationMode;
 import jakarta.persistence.metamodel.Metamodel;
 import net.bytebuddy.dynamic.loading.InjectionClassLoader;
-import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
 
 @SpringBootConfiguration
 //@EnableTransactionManagement
@@ -59,16 +65,12 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 	
 	@Bean 
 	@Qualifier(value="myBf")
-	public DefaultListableBeanFactory defaultListableBeanFactory(@Autowired InjectionClassLoader classLoader )
+	public DefaultListableBeanFactory defaultListableBeanFactory(@Autowired MetaClassVFSURLClassLoader classLoader )
 	{
 		DefaultListableBeanFactory v = new DefaultListableBeanFactory();
 		v.setParentBeanFactory(context);
 		v.setBeanClassLoader(classLoader);
 		return v;
-	}
-
-	private Boolean hasIdAnnotation(Field f) {
-		return Stream.of(f.getAnnotations()).filter(a ->a.annotationType().equals(jakarta.persistence.Id.class)).count()==1;
 	}
 
 	@Bean
@@ -89,14 +91,15 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 	@Bean(value="myPersistenceManager")
 	@Qualifier(value="myPersistenceManager")
 	@DependsOn("dataSource")
-	public MergingPersistenceUnitManager myPersistenceManager(@Autowired DataSource dataSource) {
+	public MergingPersistenceUnitManager myPersistenceManager(@Autowired DataSource dataSource
+						,@Autowired MetaClassClassesStore persistenceUnitClassesMap) {
 //		metaClassNumericHundred(injectionClassLoader,persistenceUnitClassesMap);
-		MergingPersistenceUnitManager pum = new  MetaClassMergingPersistenceUnitManager();
+		MetaClassMergingPersistenceUnitManager pum = new  MetaClassMergingPersistenceUnitManager(persistenceUnitClassesMap);
 //		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");
-		pum.setPackagesToScan("org.nanotek.data");
+		pum.setPackagesToScan("org.nanotek.test.config.spring.data");
 		pum.setDefaultDataSource(dataSource);
-//		pum.setPersistenceUnitPostProcessors(myProcessor());
+		pum.setPersistenceUnitPostProcessors(myProcessor());
 		pum.preparePersistenceUnitInfos();
 		return pum;
 	}
@@ -106,23 +109,27 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 	@DependsOn("myPersistenceManager")
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(
 			@Autowired DataSource dataSource ,
+			@Autowired MetaClassVFSURLClassLoader classLoader , 
 			@Autowired Initializer initializer, 
-			@Autowired MergingPersistenceUnitManager myPersistenceManager) {
+			@Autowired MetaClassMergingPersistenceUnitManager myPersistenceManager) {
 		
 //		MergingPersistenceUnitManager myPersistenceManager = myPersistenceManager( dataSource,
 //				classLoader,
 //				 persistenceUnitClassesMap);
 		
-		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
+		MetaClassLocalContainerEntityManagerFactoryBean factory = new MetaClassLocalContainerEntityManagerFactoryBean(classLoader);
+//		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 		factory.setDataSource(dataSource);
 		factory.setPersistenceUnitManager(myPersistenceManager);
 		factory.setPersistenceProviderClass(SpringHibernateJpaPersistenceProvider.class);
 		factory.setJpaDialect(new HibernateJpaDialect());
-		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+		HibernateJpaVendorAdapter vendorAdapter = new CustomHibernateJpaVendorAdapter(classLoader,myPersistenceManager.getPersistenceUnitClassesMap());
 		factory.setJpaVendorAdapter(vendorAdapter);
 		factory.setEntityManagerInitializer(initializer);
-//		factory.setJpaPropertyMap(buddyJpaPropertie());
+		factory.setConfig(myPersistenceManager.getPersistenceUnitClassesMap());
 		factory.setPersistenceUnitName("buddyPU");
+		factory.afterPropertiesSet2();
+//		factory.afterPropertiesSet();
 		return factory;
 	}
 	
@@ -169,5 +176,39 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.context = applicationContext;
+	}
+	
+	@Bean
+	public PersistenceUnitPostProcessor myProcessor () {
+		return new MyPersistenceUnitPostProcessor();
+	}
+
+	class MyPersistenceUnitPostProcessor  implements PersistenceUnitPostProcessor{
+
+		@Autowired
+		MetaClassClassesStore repositoryClassesMap;
+
+		@Autowired
+		@Qualifier("myBf")
+		DefaultListableBeanFactory defaultListableBeanFactory;
+
+		@Autowired
+		MetaClassVFSURLClassLoader classLoader;
+
+		@Override
+		public void postProcessPersistenceUnitInfo(MutablePersistenceUnitInfo pui) {
+			defaultListableBeanFactory.setBeanClassLoader(classLoader);
+			repositoryClassesMap
+			.forEach((x,y)->{
+				pui.addManagedClassName(y.getName());
+			});
+			pui.addManagedPackage("org.nanotek.test.config.spring.data");
+			pui.setValidationMode(ValidationMode.NONE);
+			pui.setPersistenceUnitRootUrl(classLoader.getBaseURl());
+			//			pui.setExcludeUnlistedClasses(false);
+//			Properties p = new Properties(); 
+//			pui.setProperties(p);
+			pui.setPersistenceUnitName("buddyPU");
+		}
 	}
 }

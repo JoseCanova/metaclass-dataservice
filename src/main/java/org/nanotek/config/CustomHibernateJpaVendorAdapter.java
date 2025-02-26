@@ -11,10 +11,10 @@ public class   CustomHibernateJpaVendorAdapter extends HibernateJpaVendorAdapter
 
 
 
-	private InjectionClassLoader internalClassLoader;
+	private MetaClassVFSURLClassLoader internalClassLoader;
 	private MetaClassClassesStore persistenceUnitClassesMap;
 
-	public CustomHibernateJpaVendorAdapter(InjectionClassLoader classLoader , MetaClassClassesStore persistenceUnitClassesMap) {
+	public CustomHibernateJpaVendorAdapter(MetaClassVFSURLClassLoader classLoader , MetaClassClassesStore persistenceUnitClassesMap) {
 		super();
 		this.internalClassLoader = classLoader;
 		this.persistenceUnitClassesMap = persistenceUnitClassesMap;

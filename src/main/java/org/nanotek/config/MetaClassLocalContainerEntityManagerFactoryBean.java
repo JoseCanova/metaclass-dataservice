@@ -17,7 +17,7 @@ import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 public class MetaClassLocalContainerEntityManagerFactoryBean extends LocalContainerEntityManagerFactoryBean{
 
 	@Autowired 
-	InjectionClassLoader  inkectionClassLoader;
+	MetaClassVFSURLClassLoader  inkectionClassLoader;
 	
 	@Autowired
 	MetaClassClassesStore persistenceUnityClassesConfig;
@@ -26,7 +26,7 @@ public class MetaClassLocalContainerEntityManagerFactoryBean extends LocalContai
 	
 	SpringHibernateJpaPersistenceProvider provider;
 	
-	public MetaClassLocalContainerEntityManagerFactoryBean(InjectionClassLoader inkectionClassLoader2) {
+	public MetaClassLocalContainerEntityManagerFactoryBean(MetaClassVFSURLClassLoader inkectionClassLoader2) {
 		this.inkectionClassLoader = inkectionClassLoader2;
 	}
 	public void afterPropertiesSet2() throws PersistenceException {

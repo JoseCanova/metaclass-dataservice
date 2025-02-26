@@ -198,7 +198,7 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 	@DependsOn("myPersistenceManager")
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(
 			@Autowired DataSource dataSource ,
-			@Autowired InjectionClassLoader classLoader , 
+			@Autowired MetaClassVFSURLClassLoader classLoader , 
 			@Autowired Initializer initializer, 
 			@Autowired MetaClassMergingPersistenceUnitManager myPersistenceManager) {
 		

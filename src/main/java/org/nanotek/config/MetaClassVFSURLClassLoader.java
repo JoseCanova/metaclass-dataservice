@@ -41,7 +41,7 @@ public class MetaClassVFSURLClassLoader extends URLClassLoader {
 
 	public URL getBaseURl() {
 		try {
-		fileObject = fsManager.resolveFile("ram://");
+		fileObject = fsManager.resolveFile("ram://org/nanotek/test/config/spring/data/");
         return fileObject.getURL();
 		}catch(Exception e) {
 			throw new RuntimeException(e);
