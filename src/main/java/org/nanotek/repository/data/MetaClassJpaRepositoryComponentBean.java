@@ -1,7 +1,7 @@
 package org.nanotek.repository.data;
 
 import org.nanotek.Base;
-import org.nanotek.config.PersistenceUnityClassesMap;
+import org.nanotek.config.MetaClassClassesStore;
 import org.nanotek.config.RepositoryClassesBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ public class MetaClassJpaRepositoryComponentBean<T extends MetaClassBaseEntityRe
 extends JpaRepositoryFactoryBean<T,K,ID> {
 
 	@Autowired
-	PersistenceUnityClassesMap classesCondig;
+	MetaClassClassesStore classesCondig;
 	
 	@Autowired 
 	RepositoryClassesBuilder repoConfig;
@@ -62,11 +62,11 @@ extends JpaRepositoryFactoryBean<T,K,ID> {
 		return ei;
 	}
 
-	public PersistenceUnityClassesMap getClassesCondig() {
+	public MetaClassClassesStore getClassesCondig() {
 		return classesCondig;
 	}
 
-	public void setClassesCondig(PersistenceUnityClassesMap  classesCondig) {
+	public void setClassesCondig(MetaClassClassesStore  classesCondig) {
 		this.classesCondig = classesCondig;
 	}
 

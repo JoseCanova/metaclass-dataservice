@@ -46,8 +46,8 @@ public class MetaClassDataServiceConfiguration {
 	
 	@Bean
 	@Primary
-	PersistenceUnityClassesMap persistenceUnitClassesMap() {
-		return new PersistenceUnityClassesMap();
+	MetaClassClassesStore persistenceUnitClassesMap() {
+		return new MetaClassClassesStore();
 	}
 	
 	
@@ -55,7 +55,7 @@ public class MetaClassDataServiceConfiguration {
 	@Qualifier(value="myPersistenceManager")
 	public MergingPersistenceUnitManager myPersistenceManager(@Autowired DataSource dataSource,
 			@Autowired InjectionClassLoader injectionClassLoader,
-			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap) {
+			@Autowired MetaClassClassesStore persistenceUnitClassesMap) {
 		MergingPersistenceUnitManager pum = new  MetaClassMergingPersistenceUnitManager();
 //		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");
@@ -73,7 +73,7 @@ public class MetaClassDataServiceConfiguration {
 			@Autowired  @Qualifier("myPersistenceManager") 
 			MetaClassMergingPersistenceUnitManager myPersistenceManager,
 			@Autowired InjectionClassLoader classLoader , 
-			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap,
+			@Autowired MetaClassClassesStore persistenceUnitClassesMap,
 			@Autowired Initializer initializer) {
 		MetaClassLocalContainerEntityManagerFactoryBean factory = new MetaClassLocalContainerEntityManagerFactoryBean(classLoader);
 		factory.setDataSource(dataSource);
@@ -102,7 +102,7 @@ public class MetaClassDataServiceConfiguration {
 	class Initializer implements Consumer<EntityManager>{
 
 		@Autowired
-		PersistenceUnityClassesMap config;
+		MetaClassClassesStore config;
 
 		@SuppressWarnings("unused")
 		@Override

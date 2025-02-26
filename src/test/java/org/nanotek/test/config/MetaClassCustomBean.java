@@ -5,8 +5,9 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.nanotek.config.PersistenceUnityClassesMap;
+import org.nanotek.config.MetaClassClassesStore;
 import org.nanotek.config.RepositoryClassesBuilder;
+import org.nanotek.config.VFSClassLoader;
 import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
 import org.nanotek.metaclass.bytebuddy.RdbmsEntityBaseBuddy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,8 @@ public class MetaClassCustomBean {
 
 	@Bean
 	@Primary
-	PersistenceUnityClassesMap persistenceUnitClassesMap(@Autowired InjectionClassLoader injectionClassLoader) {
-		PersistenceUnityClassesMap persistenceUnitClassesMap = new PersistenceUnityClassesMap();
+	MetaClassClassesStore persistenceUnitClassesMap(@Autowired VFSClassLoader injectionClassLoader) {
+		MetaClassClassesStore persistenceUnitClassesMap = new MetaClassClassesStore();
 		Class<?> clazz = metaClass(injectionClassLoader);
 		persistenceUnitClassesMap.put(clazz.getTypeName(),clazz);
 		Class<?> clazz1 = metaClassNumeric(injectionClassLoader);
@@ -36,7 +37,7 @@ public class MetaClassCustomBean {
 		return persistenceUnitClassesMap;
 	}
 	
-	Class<?> metaClass(InjectionClassLoader injectionClassLoader) {
+	Class<?> metaClass(VFSClassLoader injectionClassLoader) {
 		ObjectMapper objectMapper = new ObjectMapper();
     	List<JsonNode> list;
 		try {
@@ -47,7 +48,8 @@ public class MetaClassCustomBean {
 			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
 			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
 			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
-			
+			byte[] bytes = eb.getBytes();
+			injectionClassLoader.saveClassFile(loaded.getTypeName(), eb.getBytes());
 			return  Class.forName(loaded.getTypeName(), false, injectionClassLoader);	
 		
 		} catch (Exception e) {
@@ -55,7 +57,7 @@ public class MetaClassCustomBean {
 		}
 	}
 	
-	Class<?> metaClassNumeric(InjectionClassLoader injectionClassLoader) {
+	Class<?> metaClassNumeric(VFSClassLoader injectionClassLoader) {
 		ObjectMapper objectMapper = new ObjectMapper();
     	List<JsonNode> list;
 		try {
@@ -66,14 +68,14 @@ public class MetaClassCustomBean {
 			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
 			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
 			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
-		
+			injectionClassLoader.saveClassFile(loaded.getTypeName(), eb.getBytes());
 			return  Class.forName(loaded.getTypeName(), false, injectionClassLoader);	
 			} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
-	Class<?> metaClassDate(InjectionClassLoader injectionClassLoader) {
+	Class<?> metaClassDate(VFSClassLoader injectionClassLoader) {
 		ObjectMapper objectMapper = new ObjectMapper();
     	List<JsonNode> list;
 		try {
@@ -84,6 +86,7 @@ public class MetaClassCustomBean {
 			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
 			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
 			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
+			injectionClassLoader.saveClassFile(loaded.getTypeName(), eb.getBytes());
 			return  Class.forName(loaded.getTypeName(), false, injectionClassLoader);		
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -97,7 +100,7 @@ public class MetaClassCustomBean {
 	@Qualifier(value="repositoryClassesMap")
 	RepositoryClassesBuilder repositoryClassesMap(
 			@Autowired InjectionClassLoader classLoader , 
-			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap) {
+			@Autowired MetaClassClassesStore persistenceUnitClassesMap) {
 		var repositoryClassesMap = new RepositoryClassesBuilder();
 		persistenceUnitClassesMap.forEach((x,y)->{
 			Class<?> idClass = getIdClass(y);

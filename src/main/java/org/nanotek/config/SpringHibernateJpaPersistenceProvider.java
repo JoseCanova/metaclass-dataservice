@@ -19,14 +19,14 @@ import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
 public class SpringHibernateJpaPersistenceProvider extends HibernatePersistenceProvider {
 
 	private InjectionClassLoader classLoader = null;
-	private PersistenceUnityClassesMap persistenceUnityClassesConfig;
+	private MetaClassClassesStore persistenceUnityClassesConfig;
 
 	public SpringHibernateJpaPersistenceProvider() {
 		super();
 	}
 
 	public SpringHibernateJpaPersistenceProvider(InjectionClassLoader classLoader,
-			PersistenceUnityClassesMap persistenceUnityClassesConfig) {
+			MetaClassClassesStore persistenceUnityClassesConfig) {
 		super();
 		this.classLoader = classLoader;
 		this.persistenceUnityClassesConfig = persistenceUnityClassesConfig;
@@ -93,7 +93,7 @@ public class SpringHibernateJpaPersistenceProvider extends HibernatePersistenceP
 
 	public EntityManagerFactory createContainerEntityManagerFactory(PersistenceUnitInfo persistenceUnitInfo,
 			Map<String, Object> jpaPropertyMap, InjectionClassLoader inkectionClassLoader,
-			PersistenceUnityClassesMap persistenceUnityClassesConfig2) {
+			MetaClassClassesStore persistenceUnityClassesConfig2) {
 		// TODO Auto-generated method stub
 		this.persistenceUnityClassesConfig = persistenceUnityClassesConfig2;
 		return createContainerEntityManagerFactory( persistenceUnitInfo,
@@ -120,12 +120,12 @@ public class SpringHibernateJpaPersistenceProvider extends HibernatePersistenceP
 	}
 
 
-	public PersistenceUnityClassesMap getPersistenceUnityClassesConfig() {
+	public MetaClassClassesStore getPersistenceUnityClassesConfig() {
 		return persistenceUnityClassesConfig;
 	}
 
 
-	public void setPersistenceUnityClassesConfig(PersistenceUnityClassesMap persistenceUnityClassesConfig) {
+	public void setPersistenceUnityClassesConfig(MetaClassClassesStore persistenceUnityClassesConfig) {
 		this.persistenceUnityClassesConfig = persistenceUnityClassesConfig;
 	}
 

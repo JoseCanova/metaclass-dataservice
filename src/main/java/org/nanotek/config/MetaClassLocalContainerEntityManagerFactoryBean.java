@@ -20,7 +20,7 @@ public class MetaClassLocalContainerEntityManagerFactoryBean extends LocalContai
 	InjectionClassLoader  inkectionClassLoader;
 	
 	@Autowired
-	PersistenceUnityClassesMap persistenceUnityClassesConfig;
+	MetaClassClassesStore persistenceUnityClassesConfig;
 	
 	String providerClassName;
 	
@@ -58,7 +58,7 @@ public class MetaClassLocalContainerEntityManagerFactoryBean extends LocalContai
 		postProcessEntityManagerFactory(emf, this.getPersistenceUnitInfo() );
 		return emf;
 	}
-	public void setConfig(PersistenceUnityClassesMap persistenceUnityClassesConfig2) {
+	public void setConfig(MetaClassClassesStore persistenceUnityClassesConfig2) {
 			this.persistenceUnityClassesConfig = persistenceUnityClassesConfig2;
 	}
 }

@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.util.stream.Stream;
 
 import org.nanotek.config.MetaClassClassesStore;
-import org.nanotek.config.PersistenceUnityClassesMap;
+import org.nanotek.config.MetaClassClassesStore;
 import org.nanotek.config.RepositoryClassesBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,7 +28,7 @@ public class MetaClassCustomRepositoryBean {
 	@Qualifier(value="repositoryClassesMap")
 	MetaClassClassesStore  repositoryClassesMap(
 			@Autowired InjectionClassLoader classLoader , 
-			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap, 
+			@Autowired MetaClassClassesStore persistenceUnitClassesMap, 
 			@Autowired RepositoryClassesBuilder repositoryClassesBuilder) {
 		var repositoryClassesMap = new  MetaClassClassesStore  ();
 		persistenceUnitClassesMap.forEach((x,y)->{

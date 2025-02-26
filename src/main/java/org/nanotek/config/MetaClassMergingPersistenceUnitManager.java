@@ -5,13 +5,13 @@ import org.springframework.data.jpa.support.MergingPersistenceUnitManager;
 public 	class MetaClassMergingPersistenceUnitManager extends MergingPersistenceUnitManager {
 	
 	
-	PersistenceUnityClassesMap persistenceUnitClassesMap;
+	MetaClassClassesStore persistenceUnitClassesMap;
 	
 	public MetaClassMergingPersistenceUnitManager() {
 		super();
 	}
 	
-	public MetaClassMergingPersistenceUnitManager(PersistenceUnityClassesMap persistenceUnitClassesMap) {
+	public MetaClassMergingPersistenceUnitManager(MetaClassClassesStore persistenceUnitClassesMap) {
 		super();
 		this.persistenceUnitClassesMap=persistenceUnitClassesMap;
 	}
@@ -21,7 +21,7 @@ public 	class MetaClassMergingPersistenceUnitManager extends MergingPersistenceU
 		super.preparePersistenceUnitInfos();
 	}
 
-	public PersistenceUnityClassesMap getPersistenceUnitClassesMap() {
+	public MetaClassClassesStore getPersistenceUnitClassesMap() {
 		return persistenceUnitClassesMap;
 	}
 }

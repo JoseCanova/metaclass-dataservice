@@ -14,8 +14,8 @@ import javax.sql.DataSource;
 import org.nanotek.config.CustomHibernateJpaVendorAdapter;
 import org.nanotek.config.MetaClassLocalContainerEntityManagerFactoryBean;
 import org.nanotek.config.MetaClassMergingPersistenceUnitManager;
-import org.nanotek.config.PersistenceUnityClassesMap;
-import org.nanotek.config.RepositoryClassesMap;
+import org.nanotek.config.MetaClassClassesStore;
+import org.nanotek.config.RepositoryClassesBuilder;
 import org.nanotek.config.SpringHibernateJpaPersistenceProvider;
 import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
 import org.nanotek.metaclass.bytebuddy.RdbmsEntityBaseBuddy;
@@ -82,10 +82,10 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 	@Bean
 	@Primary
 	@Qualifier(value="repositoryClassesMap")
-	RepositoryClassesMap repositoryClassesMap(
+	RepositoryClassesBuilder repositoryClassesMap(
 			@Autowired InjectionClassLoader classLoader , 
-			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap) {
-		var repositoryClassesMap = new RepositoryClassesMap();
+			@Autowired MetaClassClassesStore persistenceUnitClassesMap) {
+		var repositoryClassesMap = new RepositoryClassesBuilder();
 		persistenceUnitClassesMap.forEach((x,y)->{
 			Class<?> idClass = getIdClass(y);
 			Class <?> repClass = repositoryClassesMap.prepareReppositoryForClass(y, idClass, classLoader);
@@ -193,7 +193,7 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 	@DependsOn("dataSource")
 	public MetaClassMergingPersistenceUnitManager myPersistenceManager(@Autowired DataSource dataSource,
 			@Autowired InjectionClassLoader injectionClassLoader,
-			@Autowired PersistenceUnityClassesMap persistenceUnitClassesMap) {
+			@Autowired MetaClassClassesStore persistenceUnitClassesMap) {
 //		metaClassNumericHundred(injectionClassLoader,persistenceUnitClassesMap);
 		MetaClassMergingPersistenceUnitManager pum = new  MetaClassMergingPersistenceUnitManager(persistenceUnitClassesMap);
 //		pum.setValidationMode(ValidationMode.NONE);
@@ -242,7 +242,7 @@ public class TestMetaClassDataServiceConfiguration implements ApplicationContext
 	class Initializer implements Consumer<EntityManager>{
 
 		@Autowired
-		PersistenceUnityClassesMap config;
+		MetaClassClassesStore config;
 
 		@SuppressWarnings("unused")
 		@Override

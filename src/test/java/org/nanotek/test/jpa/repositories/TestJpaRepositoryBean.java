@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Test;
 import org.nanotek.Base;
-import org.nanotek.config.RepositoryClassesMap;
+import org.nanotek.config.RepositoryClassesBuilder;
 import org.nanotek.repository.data.EntityBaseRepository;
 import org.nanotek.test.config.TestMetaClassDataServiceConfiguration;
 import org.slf4j.Logger;
@@ -45,7 +45,7 @@ public class TestJpaRepositoryBean {
 	
 	@Autowired
 	@Qualifier("repositoryClassesMap")
-	RepositoryClassesMap repositoryClassesMap;
+	RepositoryClassesBuilder repositoryClassesMap;
 	
 	
 	private TransactionTemplate transactionTemplate;

@@ -7,7 +7,8 @@ import java.util.List;
 
 import org.instancio.Instancio;
 import org.nanotek.Base;
-import org.nanotek.config.RepositoryClassesMap;
+import org.nanotek.config.RepositoryClassesBuilder;
+import org.nanotek.config.VFSClassLoader;
 import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
 import org.nanotek.metaclass.bytebuddy.RdbmsEntityBaseBuddy;
 import org.nanotek.test.jpa.repositories.TestJpaRepositoryBean;
@@ -60,6 +61,13 @@ ApplicationContextAware{
 		return ic;
 	}
 	
+	@Bean
+	@Primary
+	VFSClassLoader vfsClassLoader(@Autowired InjectionClassLoader injectionClassLoader) throws Exception{
+		VFSClassLoader vfsClassLoader = VFSClassLoader.createVFSClassLoader("ram://", injectionClassLoader);
+		return vfsClassLoader;
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(TestJpaRepositoryBean.class);
 
 	private ApplicationContext applicationContext;
@@ -74,30 +82,32 @@ ApplicationContextAware{
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		ClassLoader customClassLoader = applicationContext.getBean(InjectionClassLoader.class);
+		InjectionClassLoader injectionClassLoader = applicationContext.getBean(InjectionClassLoader.class);
+		VFSClassLoader vfsClassLoader = applicationContext.getBean(VFSClassLoader.class);
 //		context.setClassLoader(customClassLoader);
         
         TestMetaClassDataServiceApplication2 bean = applicationContext.getBean(TestMetaClassDataServiceApplication2.class);
-        bean.runApplicationContext((AnnotationConfigApplicationContext) applicationContext, customClassLoader);
+        bean.runApplicationContext((AnnotationConfigApplicationContext) applicationContext, injectionClassLoader , vfsClassLoader);
 	}
 	
 	
-	public void runApplicationContext (AnnotationConfigApplicationContext context , ClassLoader customClassLoader ) {
+	public void runApplicationContext (AnnotationConfigApplicationContext context , 
+			InjectionClassLoader injectionClassLoader , VFSClassLoader vfsClassLoader ) {
         
 		AnnotationConfigApplicationContext childContext = new AnnotationConfigApplicationContext();
-        childContext.setClassLoader(customClassLoader);
+        childContext.setClassLoader(vfsClassLoader);
         childContext.setParent(context);
         childContext.register(MetaClassCustomBean.class);
         childContext.refresh();
         
         AnnotationConfigApplicationContext childContext3 = new AnnotationConfigApplicationContext();
-        childContext3.setClassLoader(customClassLoader);
+        childContext3.setClassLoader(vfsClassLoader);
         childContext3.setParent(childContext);
         childContext3.register(MetaClassJpaDataServiceConfiguration.class);
         childContext3.refresh();
         
         AnnotationConfigApplicationContext childContext2 = new AnnotationConfigApplicationContext();
-        childContext2.setClassLoader(customClassLoader);
+        childContext2.setClassLoader(vfsClassLoader);
         childContext2.setParent(childContext3);
         childContext2.register(CustomJpaRepositoryConfig.class);
         childContext2.refresh();
@@ -109,7 +119,7 @@ ApplicationContextAware{
 
 	
 	public void run(ApplicationContext context) {
-		RepositoryClassesMap repositoryClassesMap = context.getBean(RepositoryClassesMap.class);
+		RepositoryClassesBuilder repositoryClassesMap = context.getBean(RepositoryClassesBuilder.class);
 		
 		repositoryClassesMap
 		.forEach((n,y) -> {
