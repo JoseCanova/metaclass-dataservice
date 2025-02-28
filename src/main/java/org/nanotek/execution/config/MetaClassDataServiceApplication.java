@@ -138,6 +138,7 @@ ApplicationContextAware{
 //				obj.findAll();
 				someProgramaticTransactionalServiceMethod(entityManagerFactory , entityClass);
 				simpleFlush(entityManagerFactory);
+				saveAndFlush(obj,entityClass);
 //				obj.deleteAll();
 //				Object instance = Instancio.create(entityClass);
 //				obj.saveAndFlush(entityClass.cast(instance));
@@ -148,6 +149,14 @@ ApplicationContextAware{
 		});
 	}
 	
+	@Transactional
+	private void saveAndFlush(JpaRepository<Base<?>, ?> obj, Class<Base<?>> entityClass) {
+		Base<?> instance = Instancio.create(entityClass);
+		obj.saveAndFlush(instance);
+	}
+
+
+
 	private void simpleFlush(EntityManagerFactory entityManagerFactory) {
 		EntityManager em = entityManagerFactory.createEntityManager();
 		EntityTransaction et = em.getTransaction();
@@ -156,6 +165,14 @@ ApplicationContextAware{
 		et.commit();
 	}
 
+	@Transactional
+	private void saveAndFlush(EntityManagerFactory entityManagerFactory) {
+		EntityManager em = entityManagerFactory.createEntityManager();
+		EntityTransaction et = em.getTransaction();
+		et.begin();
+		em.flush();
+		et.commit();
+	}
 
 
 	@Transactional(readOnly=false)
