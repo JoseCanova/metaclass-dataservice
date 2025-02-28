@@ -43,7 +43,7 @@ public class RepositoryClassesBuilder   {
 		DynamicType.Unloaded<?> unloaded =   new ByteBuddy(ClassFileVersion.JAVA_V22)
 //				.makeInterface(EntityBaseRepository.class)
 				.makeInterface(typeDescription)
-				.name( "org.nanotek.test.config.repositories." + theEntity.name() +"Repository")
+				.name( "org.nanotek.execution.config.spring.repositories." + theEntity.name() +"Repository")
 				.annotateType( AnnotationDescription.Builder.ofType(Repository.class)
 						.build())
 				.annotateType( AnnotationDescription.Builder.ofType(Qualifier.class)
@@ -59,11 +59,12 @@ public class RepositoryClassesBuilder   {
 		Class<?> cd =			unloaded.load(classLoader).getLoaded();
 		try {
 			classLoader.saveClassFile(cd.getTypeName(), unloaded.getBytes());
-		} catch (IOException e) {
+			Class<?> theclazz = Class.forName(cd.getTypeName(),true , classLoader);
+			System.err.println(cd.toGenericString());
+			put(theEntity.name(), theclazz);
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		System.out.println(cd.toGenericString());
-		put(theEntity.name(), cd);
 		return cd;
 	}
 
