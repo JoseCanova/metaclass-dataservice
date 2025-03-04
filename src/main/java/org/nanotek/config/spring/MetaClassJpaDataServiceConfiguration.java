@@ -1,4 +1,4 @@
-package org.nanotek.execution.config;
+package org.nanotek.config.spring;
 
 import java.util.function.Consumer;
 
@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
 import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -25,7 +26,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.jpa.support.MergingPersistenceUnitManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.persistenceunit.MutablePersistenceUnitInfo;
@@ -42,11 +42,7 @@ import jakarta.persistence.metamodel.Metamodel;
 
 @SpringBootConfiguration
 //@EnableTransactionManagement
-@EnableAutoConfiguration(exclude= {TransactionAutoConfiguration.class})
-@EnableJpaRepositories(
-		basePackages = 
-	{"org.nanotek.test.config.repositories"}
-		, transactionManagerRef = "transactionManager")
+@EnableAutoConfiguration(exclude= {JpaRepositoriesAutoConfiguration.class,  TransactionAutoConfiguration.class})
 public class MetaClassJpaDataServiceConfiguration implements ApplicationContextAware{
 
 	public MetaClassJpaDataServiceConfiguration() {
@@ -99,7 +95,7 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 		MetaClassMergingPersistenceUnitManager pum = new  MetaClassMergingPersistenceUnitManager(persistenceUnitClassesMap);
 //		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");
-		pum.setPackagesToScan("org.nanotek.execution.config.spring.data");
+		pum.setPackagesToScan("org.nanotek.config.spring.data");
 		pum.setDefaultDataSource(dataSource);
 		pum.setPersistenceUnitPostProcessors(myProcessor());
 		pum.preparePersistenceUnitInfos();
@@ -204,7 +200,7 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 			.forEach((x,y)->{
 				pui.addManagedClassName(y.getName());
 			});
-			pui.addManagedPackage("org.nanotek.execution.config.spring.data");
+			pui.addManagedPackage("org.nanotek.config.spring.data");
 			pui.setValidationMode(ValidationMode.NONE);
 			pui.setPersistenceUnitRootUrl(classLoader.getBaseURl());
 			//			pui.setExcludeUnlistedClasses(false);

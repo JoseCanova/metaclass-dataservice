@@ -22,11 +22,15 @@ import net.bytebuddy.description.annotation.AnnotationDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.description.type.TypeDescription.Generic;
 import net.bytebuddy.dynamic.DynamicType;
+import net.bytebuddy.dynamic.TypeResolutionStrategy;
+import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
+import net.bytebuddy.pool.TypePool;
 
 public class RepositoryClassesBuilder   {
 
 	private HashMap<String, Class<?>> entityStore;
-
+	public static final String basePackage = "org.nanotek.config.spring.repositories." ;
+	
 	public RepositoryClassesBuilder(){
 		constructMap() ;
 	}
@@ -43,7 +47,7 @@ public class RepositoryClassesBuilder   {
 		DynamicType.Unloaded<?> unloaded =   new ByteBuddy(ClassFileVersion.JAVA_V22)
 //				.makeInterface(EntityBaseRepository.class)
 				.makeInterface(typeDescription)
-				.name( "org.nanotek.execution.config.spring.repositories." + theEntity.name() +"Repository")
+				.name( basePackage.concat(theEntity.name()).concat("Repository"))
 				.annotateType( AnnotationDescription.Builder.ofType(Repository.class)
 						.build())
 				.annotateType( AnnotationDescription.Builder.ofType(Qualifier.class)
@@ -56,7 +60,7 @@ public class RepositoryClassesBuilder   {
 //						)
 				.make();
 				
-		Class<?> cd =			unloaded.load(classLoader).getLoaded();
+		Class<?> cd =unloaded.load(classLoader,ClassLoadingStrategy.Default.WRAPPER).getLoaded();
 		try {
 			classLoader.saveClassFile(cd.getTypeName(), unloaded.getBytes());
 			Class<?> theclazz = Class.forName(cd.getTypeName(),true , classLoader);

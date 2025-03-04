@@ -124,18 +124,17 @@ public class EntityBaseRepositoryImpl<T, ID>  extends SimpleJpaRepository<T, ID>
 	}
 
 	@Override
-//	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
-	public Object  save(Object entity) {
-
-		Assert.notNull(entity, "ENTITY_MUST_NOT_BE_NULL");
-		 EntityTransaction tx = em.getTransaction();
-	        tx.begin();
-			em.persist(entity);
-			em.flush();
-			tx.commit();
+	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
+	public <S extends T> S save(S entity) {
+		return super.save( entity);
+//		Assert.notNull(entity, "ENTITY_MUST_NOT_BE_NULL");
+//		 EntityTransaction tx = em.getTransaction();
+//	        tx.begin();
+//			em.persist(entity);
+//			em.flush();
+//			tx.commit();
 //		if (entityInformation.isNew(entity)) {
 //			em.persist(entity);
-			return entity;
 //		} else {
 //			return em.merge(entity);
 //		}
@@ -143,11 +142,8 @@ public class EntityBaseRepositoryImpl<T, ID>  extends SimpleJpaRepository<T, ID>
 
 	@Override
 	@Transactional(transactionManager = "transactionManager" , readOnly = false , propagation = Propagation.REQUIRES_NEW)
-	public Object saveAndFlush(Object entity) {
-
-			    Object result = save(entity);
-
-		return result;
+	public <S extends T> S saveAndFlush(S entity) {
+		return super.saveAndFlush(entity);
 	}
 
 	@Override

@@ -1,12 +1,20 @@
-package org.nanotek.execution.config;
+package org.nanotek.config.spring;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.jar.JarOutputStream;
 
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemManager;
+import org.apache.commons.vfs2.impl.VFSClassLoader;
 import org.instancio.Instancio;
 import org.nanotek.Base;
 import org.nanotek.config.MetaClassVFSURLClassLoader;
 import org.nanotek.config.RepositoryClassesBuilder;
+import org.nanotek.config.ramfs.JarCreator;
 import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
 import org.nanotek.metaclass.bytebuddy.RdbmsEntityBaseBuddy;
 import org.springframework.beans.BeansException;
@@ -23,10 +31,12 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.io.Resource;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
 import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,16 +71,12 @@ ApplicationContextAware{
 		return ic;
 	}
 	
-	
-	
 	@Bean
 	@Primary
 	MetaClassVFSURLClassLoader vfsClassLoader(@Autowired InjectionClassLoader injectionClassLoader) throws Exception{
 		MetaClassVFSURLClassLoader vfsClassLoader = MetaClassVFSURLClassLoader.createVFSClassLoader("ram://", injectionClassLoader);
 		return vfsClassLoader;
 	}
-	
-	
 	
 
 	private ApplicationContext applicationContext;
@@ -97,31 +103,80 @@ ApplicationContextAware{
 	
 	public void runApplicationContext (AnnotationConfigApplicationContext context , 
 			InjectionClassLoader injectionClassLoader , MetaClassVFSURLClassLoader vfsClassLoader ) {
-        
+
+    	try {   
 		AnnotationConfigApplicationContext childContext = new AnnotationConfigApplicationContext();
         childContext.setClassLoader(vfsClassLoader);
         childContext.setParent(context);
         childContext.register(MetaClassCustomBean.class);
         childContext.refresh();
+        FileObject [] files = vfsClassLoader.getFiles().toArray(new FileObject[vfsClassLoader.getFiles().size()]);
+       
         
-        AnnotationConfigApplicationContext childContext3 = new AnnotationConfigApplicationContext();
+        OutputStream out = vfsClassLoader.createJarFile();
+        JarOutputStream jout = JarCreator.createJarOutputStream(out);
+ 	        for(FileObject fo : files) {
+	        		InputStream is = fo.getContent().getInputStream();
+	        		JarCreator.addToJar(fo, is, jout);
+	        }
+ 	        System.err.println(jout);
+ 	   jout.close();     
+		
+ 	   
+        FileSystemManager fileManager = vfsClassLoader.getFsManager();
+        MetaVFSClassLoader jpaClassLoader = null;
+		jpaClassLoader = new MetaVFSClassLoader(files,fileManager,vfsClassLoader);
+		jpaClassLoader.findClazz("org.nanotek.config.spring.data.SimpleTable");
+		jpaClassLoader.findClazz("org.nanotek.config.spring.data.SimpleNumericTable");
+		jpaClassLoader.findClazz("org.nanotek.config.spring.data.SimpleDateTable");
+		jpaClassLoader.findClazz("rorg.nanotek.config.spring.repositories.SimpleNumericTableRepository");
+		jpaClassLoader.findClazz("org.nanotek.config.spring.repositories.SimpleDateTableRepository");
+		jpaClassLoader.findClazz("org.nanotek.config.spring.repositories.SimpleTableRepository");
+		
+		AnnotationConfigApplicationContext childContext3 = new AnnotationConfigApplicationContext();
         childContext3.setClassLoader(vfsClassLoader);
         childContext3.setParent(childContext);
         childContext3.register(MetaClassJpaDataServiceConfiguration.class);
         childContext3.refresh();
         
+   
         AnnotationConfigApplicationContext childContext2 = new AnnotationConfigApplicationContext();
-        childContext2.setClassLoader(vfsClassLoader);
+        childContext2.setClassLoader(jpaClassLoader);
         childContext2.setParent(childContext3);
         childContext2.register(CustomJpaRepositoryConfig.class);
         childContext2.refresh();
         childContext2.getBean("integerValue");
 //        
+        veriyLoadedClassesByResource(childContext2);
         defaultListableBeanFactory = childContext3.getBean(DefaultListableBeanFactory.class);
-        run(childContext3,defaultListableBeanFactory);
+        //run(childContext3,defaultListableBeanFactory);
+        
+    	} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 	}
 
 	
+	private void veriyLoadedClassesByResource(AnnotationConfigApplicationContext childContext3) {
+		RepositoryClassesBuilder repositoryClassesMap = childContext3.getBean(RepositoryClassesBuilder.class);
+		  try {
+			    Resource[] urls = childContext3.getResources("org/nanotek/config/spring/repositories");
+			    Resource[] resources = childContext3.getResources("org/nanotek/config/**/**/*.class");
+				Assert.isTrue(resources !=null &&  resources.length > 0, "resource is null");
+			    repositoryClassesMap
+				.forEach((n,y)->{
+						String resourceName = y.getName().replaceAll("[.]", "/").concat(".class");
+						Resource resource = childContext3.getResource(resourceName);
+						Assert.isTrue(resource !=null, "resource is null");
+				});
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+
 	public void run(ApplicationContext context, DefaultListableBeanFactory defaultListableBeanFactory2) {
 		RepositoryClassesBuilder repositoryClassesMap = context.getBean(RepositoryClassesBuilder.class);
 		EntityManagerFactory entityManagerFactory = context.getBean(EntityManagerFactory.class);
@@ -129,7 +184,7 @@ ApplicationContextAware{
 		.forEach((n,y) -> {
 			try {
 				Class<?> beanClass = y;
-				Class<Base<?>> entityClass = (Class<Base<?>>) Class.forName("org.nanotek.execution.config.spring.data."+n, true , context.getClassLoader());
+				Class<Base<?>> entityClass = (Class<Base<?>>) Class.forName("org.nanotek.config.spring.data."+n, true , context.getClassLoader());
 //				TransactionInterceptor interceptor = applicationContext.getBean(TransactionInterceptor.class);
 //				interceptor.setTransactionManager(transactionManager);
 				//				defaultListableBeanFactory.createBean(beanClass, 0, false);

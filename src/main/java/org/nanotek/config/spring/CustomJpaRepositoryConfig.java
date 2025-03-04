@@ -1,4 +1,4 @@
-package org.nanotek.execution.config;
+package org.nanotek.config.spring;
 import org.nanotek.Base;
 import org.nanotek.config.MetaClassVFSURLClassLoader;
 import org.nanotek.config.RepositoryClassesBuilder;
@@ -15,14 +15,22 @@ import org.springframework.beans.factory.support.AutowireCandidateQualifier;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.querydsl.SimpleEntityPathResolver;
 
 import jakarta.persistence.EntityManagerFactory;
 
 @SpringBootConfiguration
+@EnableAutoConfiguration(exclude= {TransactionAutoConfiguration.class})
+@EnableJpaRepositories(
+		basePackages = 
+	{"org.nanotek.execution.config.spring.repositories"}
+		, transactionManagerRef = "transactionManager")
 public class CustomJpaRepositoryConfig {
 	
 	@Autowired MetaClassVFSURLClassLoader classLoader;
@@ -47,7 +55,7 @@ public class CustomJpaRepositoryConfig {
 		
 		repositoryClassesBuilder.forEach ((x,y)->{
 			try {
-				Class<Base<?>> entityClass = (Class<Base<?>>) Class.forName("org.nanotek.execution.config.spring.data."+x, true , defaultListableBeanFactory.getBeanClassLoader());
+				Class<Base<?>> entityClass = (Class<Base<?>>) Class.forName("org.nanotek.config.spring.data."+x, true , defaultListableBeanFactory.getBeanClassLoader());
 				Class<?> beanClass = y;
 				
 				configureRepositoryBean(defaultListableBeanFactory , entityClass , x , beanClass , classLoader ,entityManagerFactory );
