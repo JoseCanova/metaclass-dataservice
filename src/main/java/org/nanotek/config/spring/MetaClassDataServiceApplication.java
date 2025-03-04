@@ -60,21 +60,20 @@ ApplicationContextAware{
 	public DefaultListableBeanFactory defaultListableBeanFactory;
 	
 	@Bean
-	@Primary
+	@Qualifier(value="injectionClassLoader")
 	InjectionClassLoader injectionClassLoader() {
 		InjectionClassLoader ic = new  MultipleParentClassLoader(Thread.currentThread().getContextClassLoader() 
-				, Arrays.asList(getClass().getClassLoader() , 
-						CrudMethodMetadata.class.getClassLoader() , 
-						AbstractEntityManagerFactoryBean.class.getClassLoader(),
-						Entity.class.getClassLoader())  , 
+				, Arrays.asList(getClass().getClassLoader())  , 
 				false);
 		return ic;
 	}
 	
 	@Bean
 	@Primary
-	MetaClassVFSURLClassLoader vfsClassLoader(@Autowired InjectionClassLoader injectionClassLoader) throws Exception{
-		MetaClassVFSURLClassLoader vfsClassLoader = MetaClassVFSURLClassLoader.createVFSClassLoader("ram://", injectionClassLoader);
+	MetaClassVFSURLClassLoader vfsClassLoader(@Autowired @Qualifier("injectionClassLoader") InjectionClassLoader injectionClassLoader) throws Exception{
+		MetaClassVFSURLClassLoader vfsClassLoader = new MetaClassVFSURLClassLoader(Thread.currentThread().getContextClassLoader() 
+				, Arrays.asList(injectionClassLoader)  , 
+				false);
 		return vfsClassLoader;
 	}
 	
@@ -91,57 +90,35 @@ ApplicationContextAware{
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		InjectionClassLoader injectionClassLoader = applicationContext.getBean(InjectionClassLoader.class);
-		MetaClassVFSURLClassLoader vfsClassLoader = applicationContext.getBean(MetaClassVFSURLClassLoader.class);
+		MetaClassVFSURLClassLoader injectionClassLoader = applicationContext.getBean(MetaClassVFSURLClassLoader.class);
 //		context.setClassLoader(customClassLoader);
 
 	        // Use the new layer
         MetaClassDataServiceApplication bean = applicationContext.getBean(MetaClassDataServiceApplication.class);
-        bean.runApplicationContext((AnnotationConfigApplicationContext) applicationContext, injectionClassLoader , vfsClassLoader);
+        bean.runApplicationContext((AnnotationConfigApplicationContext) applicationContext, injectionClassLoader);
 	}
 	
 	
 	public void runApplicationContext (AnnotationConfigApplicationContext context , 
-			InjectionClassLoader injectionClassLoader , MetaClassVFSURLClassLoader vfsClassLoader ) {
+			MetaClassVFSURLClassLoader injectionClassLoader  ) {
 
     	try {   
 		AnnotationConfigApplicationContext childContext = new AnnotationConfigApplicationContext();
-        childContext.setClassLoader(vfsClassLoader);
+        childContext.setClassLoader(getClass().getClassLoader());
         childContext.setParent(context);
         childContext.register(MetaClassCustomBean.class);
         childContext.refresh();
-        FileObject [] files = vfsClassLoader.getFiles().toArray(new FileObject[vfsClassLoader.getFiles().size()]);
        
-        
-        OutputStream out = vfsClassLoader.createJarFile();
-        JarOutputStream jout = JarCreator.createJarOutputStream(out);
- 	        for(FileObject fo : files) {
-	        		InputStream is = fo.getContent().getInputStream();
-	        		JarCreator.addToJar(fo, is, jout);
-	        }
- 	        System.err.println(jout);
- 	   jout.close();     
-		
- 	   
-        FileSystemManager fileManager = vfsClassLoader.getFsManager();
-        MetaVFSClassLoader jpaClassLoader = null;
-		jpaClassLoader = new MetaVFSClassLoader(files,fileManager,vfsClassLoader);
-		jpaClassLoader.findClazz("org.nanotek.config.spring.data.SimpleTable");
-		jpaClassLoader.findClazz("org.nanotek.config.spring.data.SimpleNumericTable");
-		jpaClassLoader.findClazz("org.nanotek.config.spring.data.SimpleDateTable");
-		jpaClassLoader.findClazz("rorg.nanotek.config.spring.repositories.SimpleNumericTableRepository");
-		jpaClassLoader.findClazz("org.nanotek.config.spring.repositories.SimpleDateTableRepository");
-		jpaClassLoader.findClazz("org.nanotek.config.spring.repositories.SimpleTableRepository");
 		
 		AnnotationConfigApplicationContext childContext3 = new AnnotationConfigApplicationContext();
-        childContext3.setClassLoader(vfsClassLoader);
+        childContext3.setClassLoader(getClass().getClassLoader());
         childContext3.setParent(childContext);
         childContext3.register(MetaClassJpaDataServiceConfiguration.class);
         childContext3.refresh();
         
    
         AnnotationConfigApplicationContext childContext2 = new AnnotationConfigApplicationContext();
-        childContext2.setClassLoader(jpaClassLoader);
+        childContext2.setClassLoader(getClass().getClassLoader());
         childContext2.setParent(childContext3);
         childContext2.register(CustomJpaRepositoryConfig.class);
         childContext2.refresh();
@@ -162,7 +139,7 @@ ApplicationContextAware{
 		RepositoryClassesBuilder repositoryClassesMap = childContext3.getBean(RepositoryClassesBuilder.class);
 		  try {
 			    Resource[] urls = childContext3.getResources("org/nanotek/config/spring/repositories");
-			    Resource[] resources = childContext3.getResources("org/nanotek/config/**/**/*.class");
+			    Resource[] resources = childContext3.getResources("org/nanotek/config/spring/**/*.class");
 				Assert.isTrue(resources !=null &&  resources.length > 0, "resource is null");
 			    repositoryClassesMap
 				.forEach((n,y)->{

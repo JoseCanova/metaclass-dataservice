@@ -40,7 +40,7 @@ public class RepositoryClassesBuilder   {
 	}
 
 
-	public Class<?> prepareReppositoryForClass(Class<?> clazz , Class<?> idClass, MetaClassVFSURLClassLoader classLoader){
+	public Class<?> prepareReppositoryForClass(Class<?> clazz , Class<?> idClass, ClassLoader classLoader){
 		Generic typeDescription = TypeDescription.Generic.Builder.parameterizedType(JpaRepository.class, clazz , idClass).build().asGenericType();
 		Entity theEntity = clazz.getAnnotation(Entity.class);
 		Optional.ofNullable(theEntity).orElseThrow();
@@ -59,10 +59,9 @@ public class RepositoryClassesBuilder   {
 //						.build()
 //						)
 				.make();
-				
-		Class<?> cd =unloaded.load(classLoader,ClassLoadingStrategy.Default.WRAPPER).getLoaded();
+				//,ClassLoadingStrategy.Default.WRAPPER_PERSISTENT
+		Class<?> cd =unloaded.load(classLoader,ClassLoadingStrategy.Default.INJECTION).getLoaded();
 		try {
-			classLoader.saveClassFile(cd.getTypeName(), unloaded.getBytes());
 			Class<?> theclazz = Class.forName(cd.getTypeName(),true , classLoader);
 			System.err.println(cd.toGenericString());
 			put(theEntity.name(), theclazz);

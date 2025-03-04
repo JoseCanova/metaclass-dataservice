@@ -202,7 +202,6 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 			});
 			pui.addManagedPackage("org.nanotek.config.spring.data");
 			pui.setValidationMode(ValidationMode.NONE);
-			pui.setPersistenceUnitRootUrl(classLoader.getBaseURl());
 			//			pui.setExcludeUnlistedClasses(false);
 //			Properties p = new Properties(); 
 //			pui.setProperties(p);

@@ -24,18 +24,18 @@ public class MetaClassCustomBean {
 
 	@Bean
 	@Primary
-	MetaClassClassesStore persistenceUnitClassesMap(@Autowired MetaClassVFSURLClassLoader injectionClassLoader) {
+	MetaClassClassesStore persistenceUnitClassesMap(@Autowired  MetaClassVFSURLClassLoader injectionClassLoader) {
 		MetaClassClassesStore persistenceUnitClassesMap = new MetaClassClassesStore();
-		Class<?> clazz = metaClass(injectionClassLoader);
+		Class<?> clazz = metaClass(getClass().getClassLoader());
 		persistenceUnitClassesMap.put(clazz.getTypeName(),clazz);
-		Class<?> clazz1 = metaClassNumeric(injectionClassLoader);
+		Class<?> clazz1 = metaClassNumeric(getClass().getClassLoader());
 		persistenceUnitClassesMap.put(clazz1.getTypeName(),clazz1);
-		Class<?> clazz2 = metaClassDate(injectionClassLoader);
+		Class<?> clazz2 = metaClassDate(getClass().getClassLoader());
 		persistenceUnitClassesMap.put(clazz2.getTypeName(),clazz2);
 		return persistenceUnitClassesMap;
 	}
 	
-	Class<?> metaClass(MetaClassVFSURLClassLoader injectionClassLoader) {
+	Class<?> metaClass(ClassLoader classLoader) {
 		ObjectMapper objectMapper = new ObjectMapper();
     	List<JsonNode> list;
 		try {
@@ -45,17 +45,17 @@ public class MetaClassCustomBean {
 			Object theNode = list.get(0);
 			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
 			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
-			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
+			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(classLoader);
 			byte[] bytes = eb.getBytes();
-			injectionClassLoader.saveClassFile(loaded.getTypeName(), eb.getBytes());
-			return  Class.forName(loaded.getTypeName(), false, injectionClassLoader);	
+			//injectionClassLoader.saveClassFile(loaded.getTypeName(), eb.getBytes());
+			return  Class.forName(loaded.getTypeName(), true, classLoader);	
 		
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
-	Class<?> metaClassNumeric(MetaClassVFSURLClassLoader injectionClassLoader) {
+	Class<?> metaClassNumeric(ClassLoader classLoader) {
 		ObjectMapper objectMapper = new ObjectMapper();
     	List<JsonNode> list;
 		try {
@@ -65,15 +65,15 @@ public class MetaClassCustomBean {
 			Object theNode = list.get(0);
 			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
 			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
-			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
-			injectionClassLoader.saveClassFile(loaded.getTypeName(), eb.getBytes());
-			return  Class.forName(loaded.getTypeName(), false, injectionClassLoader);	
+			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(classLoader);
+			//injectionClassLoader.saveClassFile(loaded.getTypeName(), eb.getBytes());
+			return  Class.forName(loaded.getTypeName(), true, classLoader);	
 			} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
-	Class<?> metaClassDate(MetaClassVFSURLClassLoader injectionClassLoader) {
+	Class<?> metaClassDate(ClassLoader classLoader) {
 		ObjectMapper objectMapper = new ObjectMapper();
     	List<JsonNode> list;
 		try {
@@ -83,9 +83,9 @@ public class MetaClassCustomBean {
 			Object theNode = list.get(0);
 			RdbmsMetaClass theClass = objectMapper.convertValue(theNode,RdbmsMetaClass.class);
 			RdbmsEntityBaseBuddy eb = RdbmsEntityBaseBuddy.instance(theClass);
-			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(injectionClassLoader);
-			injectionClassLoader.saveClassFile(loaded.getTypeName(), eb.getBytes());
-			return  Class.forName(loaded.getTypeName(), false, injectionClassLoader);		
+			Class<?> loaded = eb.getLoadedClassInDefaultClassLoader(classLoader);
+			//injectionClassLoader.saveClassFile(loaded.getTypeName(), eb.getBytes());
+			return  Class.forName(loaded.getTypeName(), true, classLoader);		
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -102,7 +102,7 @@ public class MetaClassCustomBean {
 		var repositoryClassesMap = new RepositoryClassesBuilder();
 		persistenceUnitClassesMap.forEach((x,y)->{
 			Class<?> idClass = getIdClass(y);
-			Class <?> repClass = repositoryClassesMap.prepareReppositoryForClass(y, idClass, classLoader);
+			Class <?> repClass = repositoryClassesMap.prepareReppositoryForClass(y, idClass, getClass().getClassLoader());
 			System.err.println(y.getSimpleName());
 		});
 		return repositoryClassesMap;

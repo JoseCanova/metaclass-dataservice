@@ -29,7 +29,7 @@ import jakarta.persistence.EntityManagerFactory;
 @EnableAutoConfiguration(exclude= {TransactionAutoConfiguration.class})
 @EnableJpaRepositories(
 		basePackages = 
-	{"org.nanotek.execution.config.spring.repositories"}
+	{"org.nanotek.config.spring.repositories"}
 		, transactionManagerRef = "transactionManager")
 public class CustomJpaRepositoryConfig {
 	
