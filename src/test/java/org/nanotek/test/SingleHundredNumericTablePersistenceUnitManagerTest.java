@@ -8,9 +8,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 
-import org.instancio.Instancio;
-import org.junit.jupiter.api.Test;
-import org.nanotek.test.config.TestMetaClassDataServiceConfiguration;
+import org.nanotek.config.spring.MetaClassJpaDataServiceConfiguration;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,7 +22,7 @@ import jakarta.persistence.Query;
 import jakarta.persistence.metamodel.Metamodel;
 import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 
-@SpringBootTest(classes = {TestMetaClassDataServiceConfiguration.class})
+@SpringBootTest(classes = {MetaClassJpaDataServiceConfiguration.class})
 public class SingleHundredNumericTablePersistenceUnitManagerTest {
 
 	@Autowired

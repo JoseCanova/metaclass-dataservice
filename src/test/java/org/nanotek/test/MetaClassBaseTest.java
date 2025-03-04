@@ -7,18 +7,16 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.nanotek.config.spring.MetaClassJpaDataServiceConfiguration;
 import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
 import org.nanotek.metaclass.bytebuddy.RdbmsEntityBaseBuddy;
-import org.nanotek.test.config.TestMetaClassDataServiceConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.jpa.support.MergingPersistenceUnitManager;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-@SpringBootTest(classes = {TestMetaClassDataServiceConfiguration.class})
+@SpringBootTest(classes = {MetaClassJpaDataServiceConfiguration.class})
 public class MetaClassBaseTest {
     
 	RdbmsMetaClass theClass ;

@@ -6,8 +6,8 @@ import org.instancio.Instancio;
 import org.junit.jupiter.api.Test;
 import org.nanotek.Base;
 import org.nanotek.config.RepositoryClassesBuilder;
+import org.nanotek.config.spring.MetaClassJpaDataServiceConfiguration;
 import org.nanotek.repository.data.EntityBaseRepository;
-import org.nanotek.test.config.TestMetaClassDataServiceConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ import org.springframework.transaction.support.TransactionTemplate;
    SimpleTableRepository
  */
 
-@SpringBootTest(classes = {TestMetaClassDataServiceConfiguration.class})
+@SpringBootTest(classes = {MetaClassJpaDataServiceConfiguration.class})
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 public class TestJpaRepositoryBean {
 

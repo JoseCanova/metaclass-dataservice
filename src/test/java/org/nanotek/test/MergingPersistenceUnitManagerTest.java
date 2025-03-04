@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
-import org.nanotek.test.config.TestMetaClassDataServiceConfiguration;
+import org.nanotek.config.spring.MetaClassJpaDataServiceConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jpa.support.MergingPersistenceUnitManager;
@@ -14,7 +14,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.metamodel.Metamodel;
 
-@SpringBootTest(classes = {TestMetaClassDataServiceConfiguration.class})
+@SpringBootTest(classes = {MetaClassJpaDataServiceConfiguration.class})
 public class MergingPersistenceUnitManagerTest {
 
 	@Autowired
