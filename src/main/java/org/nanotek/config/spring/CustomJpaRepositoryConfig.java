@@ -46,10 +46,10 @@ public class CustomJpaRepositoryConfig {
 	@Qualifier(value="myBf")
 	public DefaultListableBeanFactory defaultListableBeanFactory;
 	
-	@Bean("integerValue") 
+	@Bean("configureJpaRepository") 
 	@Primary
-	@Qualifier(value="integerValue")
-	public Integer integerValue(
+	@Qualifier(value="configureJpaRepository")
+	public Integer configureJpaRepository(
 			@Autowired 
 			@Qualifier("repositoryClassesMap") RepositoryClassesBuilder repositoryClassesBuilder) {
 		

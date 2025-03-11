@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.jpa.support.MergingPersistenceUnitManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.persistenceunit.MutablePersistenceUnitInfo;
@@ -42,7 +43,11 @@ import jakarta.persistence.metamodel.Metamodel;
 
 @SpringBootConfiguration
 //@EnableTransactionManagement
-@EnableAutoConfiguration(exclude= {JpaRepositoriesAutoConfiguration.class,  TransactionAutoConfiguration.class})
+@EnableAutoConfiguration(exclude= {TransactionAutoConfiguration.class})
+@EnableJpaRepositories(
+		basePackages = 
+	{"org.nanotek.config.spring.repositories"}
+		, transactionManagerRef = "transactionManager")
 public class MetaClassJpaDataServiceConfiguration implements ApplicationContextAware{
 
 	public MetaClassJpaDataServiceConfiguration() {
@@ -196,6 +201,15 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 		@Override
 		public void postProcessPersistenceUnitInfo(MutablePersistenceUnitInfo pui) {
 			defaultListableBeanFactory.setBeanClassLoader(classLoader);
+			
+			try {
+				Class<?> clazz = Class.forName("org.nanotek.config.spring.data.SimpleTable",true , classLoader);
+				pui.addManagedClassName(clazz.getName());
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+				throw new RuntimeException(e);
+			}
+			
 			repositoryClassesMap
 			.forEach((x,y)->{
 				pui.addManagedClassName(y.getName());

@@ -26,12 +26,12 @@ public class MetaClassCustomBean {
 	@Primary
 	MetaClassClassesStore persistenceUnitClassesMap(@Autowired  MetaClassVFSURLClassLoader injectionClassLoader) {
 		MetaClassClassesStore persistenceUnitClassesMap = new MetaClassClassesStore();
-		Class<?> clazz = metaClass(getClass().getClassLoader());
-		persistenceUnitClassesMap.put(clazz.getTypeName(),clazz);
-		Class<?> clazz1 = metaClassNumeric(getClass().getClassLoader());
-		persistenceUnitClassesMap.put(clazz1.getTypeName(),clazz1);
-		Class<?> clazz2 = metaClassDate(getClass().getClassLoader());
-		persistenceUnitClassesMap.put(clazz2.getTypeName(),clazz2);
+		//Class<?> clazz = metaClass(getClass().getClassLoader());
+		//persistenceUnitClassesMap.put(clazz.getTypeName(),clazz);
+//		Class<?> clazz1 = metaClassNumeric(getClass().getClassLoader());
+//		persistenceUnitClassesMap.put(clazz1.getTypeName(),clazz1);
+//		Class<?> clazz2 = metaClassDate(getClass().getClassLoader());
+//		persistenceUnitClassesMap.put(clazz2.getTypeName(),clazz2);
 		return persistenceUnitClassesMap;
 	}
 	
@@ -102,7 +102,7 @@ public class MetaClassCustomBean {
 		var repositoryClassesMap = new RepositoryClassesBuilder();
 		persistenceUnitClassesMap.forEach((x,y)->{
 			Class<?> idClass = getIdClass(y);
-			Class <?> repClass = repositoryClassesMap.prepareReppositoryForClass(y, idClass, getClass().getClassLoader());
+			Class <?> repClass = repositoryClassesMap.prepareReppositoryForClass(y, idClass, classLoader);
 			System.err.println(y.getSimpleName());
 		});
 		return repositoryClassesMap;

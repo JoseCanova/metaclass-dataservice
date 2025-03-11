@@ -1,20 +1,13 @@
 package org.nanotek.config.spring;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
-import java.util.jar.JarOutputStream;
 
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.impl.VFSClassLoader;
 import org.instancio.Instancio;
 import org.nanotek.Base;
 import org.nanotek.config.MetaClassVFSURLClassLoader;
 import org.nanotek.config.RepositoryClassesBuilder;
-import org.nanotek.config.ramfs.JarCreator;
 import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
 import org.nanotek.metaclass.bytebuddy.RdbmsEntityBaseBuddy;
 import org.springframework.beans.BeansException;
@@ -33,15 +26,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.support.CrudMethodMetadata;
-import org.springframework.orm.jpa.AbstractEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
@@ -122,7 +112,7 @@ ApplicationContextAware{
         childContext2.setParent(childContext3);
         childContext2.register(CustomJpaRepositoryConfig.class);
         childContext2.refresh();
-        childContext2.getBean("integerValue");
+        childContext2.getBean("configureJpaRepository");
 //        
         veriyLoadedClassesByResource(childContext2);
         defaultListableBeanFactory = childContext3.getBean(DefaultListableBeanFactory.class);
@@ -175,6 +165,7 @@ ApplicationContextAware{
 //				Object instance = Instancio.create(entityClass);
 //				obj.saveAndFlush(entityClass.cast(instance));
 //				obj.deleteAll();
+				
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

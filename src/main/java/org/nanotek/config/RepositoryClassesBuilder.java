@@ -29,6 +29,7 @@ import net.bytebuddy.pool.TypePool;
 public class RepositoryClassesBuilder   {
 
 	private HashMap<String, Class<?>> entityStore;
+	private HashMap<String, byte[]> byteStore;
 	public static final String basePackage = "org.nanotek.config.spring.repositories." ;
 	
 	public RepositoryClassesBuilder(){
@@ -37,17 +38,19 @@ public class RepositoryClassesBuilder   {
 
 	private void constructMap() {
 		entityStore = new HashMap<>();
+		byteStore = new HashMap<>();
 	}
 
 
-	public Class<?> prepareReppositoryForClass(Class<?> clazz , Class<?> idClass, ClassLoader classLoader){
+	public Class<?> prepareReppositoryForClass(Class<?> clazz , Class<?> idClass, MetaClassVFSURLClassLoader classLoader){
 		Generic typeDescription = TypeDescription.Generic.Builder.parameterizedType(JpaRepository.class, clazz , idClass).build().asGenericType();
 		Entity theEntity = clazz.getAnnotation(Entity.class);
 		Optional.ofNullable(theEntity).orElseThrow();
+		String repositoryName = basePackage.concat(theEntity.name()).concat("Repository");
 		DynamicType.Unloaded<?> unloaded =   new ByteBuddy(ClassFileVersion.JAVA_V22)
 //				.makeInterface(EntityBaseRepository.class)
 				.makeInterface(typeDescription)
-				.name( basePackage.concat(theEntity.name()).concat("Repository"))
+				.name(repositoryName)
 				.annotateType( AnnotationDescription.Builder.ofType(Repository.class)
 						.build())
 				.annotateType( AnnotationDescription.Builder.ofType(Qualifier.class)
@@ -59,18 +62,25 @@ public class RepositoryClassesBuilder   {
 //						.build()
 //						)
 				.make();
+		byteStore.put(repositoryName, unloaded.getBytes());
+		
 				//,ClassLoadingStrategy.Default.WRAPPER_PERSISTENT
-		Class<?> cd =unloaded.load(classLoader,ClassLoadingStrategy.Default.INJECTION).getLoaded();
+//		Class<?> cd =unloaded.load(classLoader,ClassLoadingStrategy.Default.INJECTION).getLoaded();
 		try {
-			Class<?> theclazz = Class.forName(cd.getTypeName(),true , classLoader);
-			System.err.println(cd.toGenericString());
+			String className = unloaded.getTypeDescription().getActualName();
+    		Class<?> theclazz = classLoader.defineClass(className, unloaded.getBytes());
+			System.err.println(theclazz.toGenericString());
 			put(theEntity.name(), theclazz);
+			return theclazz;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		return cd;
 	}
 
+	public byte[] getBytes(String key) {
+		return byteStore.get(key);
+	}
+	
 	public int size() {
 		return entityStore.size();
 	}
