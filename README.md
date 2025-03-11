@@ -1,22 +1,22 @@
 # metaclass-dataservice
 dataservice experiment for  "entity model" generation of metaclass-bytebuddy.
 
-04/03/2025
+### 04/03/2025
 for now the experiment is failling to configure using @EnableAutoConfiguration the JPA Repositories, 
 
-# The EntityManager and JpaRepositories are being manually configured or now,
+### The EntityManager and JpaRepositories are being manually configured or now,
 
-# The problem as far I understood seems to be that the DynamicType aren`t visible by the Spring Class that loads 
+### The problem as far I understood seems to be that the DynamicType aren`t visible by the Spring Class that loads 
 the Reources (ResourceLoader, getResources method). This seems to be not being solved since is not considered an issue but a 
 limitation of the instrumentation library. An alternative could be try to intercept (using the instrumentation library) the method on the Spring-Data-Commons that will load the resource.
 
-# Will continue to configure the beans manually as being done in previous version since the main objective is to expose the database model for 
+### Will continue to configure the beans manually as being done in previous version since the main objective is to expose the database model for 
 analysis (main objective).
 
-# There are other alternatives like create the classes with a maven plugin and load it in a standard application ( the idea still need to be mitigated),
+### There are other alternatives like create the classes with a maven plugin and load it in a standard application ( the idea still need to be mitigated),
 this alternative opens a better approach for a generic configuration but will be developed in another branch in future, with an advantage that will be gain 
 a basic competence on maven-plugin (mojo) development but, still need to be mitigated.
 
-# 11/03/2025 - Problem solved with the appropriate FileSystemProvider
+### 11/03/2025 - Problem solved with the appropriate FileSystemProvider
 ### Serialized the class using jimfs (google/jimfs) and solved the problem for the ClassLoader used to inject the DynamicTypes (the proper name) , this leads to a small ammount of memory usage but with minimal impact since the classes are interfaces or extensions of a single implementation considering the "shall exist" a superset with common methods for a domain model and "specific issues" can be handled also with "interfaces and default methods".
 
