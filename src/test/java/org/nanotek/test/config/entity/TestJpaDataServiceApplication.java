@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.instancio.Instancio;
 import org.nanotek.test.entity.data.SimpleTableEntity;
 import org.nanotek.test.entity.repositories.SimpleTableEntityRepository;
-import org.nanotek.test.jpa.repositories.TestJpaRepositoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -33,7 +32,7 @@ ApplicationRunner,
 ApplicationContextAware{
 
 	
-	private static final Logger logger = LoggerFactory.getLogger(TestJpaRepositoryBean.class);
+	private static final Logger logger = LoggerFactory.getLogger(TestJpaDataServiceConfiguration.class);
 
 	@Autowired
 	@Qualifier("myBf")
