@@ -1,6 +1,7 @@
 package org.nanotek.config.spring;
 
 import java.io.IOException;
+import java.nio.file.FileSystem;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,6 +32,8 @@ import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.jimfs.Configuration;
+import com.google.common.jimfs.Jimfs;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -59,11 +62,17 @@ ApplicationContextAware{
 	}
 	
 	@Bean
+	@Qualifier (value="jimfs")
+	FileSystem jimsFileSystem () {
+		return Jimfs.newFileSystem(Configuration.unix());
+	}
+	
+	@Bean
 	@Primary
-	MetaClassVFSURLClassLoader vfsClassLoader(@Autowired @Qualifier("injectionClassLoader") InjectionClassLoader injectionClassLoader) throws Exception{
+	MetaClassVFSURLClassLoader vfsClassLoader(@Autowired @Qualifier("injectionClassLoader") InjectionClassLoader injectionClassLoader
+			,@Autowired @Qualifier("jimfs") FileSystem fileSystem) throws Exception{
 		MetaClassVFSURLClassLoader vfsClassLoader = new MetaClassVFSURLClassLoader(Thread.currentThread().getContextClassLoader() 
-				, Arrays.asList(injectionClassLoader)  , 
-				false);
+				,  false , fileSystem);
 		return vfsClassLoader;
 	}
 	

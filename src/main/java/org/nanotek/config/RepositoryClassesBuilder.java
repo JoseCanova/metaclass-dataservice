@@ -1,6 +1,5 @@
 package org.nanotek.config;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,8 +10,8 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.nanotek.repository.data.EntityBaseRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import jakarta.persistence.Entity;
@@ -22,9 +21,6 @@ import net.bytebuddy.description.annotation.AnnotationDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.description.type.TypeDescription.Generic;
 import net.bytebuddy.dynamic.DynamicType;
-import net.bytebuddy.dynamic.TypeResolutionStrategy;
-import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
-import net.bytebuddy.pool.TypePool;
 
 public class RepositoryClassesBuilder   {
 
@@ -43,7 +39,7 @@ public class RepositoryClassesBuilder   {
 
 
 	public Class<?> prepareReppositoryForClass(Class<?> clazz , Class<?> idClass, MetaClassVFSURLClassLoader classLoader){
-		Generic typeDescription = TypeDescription.Generic.Builder.parameterizedType(JpaRepository.class, clazz , idClass).build().asGenericType();
+		Generic typeDescription = TypeDescription.Generic.Builder.parameterizedType(EntityBaseRepository.class, clazz , idClass).build().asGenericType();
 		Entity theEntity = clazz.getAnnotation(Entity.class);
 		Optional.ofNullable(theEntity).orElseThrow();
 		String repositoryName = basePackage.concat(theEntity.name()).concat("Repository");

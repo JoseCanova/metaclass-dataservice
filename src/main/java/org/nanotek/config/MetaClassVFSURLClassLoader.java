@@ -2,7 +2,6 @@ package org.nanotek.config;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystem;
@@ -19,8 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.VFS;
 
 import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 
@@ -28,20 +25,21 @@ import net.bytebuddy.dynamic.loading.InjectionClassLoader;
  */
 public class MetaClassVFSURLClassLoader extends InjectionClassLoader {
 
-	Map<String , FileObject> loadedClasses; 
 	FileSystem fileSystem;
-
+	
+	public static final String REPO_PATH="org/nanotek/config/spring/repositories/";
+	public static final String ENTITY_PATH="org/nanotek/config/spring/data/";
+	public static final String SERVICE_PATH="org/nanotek/config/spring/services/";
+	
+	
 	public MetaClassVFSURLClassLoader(ClassLoader parent, boolean sealed, FileSystem fileSystem) {
 		super(parent, false);
 		this.fileSystem = fileSystem;
 		postConstruct();
 	}
 
-
 	private void postConstruct() {
 		try { 
-			
-			loadedClasses = new HashMap<>();
 			createEntityFileDirectory();
 		}catch (Exception e) {
 			throw new RuntimeException(e);
@@ -51,7 +49,6 @@ public class MetaClassVFSURLClassLoader extends InjectionClassLoader {
 	@Override
 	protected Map<String, Class<?>> doDefineClasses(Map<String, byte[]> typeDefinitions) throws ClassNotFoundException {
 		System.err.println("do define classes");
-		
 		Map<String, Class<?>> types = new HashMap<String, Class<?>>();
 		for (Map.Entry<String, byte[]> entry : typeDefinitions.entrySet()) {
 			Class<?> clazz = defineClass(entry.getKey(), entry.getValue(), 0, entry.getValue().length);
@@ -79,24 +76,13 @@ public class MetaClassVFSURLClassLoader extends InjectionClassLoader {
 		}
     }
 	
-	private  void createEntityFileDirectory() {
-    	try {
-        	Path orgPath = fileSystem.getPath("org", new String[]{});
-        	Path nanoPath = fileSystem.getPath("org/nanotek", new String[]{});//config.spring.data
-        	Path configPath = fileSystem.getPath("org/nanotek/config", new String[]{});
-        	Path springPath = fileSystem.getPath("org/nanotek/config/spring",new String[]{});
-        	Path dataPath = fileSystem.getPath("org/nanotek/config/spring/data",new String[]{});
-        	Path repoPath = fileSystem.getPath("org/nanotek/config/spring/repositories",new String[]{});
-			Files.createDirectory(orgPath);
-			Files.createDirectory(nanoPath);
-			Files.createDirectory(configPath);
-			Files.createDirectory(springPath);
-			Files.createDirectory(dataPath);
-			Files.createDirectory(repoPath);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	private  void createEntityFileDirectory() throws IOException {
+    		Path dataPath = fileSystem.getPath(ENTITY_PATH, new String[]{});
+            Files.createDirectories(dataPath);
+        	Path repoPath = fileSystem.getPath(REPO_PATH,new String[]{});
+            Files.createDirectories(repoPath);
+            Path servicePath = fileSystem.getPath(SERVICE_PATH,new String[]{});
+            Files.createDirectories(servicePath);
     }
 	
 	@Override
@@ -132,10 +118,10 @@ public class MetaClassVFSURLClassLoader extends InjectionClassLoader {
 
    @Override
 	public Enumeration<URL> getResources(String name) throws IOException {
-	   if (name.equals("org/nanotek/config/spring/repositories/"))
+	   if (name.equals(REPO_PATH))
 	   {
 		   List<URL> files =  new ArrayList<>();
-		   System.err.println("getResoures " +  name);
+		   System.err.println("getResoures Repositories " +  name);
 		   Path theRepoPath = fileSystem.getPath(name, new String[0]);
 		   if (Files.exists(theRepoPath, new LinkOption[0])) {
            	files.add(theRepoPath.toUri().toURL());	
@@ -148,35 +134,26 @@ public class MetaClassVFSURLClassLoader extends InjectionClassLoader {
 	            return Collections.enumeration(files);
 	        }
 	   }
+	   
+	   if (name.equals(ENTITY_PATH))
+	   {
+		   List<URL> files =  new ArrayList<>();
+		   System.err.println("getResoures Data " +  name);
+		   Path thePath = fileSystem.getPath(name, new String[0]);
+		   if (Files.exists(thePath, new LinkOption[0])) {
+           	files.add(thePath.toUri().toURL());	
+           	return Collections.enumeration(files);
+		   }
+		   try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(thePath)) {
+	            for (Path file : directoryStream) {
+	            	files.add(file.toUri().toURL());	
+	            }
+	            return Collections.enumeration(files);
+	        }
+	   }
 	  
 	   return super.getResources(name);
    }
-//
-//	   List<FileObject> classes =  new ArrayList<>();
-//	   loadedClasses
-//	    .entrySet()
-//	    .stream()
-//	    .filter((k) -> k.getKey().contains(keyname) || keyname.contains(k.getKey()))
-//	    .forEach (k -> {
-//	    	FileObject foo = k.getValue();
-//	    	System.err.println("contains " + foo);
-//	    	classes.add(foo);
-//	    });
-//	   if(classes.size() == 0)
-//	    return super.getResources(name);
-//	   else 
-//	   {	List <URL> urls = new ArrayList<>();
-//		   classes.forEach(c -> {
-//			   try {
-////				   URI cc = new URI("file" , c.getURL().getPath(),c.getURL().getFile());
-//				   urls.add(c.getURL());
-//			   }catch (Exception e) {
-//				   e.printStackTrace();
-//			   }
-//		   });
-//		   return Collections.enumeration(urls);
-//	   }
-//	}
 }
 
 
