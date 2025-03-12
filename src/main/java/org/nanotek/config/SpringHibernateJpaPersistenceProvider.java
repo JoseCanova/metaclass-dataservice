@@ -13,7 +13,6 @@ import org.springframework.orm.jpa.persistenceunit.SmartPersistenceUnitInfo;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.spi.PersistenceUnitInfo;
 import jakarta.persistence.spi.ProviderUtil;
-import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
 
 public class SpringHibernateJpaPersistenceProvider extends HibernatePersistenceProvider {
