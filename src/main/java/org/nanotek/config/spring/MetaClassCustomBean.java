@@ -7,11 +7,9 @@ import java.util.stream.Stream;
 
 import org.nanotek.config.MetaClassClassesStore;
 import org.nanotek.config.MetaClassVFSURLClassLoader;
-import org.nanotek.config.RepositoryClassesBuilder;
 import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
 import org.nanotek.metaclass.bytebuddy.RdbmsEntityBaseBuddy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -93,20 +91,20 @@ public class MetaClassCustomBean {
 	
 
 
-	@Bean
-	@Primary
-	@Qualifier(value="repositoryClassesMap")
-	RepositoryClassesBuilder repositoryClassesMap(
-			@Autowired MetaClassVFSURLClassLoader classLoader , 
-			@Autowired MetaClassClassesStore persistenceUnitClassesMap) {
-		var repositoryClassesMap = new RepositoryClassesBuilder();
-		persistenceUnitClassesMap.forEach((x,y)->{
-			Class<?> idClass = getIdClass(y);
-			Class <?> repClass = repositoryClassesMap.prepareReppositoryForClass(y, idClass, classLoader);
-			System.err.println(y.getSimpleName());
-		});
-		return repositoryClassesMap;
-	}
+//	@Bean
+//	@Primary
+//	@Qualifier(value="repositoryClassesMap")
+//	RepositoryClassesBuilder repositoryClassesMap(
+//			@Autowired MetaClassVFSURLClassLoader classLoader , 
+//			@Autowired MetaClassClassesStore persistenceUnitClassesMap) {
+//		var repositoryClassesMap = new RepositoryClassesBuilder();
+//		persistenceUnitClassesMap.forEach((x,y)->{
+//			Class<?> idClass = getIdClass(y);
+//			Class <?> repClass = repositoryClassesMap.prepareReppositoryForClass(y, idClass, classLoader);
+//			System.err.println(y.getSimpleName());
+//		});
+//		return repositoryClassesMap;
+//	}
 	
 	
 	private Class<?> getIdClass(Class<?> y) {

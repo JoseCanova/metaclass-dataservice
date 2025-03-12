@@ -2,12 +2,10 @@ package org.nanotek.repository.data;
 
 import org.nanotek.Base;
 import org.nanotek.config.MetaClassClassesStore;
-import org.nanotek.config.RepositoryClassesBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.query.JpaQueryMethodFactory;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.querydsl.EntityPathResolver;
@@ -24,9 +22,9 @@ extends JpaRepositoryFactoryBean<T,K,ID> {
 	@Autowired
 	MetaClassClassesStore classesCondig;
 	
-	@Autowired 
-	RepositoryClassesBuilder repoConfig;
-	
+//	@Autowired 
+//	RepositoryClassesBuilder repoConfig;
+//	
 	@Autowired
 	EntityManagerFactory entityManagerFactory;
 	
@@ -70,13 +68,6 @@ extends JpaRepositoryFactoryBean<T,K,ID> {
 		this.classesCondig = classesCondig;
 	}
 
-	public RepositoryClassesBuilder getRepoConfig() {
-		return repoConfig;
-	}
-
-	public void setRepoConfig(RepositoryClassesBuilder repoConfig) {
-		this.repoConfig = repoConfig;
-	}
 
 	public Class<?> getEntityClass() {
 		return entityClass;

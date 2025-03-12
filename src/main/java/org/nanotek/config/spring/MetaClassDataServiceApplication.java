@@ -8,7 +8,6 @@ import java.util.List;
 import org.instancio.Instancio;
 import org.nanotek.Base;
 import org.nanotek.config.MetaClassVFSURLClassLoader;
-import org.nanotek.config.RepositoryClassesBuilder;
 import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
 import org.nanotek.metaclass.bytebuddy.RdbmsEntityBaseBuddy;
 import org.springframework.beans.BeansException;
@@ -135,17 +134,10 @@ ApplicationContextAware{
 
 	
 	private void veriyLoadedClassesByResource(AnnotationConfigApplicationContext childContext3) {
-		RepositoryClassesBuilder repositoryClassesMap = childContext3.getBean(RepositoryClassesBuilder.class);
 		  try {
 			    Resource[] urls = childContext3.getResources("org/nanotek/config/spring/repositories");
 			    Resource[] resources = childContext3.getResources("org/nanotek/config/spring/**/*.class");
 				Assert.isTrue(resources !=null &&  resources.length > 0, "resource is null");
-			    repositoryClassesMap
-				.forEach((n,y)->{
-						String resourceName = y.getName().replaceAll("[.]", "/").concat(".class");
-						Resource resource = childContext3.getResource(resourceName);
-						Assert.isTrue(resource !=null, "resource is null");
-				});
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -153,34 +145,6 @@ ApplicationContextAware{
 
 
 
-	public void run(ApplicationContext context, DefaultListableBeanFactory defaultListableBeanFactory2) {
-		RepositoryClassesBuilder repositoryClassesMap = context.getBean(RepositoryClassesBuilder.class);
-		EntityManagerFactory entityManagerFactory = context.getBean(EntityManagerFactory.class);
-		repositoryClassesMap
-		.forEach((n,y) -> {
-			try {
-				Class<?> beanClass = y;
-				Class<Base<?>> entityClass = (Class<Base<?>>) Class.forName("org.nanotek.config.spring.data."+n, true , context.getClassLoader());
-//				TransactionInterceptor interceptor = applicationContext.getBean(TransactionInterceptor.class);
-//				interceptor.setTransactionManager(transactionManager);
-				//				defaultListableBeanFactory.createBean(beanClass, 0, false);
-				JpaRepository<Base<?>,?> obj = (JpaRepository<Base<?>, ?>) defaultListableBeanFactory.getBean(y);
-//				assertNotNull(obj);
-//				obj.findAll();
-				someProgramaticTransactionalServiceMethod(entityManagerFactory , entityClass);
-				simpleFlush(entityManagerFactory);
-				saveAndFlush(obj,entityClass);
-//				obj.deleteAll();
-//				Object instance = Instancio.create(entityClass);
-//				obj.saveAndFlush(entityClass.cast(instance));
-//				obj.deleteAll();
-				
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		});
-	}
-	
 	@Transactional
 	private void saveAndFlush(JpaRepository<Base<?>, ?> obj, Class<Base<?>> entityClass) {
 		Base<?> instance = Instancio.create(entityClass);
