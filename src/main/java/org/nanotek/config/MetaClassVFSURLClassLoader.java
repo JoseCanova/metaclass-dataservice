@@ -140,7 +140,6 @@ public class MetaClassVFSURLClassLoader extends InjectionClassLoader {
 		   Path thePath = fileSystem.getPath(name, new String[0]);
 		   if (Files.exists(thePath, new LinkOption[0])) {
            	files.add(thePath.toUri().toURL());	
-           	return Collections.enumeration(files);
 		   }
 		   try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(thePath)) {
 	            for (Path file : directoryStream) {

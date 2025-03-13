@@ -1,15 +1,13 @@
 package org.nanotek.config.spring;
 
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
-import org.nanotek.config.CustomHibernateJpaVendorAdapter;
+import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.nanotek.config.MetaClassClassesStore;
-import org.nanotek.config.MetaClassLocalContainerEntityManagerFactoryBean;
-import org.nanotek.config.MetaClassMergingPersistenceUnitManager;
 import org.nanotek.config.MetaClassVFSURLClassLoader;
-import org.nanotek.config.SpringHibernateJpaPersistenceProvider;
 import org.nanotek.repository.data.MetaClassJpaTransactionManager;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,19 +15,18 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
 import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.data.jpa.support.MergingPersistenceUnitManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.persistenceunit.MutablePersistenceUnitInfo;
+import org.springframework.orm.jpa.persistenceunit.PersistenceManagedTypes;
 import org.springframework.orm.jpa.persistenceunit.PersistenceUnitPostProcessor;
 import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -44,27 +41,12 @@ import jakarta.persistence.metamodel.Metamodel;
 @SpringBootConfiguration
 //@EnableTransactionManagement
 @EnableAutoConfiguration(exclude= {TransactionAutoConfiguration.class})
-@EnableJpaRepositories(
-		basePackages = 
-	{"org.nanotek.config.spring.repositories"}
-		, transactionManagerRef = "transactionManager")
 public class MetaClassJpaDataServiceConfiguration implements ApplicationContextAware{
 
 	public MetaClassJpaDataServiceConfiguration() {
 	}
 	
 	ApplicationContext context;
-	
-	
-	@Autowired
-	MetaClassClassesStore metaClassClassesStore;
-	
-	@Bean
-	@Lazy(true)
-	@Qualifier(value="repositoryClassesMap")
-	public MetaClassClassesStore getMetaClassClassesStore() {
-		return metaClassClassesStore;
-	}
 	
 	@Bean 
 	@Qualifier(value="myBf")
@@ -94,16 +76,16 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 	@Bean(value="myPersistenceManager")
 	@Qualifier(value="myPersistenceManager")
 	@DependsOn("dataSource")
-	public MergingPersistenceUnitManager myPersistenceManager(@Autowired DataSource dataSource
-						,@Autowired MetaClassClassesStore persistenceUnitClassesMap) {
+	public MergingPersistenceUnitManager myPersistenceManager(@Autowired DataSource dataSource) {
 //		metaClassNumericHundred(injectionClassLoader,persistenceUnitClassesMap);
-		MetaClassMergingPersistenceUnitManager pum = new  MetaClassMergingPersistenceUnitManager(persistenceUnitClassesMap);
-//		pum.setValidationMode(ValidationMode.NONE);
+		MergingPersistenceUnitManager pum = new  MergingPersistenceUnitManager();
+		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");
 		pum.setPackagesToScan("org.nanotek.config.spring.data");
+		String[] names = BootstrapAgent.metaClassRegistry.getEntityClasses().stream().map(c->c.getName()).collect(Collectors.toList()).toArray(new String[0]);
+		pum.setManagedTypes(PersistenceManagedTypes.of(names));
 		pum.setDefaultDataSource(dataSource);
-		pum.setPersistenceUnitPostProcessors(myProcessor());
-		pum.preparePersistenceUnitInfos();
+		pum.setResourceLoader(new PathMatchingResourcePatternResolver(BootstrapAgent.byteArrayClassLoader));
 		return pum;
 	}
 	
@@ -114,25 +96,18 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 			@Autowired DataSource dataSource ,
 			@Autowired MetaClassVFSURLClassLoader classLoader , 
 			@Autowired Initializer initializer, 
-			@Autowired MetaClassMergingPersistenceUnitManager myPersistenceManager) {
+			@Autowired @Qualifier("myPersistenceManager") MergingPersistenceUnitManager myPersistenceManager) {
 		
-//		MergingPersistenceUnitManager myPersistenceManager = myPersistenceManager( dataSource,
-//				classLoader,
-//				 persistenceUnitClassesMap);
-		
-		MetaClassLocalContainerEntityManagerFactoryBean factory = new MetaClassLocalContainerEntityManagerFactoryBean(classLoader);
+		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 //		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
+		factory.setBeanClassLoader(classLoader);
 		factory.setDataSource(dataSource);
 		factory.setPersistenceUnitManager(myPersistenceManager);
-		factory.setPersistenceProviderClass(SpringHibernateJpaPersistenceProvider.class);
+		factory.setPersistenceProviderClass(HibernatePersistenceProvider.class);
 		factory.setJpaDialect(new HibernateJpaDialect());
-		HibernateJpaVendorAdapter vendorAdapter = new CustomHibernateJpaVendorAdapter(classLoader,myPersistenceManager.getPersistenceUnitClassesMap());
+		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 		factory.setJpaVendorAdapter(vendorAdapter);
 		factory.setEntityManagerInitializer(initializer);
-		factory.setConfig(myPersistenceManager.getPersistenceUnitClassesMap());
-		factory.setPersistenceUnitName("buddyPU");
-		factory.afterPropertiesSet2();
-//		factory.afterPropertiesSet();
 		return factory;
 	}
 	
@@ -168,14 +143,6 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 		return transactionManager;//new DataSourceTransactionManager(dataSource);
 	}
 
-//	@Bean 
-//	@DependsOn("transactionManager")
-//	public TransactionProxyFactoryBean transactionProxyFactoryBean(@Autowired PlatformTransactionManager transactionManager) {
-//		TransactionProxyFactoryBean transactionProxyFactoryBean = new TransactionProxyFactoryBean();
-//		transactionProxyFactoryBean.setTransactionManager(transactionManager);
-//		return transactionProxyFactoryBean;
-//	}
-	
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.context = applicationContext;
@@ -204,7 +171,9 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 			
 			try {
 				Class<?> clazz = Class.forName("org.nanotek.config.spring.data.SimpleTable",true , classLoader);
+				Class<?> clazzn = Class.forName("org.nanotek.config.spring.data.SimpleNumericTable",true , classLoader);
 				pui.addManagedClassName(clazz.getName());
+				pui.addManagedClassName(clazzn.getName());
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 				throw new RuntimeException(e);
