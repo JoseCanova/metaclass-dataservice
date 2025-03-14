@@ -82,8 +82,12 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");
 		pum.setPackagesToScan("org.nanotek.config.spring.data");
-		String[] names = BootstrapAgent.metaClassRegistry.getEntityClasses().stream().map(c->c.getName()).collect(Collectors.toList()).toArray(new String[0]);
-		pum.setManagedTypes(PersistenceManagedTypes.of(names));
+		String[] entityNames = BootstrapAgent.metaClassRegistry
+				.getEntityClasses()
+				.stream()
+				.map(c->c.getName())
+				.collect(Collectors.toList()).toArray(new String[0]);
+		pum.setManagedTypes(PersistenceManagedTypes.of(entityNames));
 		pum.setDefaultDataSource(dataSource);
 		pum.setResourceLoader(new PathMatchingResourcePatternResolver(BootstrapAgent.byteArrayClassLoader));
 		return pum;
@@ -99,7 +103,6 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 			@Autowired @Qualifier("myPersistenceManager") MergingPersistenceUnitManager myPersistenceManager) {
 		
 		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
-//		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 		factory.setBeanClassLoader(classLoader);
 		factory.setDataSource(dataSource);
 		factory.setPersistenceUnitManager(myPersistenceManager);
