@@ -1,5 +1,11 @@
 debug: true
 
+springdoc:
+    show-actuator: true
+
+
+
+
 server:
   servlet:
     context-path: /

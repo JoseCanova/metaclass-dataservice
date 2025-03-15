@@ -66,7 +66,7 @@ import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 
 //WebMvcAutoConfiguration.class, 
 @SpringBootApplication(proxyBeanMethods = false)
-@SpringBootConfiguration(proxyBeanMethods = false)
+//@SpringBootConfiguration(proxyBeanMethods = false)
 @ComponentScan(useDefaultFilters=false)
 //@EnableAutoConfiguration(exclude = {WebServicesAutoConfiguration.class,  JpaRepositoriesAutoConfiguration.class ,  HibernateJpaAutoConfiguration.class , RepositoryRestMvcAutoConfiguration.class})
 public class ApplicationAgent 
