@@ -82,14 +82,14 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");
 		pum.setPackagesToScan("org.nanotek.config.spring.data");
-		String[] entityNames = BootstrapAgent.metaClassRegistry
+		String[] entityNames = ApplicationAgent.metaClassRegistry
 				.getEntityClasses()
 				.stream()
 				.map(c->c.getName())
 				.collect(Collectors.toList()).toArray(new String[0]);
 		pum.setManagedTypes(PersistenceManagedTypes.of(entityNames));
 		pum.setDefaultDataSource(dataSource);
-		pum.setResourceLoader(new PathMatchingResourcePatternResolver(BootstrapAgent.byteArrayClassLoader));
+		pum.setResourceLoader(new PathMatchingResourcePatternResolver(ApplicationAgent.byteArrayClassLoader));
 		return pum;
 	}
 	

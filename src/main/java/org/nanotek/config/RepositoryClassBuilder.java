@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.nanotek.repository.data.EntityBaseRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.stereotype.Repository;
 
 import jakarta.persistence.Entity;
@@ -35,6 +36,10 @@ public class RepositoryClassBuilder   {
 						.build())
 				.annotateType( AnnotationDescription.Builder.ofType(Qualifier.class)
 						.define("value",  theEntity.name()+"Repository")
+						.build())//collectionResourceRel = "people", path = "people"
+				.annotateType( AnnotationDescription.Builder.ofType(RepositoryRestResource.class)
+						.define("collectionResourceRel",  theEntity.name().toLowerCase())
+						.define("path", theEntity.name().toLowerCase())
 						.build())
 				.make();
 			return new RepositoryPair(repositoryName,unloaded);
