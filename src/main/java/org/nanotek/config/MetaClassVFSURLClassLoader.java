@@ -25,7 +25,7 @@ public class MetaClassVFSURLClassLoader extends InjectionClassLoader {
 
 	FileSystem fileSystem;
 	
-	public static final String REPO_PATH="org/nanotek/config/spring/repositories/";
+	public static final String REPO_PATH="jimfs/org/nanotek/config/spring/repositories/";
 	public static final String ENTITY_PATH="org/nanotek/config/spring/data/";
 	public static final String SERVICE_PATH="org/nanotek/config/spring/services/";
 	

@@ -12,6 +12,7 @@ logging:
      org.hibernate: debug
      org.springframework.transaction.interceptor: info
      org.springframework.data: debug
+     org.springframework.data.rest: debug
      org.springframework.data.jpa.repository: debug
      org.springframework.data.jpa.repository.support: debug
   

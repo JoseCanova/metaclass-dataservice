@@ -107,7 +107,7 @@ ApplicationContextAware{
         urlConnection.printValue("hello");
         Class<?> clazz = Class.forName("org.nanotek.config.spring.data.SimpleTable", true , byteArrayClassLoader);
         System.out.println(clazz.getName());
-        clazz = Class.forName("org.nanotek.config.spring.repositories.SimpleTableRepository" , true , byteArrayClassLoader);
+        clazz = Class.forName("jimfs.org.nanotek.config.spring.repositories.SimpleTableRepository" , true , byteArrayClassLoader);
         System.out.println(clazz.getName());
         AnnotationConfigServletWebServerApplicationContext context  = 
         		(AnnotationConfigServletWebServerApplicationContext) 
