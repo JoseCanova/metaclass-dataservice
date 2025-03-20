@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 
 import org.hibernate.jpa.HibernatePersistenceProvider;
-import org.nanotek.config.MetaClassClassesStore;
+import org.nanotek.MetaClassRestClientApplication;
 import org.nanotek.config.MetaClassVFSURLClassLoader;
 import org.nanotek.repository.data.MetaClassJpaTransactionManager;
 import org.springframework.beans.BeansException;
@@ -25,9 +25,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.data.jpa.support.MergingPersistenceUnitManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.persistenceunit.MutablePersistenceUnitInfo;
 import org.springframework.orm.jpa.persistenceunit.PersistenceManagedTypes;
-import org.springframework.orm.jpa.persistenceunit.PersistenceUnitPostProcessor;
 import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -82,14 +80,14 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");
 		pum.setPackagesToScan("org.nanotek.config.spring.data");
-		String[] entityNames = ApplicationAgent.metaClassRegistry
+		String[] entityNames = MetaClassRestClientApplication.metaClassRegistry
 				.getEntityClasses()
 				.stream()
 				.map(c->c.getName())
 				.collect(Collectors.toList()).toArray(new String[0]);
 		pum.setManagedTypes(PersistenceManagedTypes.of(entityNames));
 		pum.setDefaultDataSource(dataSource);
-		pum.setResourceLoader(new PathMatchingResourcePatternResolver(ApplicationAgent.byteArrayClassLoader));
+		pum.setResourceLoader(new PathMatchingResourcePatternResolver(MetaClassRestClientApplication.byteArrayClassLoader));
 		return pum;
 	}
 	
@@ -151,47 +149,5 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 		this.context = applicationContext;
 	}
 	
-	@Bean
-	public PersistenceUnitPostProcessor myProcessor () {
-		return new MyPersistenceUnitPostProcessor();
-	}
 
-	class MyPersistenceUnitPostProcessor  implements PersistenceUnitPostProcessor{
-
-		@Autowired
-		MetaClassClassesStore repositoryClassesMap;
-
-		@Autowired
-		@Qualifier("myBf")
-		DefaultListableBeanFactory defaultListableBeanFactory;
-
-		@Autowired
-		MetaClassVFSURLClassLoader classLoader;
-
-		@Override
-		public void postProcessPersistenceUnitInfo(MutablePersistenceUnitInfo pui) {
-			defaultListableBeanFactory.setBeanClassLoader(classLoader);
-			
-			try {
-				Class<?> clazz = Class.forName("org.nanotek.config.spring.data.SimpleTable",true , classLoader);
-				Class<?> clazzn = Class.forName("org.nanotek.config.spring.data.SimpleNumericTable",true , classLoader);
-				pui.addManagedClassName(clazz.getName());
-				pui.addManagedClassName(clazzn.getName());
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-				throw new RuntimeException(e);
-			}
-			
-			repositoryClassesMap
-			.forEach((x,y)->{
-				pui.addManagedClassName(y.getName());
-			});
-			pui.addManagedPackage("org.nanotek.config.spring.data");
-			pui.setValidationMode(ValidationMode.NONE);
-			//			pui.setExcludeUnlistedClasses(false);
-//			Properties p = new Properties(); 
-//			pui.setProperties(p);
-			pui.setPersistenceUnitName("buddyPU");
-		}
-	}
 }

@@ -19,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>org.nanotek</groupId>
-            <artifactId>metaclass.bytebuddy</artifactId>
+            <artifactId>metaclass-autoconfiguration-starter</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <exclusions>
             	<exclusion>

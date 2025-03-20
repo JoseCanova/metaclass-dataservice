@@ -3,17 +3,14 @@ debug: true
 springdoc:
     show-actuator: true
 
-
-
-
 server:
   servlet:
     context-path: /
-  port: 8086
+  port: 8088
   
 logging:
    level:
-     root: info
+     root: debug
      org.springframework: debug
      org.hibernate: debug
      org.springframework.transaction.interceptor: info
@@ -91,3 +88,4 @@ management:
    jmx:
      exposure:
        include: "*"
+       

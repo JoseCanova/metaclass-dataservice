@@ -85,7 +85,7 @@ public class MetaClassVFSURLClassLoader extends InjectionClassLoader {
 	
 	@Override
 	public InputStream getResourceAsStream(String name) {
-		System.err.println("getResourceAsStream " + name);
+//		System.err.println("getResourceAsStream " + name);
 		Path thePath = fileSystem.getPath(name, new String[0]);
     	boolean bol = Files.exists(thePath, new LinkOption[0]);
     	InputStream is = null;
@@ -101,7 +101,7 @@ public class MetaClassVFSURLClassLoader extends InjectionClassLoader {
 
 	@Override
 	public URL getResource(String name) {
-		System.err.println("getResource " + name);
+//		System.err.println("getResource " + name);
 		Path thePath = fileSystem.getPath(name, new String[0]);
     	boolean bol = Files.exists(thePath, new LinkOption[0]);
     	URL theURL = null;

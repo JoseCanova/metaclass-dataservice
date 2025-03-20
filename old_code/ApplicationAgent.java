@@ -23,13 +23,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringApplicationRunListener;
-import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.rest.RepositoryRestMvcAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-import org.springframework.boot.autoconfigure.webservices.WebServicesAutoConfiguration;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -45,8 +39,11 @@ import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.util.Pair;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -103,8 +100,6 @@ ApplicationContextAware{
     public static void main(String[] args) throws Exception {
     	Instrumentation instrumentation = ByteBuddyAgent.install();
         premain(null, instrumentation);
-        var urlConnection = new Clazze();
-        urlConnection.printValue("hello");
         Class<?> clazz = Class.forName("org.nanotek.config.spring.data.SimpleTable", true , byteArrayClassLoader);
         System.out.println(clazz.getName());
         clazz = Class.forName("jimfs.org.nanotek.config.spring.repositories.SimpleTableRepository" , true , byteArrayClassLoader);
@@ -116,6 +111,15 @@ ApplicationContextAware{
     }
 
     public static void premain(String arg, Instrumentation inst) throws Exception {
+    	
+		/* Will use this configuration for meta-classes.
+		 * RestTemplate restTemplate = new RestTemplate(); String fooResourceUrl =
+		 * "http://localhost:8086/meta-class"; ResponseEntity<String> response =
+		 * restTemplate.getForEntity(fooResourceUrl , String.class);
+		 * System.err.println(response);
+		 */
+
+    	
     	fileSystem = Jimfs.newFileSystem(Configuration.unix());
     	byteArrayClassLoader = new MetaClassVFSURLClassLoader (ApplicationAgent.class.getClassLoader() , false ,fileSystem);
     	metaClassRegistry = new  MetaClassRegistry<>();
@@ -197,12 +201,6 @@ ApplicationContextAware{
     private static Boolean hasIdAnnotation(Field f) {
 		return Stream.of(f.getAnnotations()).filter(a ->a.annotationType().equals(jakarta.persistence.Id.class)).count()==1;
 	}
-    
-    public static class Clazze  {
-    	public void printValue(String value) {
-    		System.err.println(value);
-    	}
-    }
     
 	public void run(ApplicationArguments args) throws Exception {
 		MetaClassVFSURLClassLoader injectionClassLoader = applicationContext.getBean(MetaClassVFSURLClassLoader.class);

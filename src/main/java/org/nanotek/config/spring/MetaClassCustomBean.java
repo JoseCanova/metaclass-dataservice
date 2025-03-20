@@ -5,33 +5,15 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.nanotek.config.MetaClassClassesStore;
-import org.nanotek.config.MetaClassVFSURLClassLoader;
 import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
 import org.nanotek.metaclass.bytebuddy.RdbmsEntityBaseBuddy;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
 public class MetaClassCustomBean {
-
-	@Bean
-	@Primary
-	MetaClassClassesStore persistenceUnitClassesMap(@Autowired  MetaClassVFSURLClassLoader injectionClassLoader) {
-		MetaClassClassesStore persistenceUnitClassesMap = new MetaClassClassesStore();
-		//Class<?> clazz = metaClass(getClass().getClassLoader());
-		//persistenceUnitClassesMap.put(clazz.getTypeName(),clazz);
-//		Class<?> clazz1 = metaClassNumeric(getClass().getClassLoader());
-//		persistenceUnitClassesMap.put(clazz1.getTypeName(),clazz1);
-//		Class<?> clazz2 = metaClassDate(getClass().getClassLoader());
-//		persistenceUnitClassesMap.put(clazz2.getTypeName(),clazz2);
-		return persistenceUnitClassesMap;
-	}
 	
 	Class<?> metaClass(ClassLoader classLoader) {
 		ObjectMapper objectMapper = new ObjectMapper();
