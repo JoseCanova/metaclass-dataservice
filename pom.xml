@@ -19,13 +19,13 @@
     <dependencies>
         <dependency>
             <groupId>org.nanotek</groupId>
-            <artifactId>metaclass-autoconfiguration-starter</artifactId>
+            <artifactId>metaclass.bytebuddy</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <exclusions>
-            	<exclusion>
-            		<groupId>org.slf4j</groupId>
-            		<artifactId>slf4j-jdk14</artifactId>
-            	</exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-jdk14</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>

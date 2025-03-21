@@ -35,7 +35,7 @@ public class RepositoryClassBuilder   {
 				.annotateType( AnnotationDescription.Builder.ofType(Repository.class)
 						.build())
 				.annotateType( AnnotationDescription.Builder.ofType(Qualifier.class)
-						.define("value",  theEntity.name()+"Repository")
+						.define("value",  theEntity.name().concat("Repository"))
 						.build())//collectionResourceRel = "people", path = "people"
 				.annotateType( AnnotationDescription.Builder.ofType(RepositoryRestResource.class)
 						.define("collectionResourceRel",  theEntity.name().toLowerCase())

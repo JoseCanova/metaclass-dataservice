@@ -2,12 +2,9 @@ package org.nanotek.repository.data;
 
 import javax.sql.DataSource;
 
-import org.springframework.jdbc.datasource.ConnectionHolder;
 import org.springframework.orm.jpa.EntityManagerFactoryInfo;
-import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.orm.jpa.JpaDialect;
 import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import jakarta.persistence.EntityManagerFactory;
 
