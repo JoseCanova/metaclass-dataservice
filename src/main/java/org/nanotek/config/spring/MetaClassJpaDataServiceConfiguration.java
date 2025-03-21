@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 
 import org.hibernate.jpa.HibernatePersistenceProvider;
-import org.nanotek.MetaClassRestClientApplication;
+import org.nanotek.config.MetaClassRegistry;
 import org.nanotek.config.MetaClassVFSURLClassLoader;
 import org.nanotek.repository.data.MetaClassJpaTransactionManager;
 import org.springframework.beans.BeansException;
@@ -63,31 +63,24 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 		return new HikariConfig();
 	}
 
-//	@Bean
-//	@Primary
-//	@DependsOn("hikariConfig")
-//	public DataSource dataSource() {
-//		return new HikariDataSource(hikariConfig());
-//	}
-//	
-//	
 	@Bean(value="myPersistenceManager")
 	@Qualifier(value="myPersistenceManager")
 	@DependsOn("dataSource")
-	public MergingPersistenceUnitManager myPersistenceManager(@Autowired DataSource dataSource) {
-//		metaClassNumericHundred(injectionClassLoader,persistenceUnitClassesMap);
+	public MergingPersistenceUnitManager myPersistenceManager(@Autowired DataSource dataSource,
+			@Autowired MetaClassVFSURLClassLoader classLoader,
+			@Autowired MetaClassRegistry<?> metaClassRegistry) {
 		MergingPersistenceUnitManager pum = new  MergingPersistenceUnitManager();
 		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");
 		pum.setPackagesToScan("org.nanotek.config.spring.data");
-		String[] entityNames = MetaClassRestClientApplication.metaClassRegistry
+		String[] entityNames = metaClassRegistry
 				.getEntityClasses()
 				.stream()
 				.map(c->c.getName())
 				.collect(Collectors.toList()).toArray(new String[0]);
 		pum.setManagedTypes(PersistenceManagedTypes.of(entityNames));
 		pum.setDefaultDataSource(dataSource);
-		pum.setResourceLoader(new PathMatchingResourcePatternResolver(MetaClassRestClientApplication.byteArrayClassLoader));
+		pum.setResourceLoader(new PathMatchingResourcePatternResolver(classLoader));
 		return pum;
 	}
 	
