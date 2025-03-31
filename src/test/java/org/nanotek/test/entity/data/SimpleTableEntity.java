@@ -2,12 +2,15 @@ package org.nanotek.test.entity.data;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Set;
 
 import org.nanotek.Base;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity(name="SimpleTableEntity")
@@ -27,6 +30,9 @@ implements Base<SimpleTableEntity> {
 
 	@Column(name="simple_timestamp" , nullable = false)
 	private Timestamp simpleTimestamp;
+	
+	@OneToMany(mappedBy = "simpleTableEntity")
+	private Set<SimpleForeignTableEntity> simpleForeignTableEntitySet;
 	
 	public SimpleTableEntity() {
 	}
