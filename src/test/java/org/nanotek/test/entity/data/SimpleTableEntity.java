@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.nanotek.Base;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -30,7 +31,7 @@ implements Base<SimpleTableEntity> {
 	@Column(name="simple_timestamp" , nullable = false)
 	private Timestamp simpleTimestamp;
 	
-	@OneToMany(mappedBy = "simpleTableEntity")
+	@OneToMany(mappedBy = "simpleTableEntity", cascade = CascadeType.ALL)
 	private Set<SimpleForeignTableEntity> simpleForeignTableEntitySet;
 	
 	public SimpleTableEntity() {

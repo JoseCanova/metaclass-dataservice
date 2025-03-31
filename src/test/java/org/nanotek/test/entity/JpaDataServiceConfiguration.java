@@ -1,18 +1,12 @@
 package org.nanotek.test.entity;
 
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
 import javax.sql.DataSource;
 
 import org.hibernate.jpa.HibernatePersistenceProvider;
-import org.nanotek.config.MetaClassRegistry;
-import org.nanotek.config.MetaClassVFSURLClassLoader;
 import org.nanotek.repository.data.MetaClassJpaTransactionManager;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
@@ -22,21 +16,19 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.jpa.support.MergingPersistenceUnitManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.persistenceunit.PersistenceManagedTypes;
 import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.zaxxer.hikari.HikariConfig;
 
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.ValidationMode;
-import jakarta.persistence.metamodel.Metamodel;
 
 @SpringBootConfiguration
+@EnableJpaRepositories(basePackages = "org.nanotek.test.entity.repositories")
 @EnableAutoConfiguration(exclude= {TransactionAutoConfiguration.class})
 public class JpaDataServiceConfiguration implements ApplicationContextAware{
 
