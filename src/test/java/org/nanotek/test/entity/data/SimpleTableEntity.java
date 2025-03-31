@@ -9,7 +9,6 @@ import org.nanotek.Base;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -23,7 +22,6 @@ implements Base<SimpleTableEntity> {
 	private String simpleKey;
 
 	@Column(name="simple_column" , nullable = false)
-	private String simpleColumn;
 
 	@Column(name="simple_date" , nullable = false)
 	private Date simpleDate;
