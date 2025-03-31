@@ -9,7 +9,6 @@ import org.nanotek.Base;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -68,6 +67,14 @@ implements Base<SimpleTableEntity> {
 
 	public void setSimpleTimestamp(Timestamp simpleTimestamp) {
 		this.simpleTimestamp = simpleTimestamp;
+	}
+
+	public Set<SimpleForeignTableEntity> getSimpleForeignTableEntitySet() {
+		return simpleForeignTableEntitySet;
+	}
+
+	public void setSimpleForeignTableEntitySet(Set<SimpleForeignTableEntity> simpleForeignTableEntitySet) {
+		this.simpleForeignTableEntitySet = simpleForeignTableEntitySet;
 	}
 	
 }
