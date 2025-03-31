@@ -21,6 +21,8 @@ import jakarta.persistence.Query;
 import jakarta.persistence.metamodel.Metamodel;
 import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 
+
+//TODO: Fix configuration for the unit test.
 @SpringBootTest(classes = {MetaClassJpaDataServiceConfiguration.class})
 public class SingleDateTablePersistenceUnitManagerTest {
 
