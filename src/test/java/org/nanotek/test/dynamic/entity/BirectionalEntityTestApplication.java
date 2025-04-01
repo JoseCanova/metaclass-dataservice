@@ -14,7 +14,6 @@ import org.nanotek.config.MetaClassRegistry;
 import org.nanotek.config.MetaClassVFSURLClassLoader;
 import org.nanotek.config.RepositoryClassBuilder;
 import org.nanotek.config.RepositoryPair;
-import org.nanotek.config.spring.MetaClassJpaDataServiceConfiguration;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
