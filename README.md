@@ -26,6 +26,7 @@
 #### 01-04-2025 - Solution Partially Mitigated
 
 ##### Indeed, for sure if the class is loaded it`s will not be possible to alter adding new properties without redefine the class (which means another classloader) but it`s possible as answered by bytebuddy team to "postpone" the class creation, this opens a new strategy to think of how to construct the class model. Will first manually create some simple models to fix in mind the solution for the problem and also practice the solutions for bidrectional and unidirectional relations in the ORM model.
+###### Bidirectional issues, one point to notice is that "toString,hashCodeEquals" will need to be reevaluated since it will lead to stackoverflow if implemented ad-hoc(another issue to analyze during manual tests).
 
 
 
