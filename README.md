@@ -14,7 +14,7 @@
 #### Changed the package declaration to a package jims..org... and the repository interfaces were successfully scanned. Now the effort will center around starting a configuration before the SpringApplication(SpringBoot) AnnotationWeb...Context.   
 #### The purpose is to use a simple spring boot configuration (not that simple) to execute the "database scan process - class generation process" and , with this prepare the ClassLoader for the WebApplicationContext (until now the test ran without any problem with a CustomClassLoader).
 
-### Use  of Mapped Super Clases for class hierachy with tables with one-many one-one relation ships.
+### Use  of Mapped Super Clases for class hierachy with tables with one-many one-one relations.
 #### Next step is think how to solve efficiently the problem regarding FK (one-one one-many relationships), the mapped superclass seems to be the appropriate solution, first build classes with all atributes that are not (fk) as mappedsuperclaaes then create the child classes with the FK`s relation ships. There will be the need to filter the atributes that are part of the relation ships.  
 
 #### Next Milestone for upcoming week (since "dengue fever" is a giant headache and stay focused with such headache is not necessary) is to prepare the configuration of the classes based on metamodel provided by the microservice on project "schema-metaclass", it`s the best solution a resttemplate (without all complication of non blocking reactive programming), keep it simple since the configuration of the classes is already complicated, then after start with working on one-to-many,one-to-one relations, with superclasses is quite simple with a "table per class" inheritance strategy.  
