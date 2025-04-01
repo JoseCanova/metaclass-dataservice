@@ -67,7 +67,8 @@ public class MetaClassVFSURLClassLoader extends InjectionClassLoader {
     		String  directoryString  = className.replaceAll("[.]", "/").replace(simpleName, "");
     		Path rootPath = fileSystem.getPath(directoryString, new String[0]);
         	Path classPath = rootPath.resolve(simpleName.concat(".class"));
-        	Files.createFile(classPath, new FileAttribute[0]);
+        	if(!Files.exists(classPath, LinkOption.NOFOLLOW_LINKS))
+        			Files.createFile(classPath, new FileAttribute[0]);
 			Files.write(classPath, entityBytes2, StandardOpenOption.WRITE);
 		} catch (IOException e) {
 			e.printStackTrace();

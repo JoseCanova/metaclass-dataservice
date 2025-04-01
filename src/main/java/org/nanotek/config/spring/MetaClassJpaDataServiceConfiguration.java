@@ -112,7 +112,6 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 
 	class Initializer implements Consumer<EntityManager>{
 
-		@SuppressWarnings("unused")
 		@Override
 		public void accept(EntityManager em) {
 			Metamodel model = em.getMetamodel();
