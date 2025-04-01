@@ -22,3 +22,10 @@
 #### 31-03-2025 - Mitigating ORM Associations.
 
 #### First of all, mitigate the problem to understand what solution wil be feasible, a possible solution exists, a question was posted inquiring "how to generate" bidirectional relations with DynamicTypes (not already loaded) which seems to be not possible and a ClassLoader chain will be hard to manage (since the redefinition of classes would require a ClassLoader chain), So the candidate model is "one of the sides" probably the "Parent Side" be a Mapped SuperClass, but such solution need to be tested on the imagined scenarios (bidirectional and non-bidirectional relations).
+
+#### 01-04-2025 - Solution Partially Migigated
+
+### Indeed, for sure if the class is loaded it`s will not be possible to alter adding new properties without redefine the class (which means another classloader) but it`s possible as answered by bytebuddy team to "postpone" the class creation, this opens a new strategy to think of how to construct the class model. Will first manually create some simple models to fix in mind the solution for the problem and also practice the solutions for bidrectional and unidirectional relations in the ORM model.
+
+
+
