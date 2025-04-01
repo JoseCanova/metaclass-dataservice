@@ -28,6 +28,6 @@
 ##### Indeed, for sure if the class is loaded it`s will not be possible to alter adding new properties without redefine the class (which means another classloader) but it`s possible as answered by bytebuddy team to "postpone" the class creation, this opens a new strategy to think of how to construct the class model. Will first manually create some simple models to fix in mind the solution for the problem and also practice the solutions for bidrectional and unidirectional relations in the ORM model.
 ###### Bidirectional issues, one point to notice is that "toString,hashCodeEquals" will need to be reevaluated since it will lead to stackoverflow if implemented ad-hoc(another issue to analyze during manual tests).
 
-###### Created an example with a Person-Pet model (without metaclass model) to evaluate the solution of bidirectional relationship classes using the TypeDescription from a DynamicType.Builder probided by byte-buddy it worked as suggested, still have to investigate how to fill AnnotationDescriptions with values different from native values (like CascadeType from OneToMany annotation). 
+###### Created an example with a Person-Pet model (without metaclass model) to evaluate the solution of bidirectional relationship classes using the TypeDescription from a DynamicType.Builder provided by byte-buddy team it worked as suggested, still have to investigate how to fill AnnotationDescriptions with values different from native values (like CascadeType from OneToMany annotation). 
 
 
