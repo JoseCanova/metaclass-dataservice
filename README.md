@@ -18,3 +18,15 @@
 #### Next step is think how to solve efficiently the problem regarding FK (one-one one-many relationships), the mapped superclass seems to be the appropriate solution, first build classes with all atributes that are not (fk) as mappedsuperclaaes then create the child classes with the FK`s relation ships. There will be the need to filter the atributes that are part of the relation ships.  
 
 #### Next Milestone for upcoming week (since "dengue fever" is a giant headache and stay focused with such headache is not necessary) is to prepare the configuration of the classes based on metamodel provided by the microservice on project "schema-metaclass", it`s the best solution a resttemplate (without all complication of non blocking reactive programming), keep it simple since the configuration of the classes is already complicated, then after start with working on one-to-many,one-to-one relations, with superclasses is quite simple with a "table per class" inheritance strategy.  
+
+#### 31-03-2025 - Mitigating ORM Associations.
+
+#### First of all, mitigate the problem to understand what solution wil be feasible, a possible solution exists, a question was posted inquiring "how to generate" bidirectional relations with DynamicTypes (not already loaded) which seems to be not possible and a ClassLoader chain will be hard to manage (since the redefinition of classes would require a ClassLoader chain), So the candidate model is "one of the sides" probably the "Parent Side" be a Mapped SuperClass, but such solution need to be tested on the imagined scenarios (bidirectional and non-bidirectional relations).
+
+#### 01-04-2025 - Solution Partially Mitigated
+
+##### Indeed, for sure if the class is loaded it`s will not be possible to alter adding new properties without redefine the class (which means another classloader) but it`s possible as answered by bytebuddy team to "postpone" the class creation, this opens a new strategy to think of how to construct the class model. Will first manually create some simple models to fix in mind the solution for the problem and also practice the solutions for bidrectional and unidirectional relations in the ORM model.
+###### Bidirectional issues, one point to notice is that "toString,hashCodeEquals" will need to be reevaluated since it will lead to stackoverflow if implemented ad-hoc(another issue to analyze during manual tests).
+
+
+
