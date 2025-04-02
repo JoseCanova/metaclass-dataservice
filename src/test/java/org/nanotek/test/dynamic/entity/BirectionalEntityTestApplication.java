@@ -25,6 +25,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -34,6 +35,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.description.annotation.AnnotationDescription;
+import net.bytebuddy.description.annotation.AnnotationValue;
+import net.bytebuddy.description.enumeration.EnumerationDescription;
 import net.bytebuddy.description.type.TypeDefinition;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType.Builder;
@@ -170,9 +173,15 @@ public class BirectionalEntityTestApplication {
 																		.define("name", "person_key")
 																		.define("nullable", false).build();
 		
+        TypeDescription cascadeTypeTd = new TypeDescription.ForLoadedType(CascadeType.class);
+        
+        EnumerationDescription cascadeTypeEd = new EnumerationDescription.ForLoadedEnumeration(CascadeType.ALL);
+        var av = AnnotationValue.ForDescriptionArray.of(cascadeTypeTd, new EnumerationDescription[]{cascadeTypeEd});
+        
 		//TODO:Verify how to include the enumeration CascadeType or other values than native.
 		AnnotationDescription personPetOneAnnotationDescription = AnnotationDescription
 																	.Builder.ofType(OneToMany.class)
+																	.define("cascade", av )
 																	.define("mappedBy", "person").build();
 		
 		Builder<?> personBuilder = new ByteBuddy()
