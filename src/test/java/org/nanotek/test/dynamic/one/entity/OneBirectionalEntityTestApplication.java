@@ -2,8 +2,15 @@ package org.nanotek.test.dynamic.one.entity;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.file.FileSystem;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -47,12 +54,14 @@ import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 @SpringBootApplication
 public class OneBirectionalEntityTestApplication {
 
+	public static final String  directoryString  = "/home/jose/git/metaclass-dataservice/target/entity-classes";
+
+	
 	public static final FileSystem fileSystem = Jimfs.newFileSystem(Configuration.unix());
 	
 	public static final MetaClassVFSURLClassLoader byteArrayClassLoader  = new MetaClassVFSURLClassLoader 
 																			(TestRedefineClass.class.getClassLoader() , 
 																					false ,fileSystem);
-
 	public static final MetaClassRegistry<?> metaClassRegistry  = new  MetaClassRegistry<>();
 	
 	@Bean
@@ -72,9 +81,9 @@ public class OneBirectionalEntityTestApplication {
 	 MetaClassRegistry<?> metaClassRegistry(){
 		return metaClassRegistry;
 	}
-		
 	
 	List<?> classes;
+	
 	public OneBirectionalEntityTestApplication() {
 	}
 	
@@ -86,8 +95,10 @@ public class OneBirectionalEntityTestApplication {
 		
 		model.stream().forEach(c ->{
 			prepareRepositoryClass(c, byteArrayClassLoader);
+			saveEntityFile(c,byteArrayClassLoader);
 		});
 		
+		System.exit(0);
 		
 		AnnotationConfigServletWebServerApplicationContext context  = 
         		(AnnotationConfigServletWebServerApplicationContext) 
@@ -96,6 +107,33 @@ public class OneBirectionalEntityTestApplication {
 	
 	}
 	
+	private static void saveEntityFile(Class<?> c, MetaClassVFSURLClassLoader bytearrayclassloader2) {
+		
+		String fileName =  c.getName().replaceAll("[.]","/").concat(".class");
+		
+		InputStream is = bytearrayclassloader2.getResourceAsStream(fileName);
+
+		try 
+		{
+
+			byte[] classBytes = is.readAllBytes();
+			var className = c.getName();
+			var simpleName = c.getSimpleName();
+			Path dirPath = Paths.get(directoryString, new String[] {});
+			Files.createDirectories(dirPath);
+			var classLocation  = directoryString.concat("/").concat(simpleName).concat(".class");
+			Path classPath = Paths.get(classLocation, new String[] {});
+			if(!Files.exists(classPath, LinkOption.NOFOLLOW_LINKS))
+    			Files.createFile(classPath, new FileAttribute[0]);
+			Files.write(classPath, classBytes, StandardOpenOption.WRITE);
+
+			
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		
+	}
+
 	public static Class<?> prepareRepositoryClass(Class<?> entityClass , 
 			MetaClassVFSURLClassLoader classLoader){
 		Class<?> idClass = getIdClass(entityClass);
