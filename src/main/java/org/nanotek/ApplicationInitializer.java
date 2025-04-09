@@ -12,9 +12,9 @@ import org.nanotek.config.MetaClassVFSURLClassLoader;
 import org.nanotek.config.RepositoryClassBuilder;
 import org.nanotek.config.RepositoryPair;
 import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
-import org.nanotek.meta.model.rdbms.RdbmsMetaClassAttribute;
 import org.nanotek.metaclass.BuilderMetaClass;
 import org.nanotek.metaclass.BuilderMetaClassRegistry;
+import org.nanotek.metaclass.ProcessedForeignKeyRegistry;
 import org.nanotek.metaclass.bytebuddy.RdbmsEntityBaseBuddy;
 import org.nanotek.metaclass.bytebuddy.attributes.AttributeBaseBuilder;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +41,9 @@ public interface ApplicationInitializer {
 	public static final BuilderMetaClassRegistry builderMetaClassRegistry 
 							= new BuilderMetaClassRegistry();
 	
+	public static final ProcessedForeignKeyRegistry processedForeignKeyRegistry
+						= new ProcessedForeignKeyRegistry();
+	
 	public static void configureMetaClasses (String uriEndpont
 											,MetaClassVFSURLClassLoader byteArrayClassLoader,
 											MetaClassRegistry<?> metaClassRegistry ) throws Exception{
@@ -52,13 +55,28 @@ public interface ApplicationInitializer {
 			prepareForeignAttributes(mc);
 		});
 		
+//		//TODO: fix class stream to load the generation on just correct tables
+//		metaClasses
+//		.stream()
+//		.forEach(mc ->{
+//			BuilderMetaClass bmc = builderMetaClassRegistry.getBuilderMetaClass(mc.getTableName());
+//			AttributeBaseBuilder
+//				.on()
+//				.generateCollectionsClassAttributes(mc, 
+//													bmc.builder(), 
+//													builderMetaClassRegistry, 
+//													processedForeignKeyRegistry);
+//			
+//		});
+		
 		metaClasses.forEach(mc->{
 			try {
 					String key = mc.getTableName();
-					BuilderMetaClass bmc=builderMetaClassRegistry.getBuilderMetaClass(key);
+					BuilderMetaClass bmc= builderMetaClassRegistry.getBuilderMetaClass(key);
 					Unloaded<?> unLoaded  = bmc.builder().make();
 					String className = unLoaded.getTypeDescription().getActualName();
 		    		Class<?> clazz = byteArrayClassLoader.defineClass(className, unLoaded.getBytes());
+		    		ClassFileSerializer.saveEntityFile(clazz,byteArrayClassLoader);
 		    		metaClassRegistry.registryEntityClass(Class.class.<Class<Base<?>>>cast(clazz));
 		    		prepareRepositoryClass(clazz, byteArrayClassLoader, metaClassRegistry);
 			} catch (Exception e) {
@@ -85,7 +103,7 @@ public interface ApplicationInitializer {
 		Builder <?> builder=bmc.builder();
 		Builder <?> foreignAttributeBuilder = AttributeBaseBuilder
 				.on().generateForeignKeyClassAttributes(mc , 
-						builder,builderMetaClassRegistry);
+						builder,builderMetaClassRegistry,processedForeignKeyRegistry);
 				BuilderMetaClass fabmc = new BuilderMetaClass(foreignAttributeBuilder,mc);
 				builderMetaClassRegistry.registryBuilderMetaClass(mc.getTableName(), fabmc);
 	}
