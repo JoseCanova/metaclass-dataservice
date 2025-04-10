@@ -11,6 +11,12 @@ CREATE TABLE public.pet
    pet_person_key varchar(50) NOT NULL
 )
 ;
+create table food 
+(
+food_key varchar(30) primary key,
+food_name varchar(200),
+food_pet_key varchar(25) references pet(pet_key));
+
 ALTER TABLE public.pet
 ADD CONSTRAINT pet_fkey
 FOREIGN KEY (pet_person_key)
