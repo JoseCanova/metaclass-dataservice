@@ -55,6 +55,16 @@ public interface ApplicationInitializer {
 			prepareForeignAttributes(mc);
 		});
 		
+		processedForeignKeyRegistry
+		.getProcessedForeignKeys()
+		.forEach(fk ->{
+			AttributeBaseBuilder
+			.on()
+			.generateCollectionsClassAttributes(fk,
+												builderMetaClassRegistry, 
+												processedForeignKeyRegistry);
+		});
+		
 //		//TODO: fix class stream to load the generation on just correct tables
 //		metaClasses
 //		.stream()
