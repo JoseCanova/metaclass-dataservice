@@ -3,6 +3,7 @@ package org.nanotek;
 
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -60,9 +61,8 @@ public interface ApplicationInitializer {
 		.forEach(fk ->{
 			AttributeBaseBuilder
 			.on()
-			.generateCollectionsClassAttributes(fk,
-												builderMetaClassRegistry, 
-												processedForeignKeyRegistry);
+			.generateParentRelationAttribute(fk,
+												builderMetaClassRegistry);
 		});
 		
 //		//TODO: fix class stream to load the generation on just correct tables
@@ -79,6 +79,7 @@ public interface ApplicationInitializer {
 //			
 //		});
 		
+		ArrayList<Class<?>> theList = new ArrayList<>();
 		metaClasses.forEach(mc->{
 			try {
 					String key = mc.getTableName();
@@ -87,13 +88,15 @@ public interface ApplicationInitializer {
 					String className = unLoaded.getTypeDescription().getActualName();
 		    		Class<?> clazz = byteArrayClassLoader.defineClass(className, unLoaded.getBytes());
 		    		ClassFileSerializer.saveEntityFile(clazz,byteArrayClassLoader);
-		    		metaClassRegistry.registryEntityClass(Class.class.<Class<Base<?>>>cast(clazz));
-		    		prepareRepositoryClass(clazz, byteArrayClassLoader, metaClassRegistry);
+		    		theList.add(clazz);
 			} catch (Exception e) {
 	    		throw new RuntimeException(e);
 	    	}
 		});
 		
+		theList.forEach(clazz ->{
+    		metaClassRegistry.registryEntityClass(Class.class.<Class<Base<?>>>cast(clazz));
+    		prepareRepositoryClass(clazz, byteArrayClassLoader, metaClassRegistry);});
 	}
 	
 	public static void prepareSimpleAttributes(RdbmsMetaClass mc) {
@@ -174,6 +177,7 @@ public interface ApplicationInitializer {
 		public static Class<?> prepareRepositoryClass(Class<?> entityClass , 
 				MetaClassVFSURLClassLoader classLoader,
 				MetaClassRegistry<?> metaClassRegistry){
+			
 			Class<?> idClass = getIdClass(entityClass);
 			RepositoryPair pair = RepositoryClassBuilder.prepareReppositoryForClass(entityClass, idClass);
 			try {

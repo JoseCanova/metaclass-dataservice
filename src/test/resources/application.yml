@@ -28,8 +28,8 @@ spring:
   activemq:
    broker-url: tcp://localhost:61616
   datasource:
-    jdbcUrl: jdbc:postgresql://127.0.0.1:5432/simpledb
-    url: jdbc:postgresql://127.0.0.1:5432/simpledb
+    jdbcUrl: jdbc:postgresql://127.0.0.1:5432/simplefkdb
+    url: jdbc:postgresql://127.0.0.1:5432/simplefkdb
     username: postgres 
     password: postgres123   
   hikari:
