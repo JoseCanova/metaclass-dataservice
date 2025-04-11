@@ -1,32 +1,32 @@
 package org.nanotek.test.jpa.data;
 
-import java.util.Optional;
-
-import org.nanotek.Base;
-
 import jakarta.persistence.Column;
+import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
+import org.nanotek.Base;
 
 @Entity(
-   name = "Person"
+   name = "Food"
 )
 @Table(
-   name = "person",
+   name = "food",
    catalog = "",
    schema = "",
    uniqueConstraints = {},
    indexes = {}
 )
-public class Person implements Base<Base> {
+public class Food implements Base<Base> {
    @Max(
       payload = {},
-      value = 50L,
+      value = 30L,
       message = "{jakarta.validation.constraints.Max.message}",
       groups = {}
    )
@@ -37,7 +37,7 @@ public class Person implements Base<Base> {
    )
    @Column(
       unique = false,
-      name = "person_key",
+      name = "food_key",
       length = 255,
       scale = 0,
       table = "",
@@ -48,63 +48,73 @@ public class Person implements Base<Base> {
       columnDefinition = ""
    )
    @Id
-   private String personKey;
+   private String foodKey;
    @Max(
       payload = {},
       value = 200L,
       message = "{jakarta.validation.constraints.Max.message}",
       groups = {}
    )
-   @NotBlank(
-      payload = {},
-      message = "{jakarta.validation.constraints.NotBlank.message}",
-      groups = {}
-   )
    @Column(
       unique = false,
-      name = "person_name",
+      name = "food_name",
       length = 255,
       scale = 0,
       table = "",
       precision = 0,
-      nullable = false,
+      nullable = true,
       insertable = true,
       updatable = true,
       columnDefinition = ""
    )
-   private String personName;
+   private String foodName;
    @OneToOne(
       optional = true,
       cascade = {},
       fetch = FetchType.EAGER,
       targetEntity = void.class,
-      mappedBy = "personKey",
+      mappedBy = "",
       orphanRemoval = false
    )
-   private Pet pet;
+   @JoinColumn(
+      unique = false,
+      name = "food_pet_key",
+      table = "",
+      referencedColumnName = "pet_key",
+      nullable = true,
+      insertable = true,
+      updatable = true,
+      columnDefinition = "",
+      foreignKey = @ForeignKey(
+         name = "",
+         value = ConstraintMode.PROVIDER_DEFAULT,
+         foreignKeyDefinition = ""
+      )
+   )
+   private Pet petKey;
 
-   public void setPersonKey(String var1) {
-      this.personKey = var1;
+   public void setFoodKey(String var1) {
+      this.foodKey = var1;
    }
 
-   public String getPersonKey() {
-      return this.personKey;
+   public String getFoodKey() {
+      return this.foodKey;
    }
 
-   public void setPersonName(String var1) {
-      this.personName = var1;
+   public void setFoodName(String var1) {
+      this.foodName = var1;
    }
 
-   public String getPersonName() {
-      return this.personName;
+   public String getFoodName() {
+      return this.foodName;
    }
 
-   public void setPet(Pet var1) {
-      this.pet = var1;
+   public void setPetKey(Pet var1) {
+      this.petKey = var1;
    }
 
-   public Optional<Pet> getPet() {
-      return Optional.ofNullable(this.pet);
+   public Pet getPetKey() {
+      return this.petKey;
    }
 }
 
