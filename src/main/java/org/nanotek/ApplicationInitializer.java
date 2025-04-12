@@ -1,6 +1,7 @@
 package org.nanotek;
 
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.ArrayList;
@@ -8,6 +9,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jetbrains.java.decompiler.api.Decompiler;
+import org.jetbrains.java.decompiler.main.decompiler.ConsoleFileSaver;
 import org.nanotek.config.MetaClassRegistry;
 import org.nanotek.config.MetaClassVFSURLClassLoader;
 import org.nanotek.config.RepositoryClassBuilder;
@@ -47,7 +50,7 @@ public interface ApplicationInitializer {
 	
 	public static void configureMetaClasses (String uriEndpont
 											,MetaClassVFSURLClassLoader byteArrayClassLoader,
-											MetaClassRegistry<?> metaClassRegistry ) throws Exception{
+											 MetaClassRegistry<?> metaClassRegistry ) throws Exception{
 		
 		List<RdbmsMetaClass> metaClasses = getMetaClasses(uriEndpont); 
 		metaClasses.forEach(mc ->{
@@ -97,7 +100,36 @@ public interface ApplicationInitializer {
 		theList.forEach(clazz ->{
     		metaClassRegistry.registryEntityClass(Class.class.<Class<Base<?>>>cast(clazz));
     		prepareRepositoryClass(clazz, byteArrayClassLoader, metaClassRegistry);});
+		decompileJavaClasses(theList);
 	}
+	
+	public static void decompileJavaClasses (List<Class<?>> javaClassList) {
+       
+		javaClassList.forEach(cl ->{
+        	File input = new File("/home/jose/Documents/".concat(cl.getSimpleName()).concat(".class"));
+	        
+	        // Define the output folder where decompiled source files will be written.
+	        File output = new File("/home/jose/Documents/".concat(cl.getSimpleName()).concat(".java"));
+	        
+	        try {
+	        	 if(output.exists()) {
+	        		 output.delete();
+	        	 }
+	        	
+	        	 output.createNewFile();
+	        	 Decompiler decompiler =  Decompiler.builder()
+	        			 .inputs(input)
+	        			 .output(new ConsoleFileSaver(output))
+	        			 .option("decompile-generics", "true")
+	     	        	.build();
+	            decompiler.decompile();
+	            System.out.println("Decompilation completed successfully.");
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+		});
+	}
+	
 	
 	public static void prepareSimpleAttributes(RdbmsMetaClass mc) {
 	
