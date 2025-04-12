@@ -79,11 +79,6 @@
                 <artifactId>vavr</artifactId>
                 <version>0.10.5</version>
          </dependency>
-        <dependency>
-            <groupId>org.vineflower</groupId>
-            <artifactId>vineflower</artifactId>
-            <version>1.11.1</version>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
