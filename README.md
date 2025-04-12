@@ -30,4 +30,6 @@
 
 ###### Created an example with a Person-Pet model (without metaclass model) to evaluate the solution of bidirectional relationship classes using the TypeDescription from a DynamicType.Builder provided by byte-buddy team it worked as suggested, still have to investigate how to fill AnnotationDescriptions with values different from native values (like CascadeType from OneToMany annotation). 
 
-
+##### Time for reorganize the project code.
+##### The project need a redesign on of the "generation funcionalities" because the structure got broke in the aim of produce a result to understand the problems that need to be analyzed. First of all, it will be need to create a manager for model build, such management will be moved to "metaclass-bytebuddy" actually the management of the generation of the model is in this project which brokes the structure of the "metaclass-bytebuddy".
+#### This project will remain as a "platform-testbed" since the knowledge of "maven-plugin" development is still in early-phases, and index scanning and management need an effort to achieve a basic goal that is generate many-many relations (this is cleary a big effort since that metaclasses graph need to be generated).
