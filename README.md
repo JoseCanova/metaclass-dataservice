@@ -36,3 +36,8 @@
 
 ##### Generate the source code from class file in this scenario isn`t a bad idea.
 ##### There are some advantages, executing a simple test with EntityClasses generated the model source code is quite simple, there is a small payload on performance but with the gain of simplicity on model generation, moving indeed to "generated-sources" and providing already the classes created by bytebuddy, which in a first view there are complete (which means all annotations are full written). And the source code based on the class file is an accessory for the compilation.
+
+##### OneToMany - OneToOne with single join-key table attribute solved.
+###### The problem resides now to fit join tables on current algorithm that generates the class, which means before generating the relations , identify the table which holds the FK and classify it as a "simple table" or "join table" (which cab be done at the initilization of the model).
+##### But first define a "join table", a Join Table can be identified as a table that holds 2 foreign key attributes only, which means the number of fk`s are equals to the number of columns in the table, and each column may have an index (unique or not) and the primary key can be a "composed pk" or not (no pk). It also may contain a primary key that is one of the columns of one the foreign keys. 
+##### By the end is, at beginning scan the metaclasses to identify "join tables" crate a new object that holds this metaclass that by the end of the generation process crate the OneOne,OneMany,ManyMany relations based on a "join_table" annotation.
