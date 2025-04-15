@@ -50,7 +50,7 @@ public class MetaClassRegistry<T extends Base<?>> {
 					.filter(mk -> mk.getKey(0).equals(uuid) || mk.getKey(1).equals(uuid))
 					.limit(1)
 					.map(mk -> repositoryRegistry.get(mk))
-					.findFirst().orElseThrow(EntityNotFoundException::new);
+					.findFirst().orElseThrow(RepositoryNotFoundException::new);
 	}
 	
 	public List<Class<Base<?>>> getEntityClasses() {

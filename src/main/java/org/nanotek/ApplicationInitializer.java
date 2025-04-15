@@ -50,7 +50,10 @@ public interface ApplicationInitializer {
 											 MetaClassRegistry<?> metaClassRegistry ) throws Exception{
 		
 		List<RdbmsMetaClass> metaClasses = getMetaClasses(uriEndpont); 
-		metaClasses.forEach(mc ->{
+		//TODO?need data structures for metaclasses and join tables (represented as metaclasses)
+		metaClasses.
+		stream()
+		.forEach(mc ->{
 			mountRdbmsMetaClassConfiguration(mc);
 			prepareSimpleAttributes(mc);
 			prepareForeignAttributes(mc);
@@ -78,7 +81,7 @@ public interface ApplicationInitializer {
 //													processedForeignKeyRegistry);
 //			
 //		});
-		
+		//TODO: this need to be filtered to exclude join tables
 		ArrayList<Class<?>> theList = new ArrayList<>();
 		metaClasses.forEach(mc->{
 			try {
