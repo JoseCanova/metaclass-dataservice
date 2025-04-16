@@ -83,15 +83,15 @@ public class Person implements Base<Base> {
    )
    private Pet pet;
 
-   public void setPersonKey(String var1) {
+   public void personKey(String var1) {
       this.personKey = var1;
    }
 
-   public String getPersonKey() {
+   public String personKey() {
       return this.personKey;
    }
 
-   public void setPersonName(String var1) {
+   public void personName(String var1) {
       this.personName = var1;
    }
 
@@ -99,11 +99,11 @@ public class Person implements Base<Base> {
       return this.personName;
    }
 
-   public void setPet(Pet var1) {
+   public void pet(Pet var1) {
       this.pet = var1;
    }
 
-   public Optional<Pet> getPet() {
+   public Optional<Pet> pet() {
       return Optional.ofNullable(this.pet);
    }
 }

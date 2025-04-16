@@ -37,8 +37,9 @@ public class JpaDataServiceConfigurationTest {
 				person ->{
 					assertNotNull(person);
 					Optional<Person> casperPersonAgain = personRepository.findById("p_key");
-					Optional<Pet> optionalPirineusKiller = casperPersonAgain.get().getPet();
+					Optional<Pet> optionalPirineusKiller = casperPersonAgain.get().pet();
 					assertTrue(optionalPirineusKiller.isPresent());
+					System.out.println("Pirineus Killer is present");
 				}, 
 				() -> new RuntimeException());
 		
