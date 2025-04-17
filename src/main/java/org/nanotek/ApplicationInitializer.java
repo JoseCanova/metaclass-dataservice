@@ -13,16 +13,23 @@ import org.nanotek.config.MetaClassVFSURLClassLoader;
 import org.nanotek.config.RepositoryClassBuilder;
 import org.nanotek.config.RepositoryPair;
 import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
+import org.nanotek.meta.model.rdbms.RdbmsMetaClassForeignKey;
 import org.nanotek.metaclass.BuilderMetaClass;
 import org.nanotek.metaclass.BuilderMetaClassRegistry;
 import org.nanotek.metaclass.ProcessedForeignKeyRegistry;
 import org.nanotek.metaclass.bytebuddy.RdbmsEntityBaseBuddy;
+import org.nanotek.metaclass.bytebuddy.annotations.orm.relation.ForeignKeyMetaClassRecord;
+import org.nanotek.metaclass.bytebuddy.annotations.orm.relation.JoinTableAnnotationDescriptionFactory;
+import org.nanotek.metaclass.bytebuddy.annotations.orm.relation.ManyToManyAnnotationDescriptionFactory;
 import org.nanotek.metaclass.bytebuddy.attributes.AttributeBaseBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import net.bytebuddy.description.annotation.AnnotationDescription;
+import net.bytebuddy.description.type.TypeDefinition;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType.Builder;
 import net.bytebuddy.dynamic.DynamicType.Unloaded;
 
@@ -50,13 +57,17 @@ public interface ApplicationInitializer {
 											 MetaClassRegistry<?> metaClassRegistry ) throws Exception{
 		
 		List<RdbmsMetaClass> resultMetaClasses = getMetaClasses(uriEndpont); 
-		//TODO?need data structures for metaclasses and join tables (represented as metaclasses)
-		List<RdbmsMetaClass> metaClasses = 	resultMetaClasses
+		List<RdbmsMetaClass> joinMetaClasses = new ArrayList<>();
+		//TODO: need data structures for metaclasses and join tables (represented as metaclasses)
+		List<RdbmsMetaClass> entityMetaClasses = 	resultMetaClasses
 												.stream()
-												.filter(mc -> !mc.isJoinMetaClass())
+												.filter(mc -> {var isJoin = mc.isJoinMetaClass();
+																if(isJoin)
+																	joinMetaClasses.add(mc);
+																return !isJoin;})
 												.collect(Collectors.toList());
 
-		metaClasses.
+		entityMetaClasses.
 		stream()
 		.forEach(mc ->{
 			mountRdbmsMetaClassConfiguration(mc);
@@ -73,22 +84,12 @@ public interface ApplicationInitializer {
 												builderMetaClassRegistry);
 		});
 		
-//		//TODO: fix class stream to load the generation on just correct tables
-//		metaClasses
-//		.stream()
-//		.forEach(mc ->{
-//			BuilderMetaClass bmc = builderMetaClassRegistry.getBuilderMetaClass(mc.getTableName());
-//			AttributeBaseBuilder
-//				.on()
-//				.generateCollectionsClassAttributes(mc, 
-//													bmc.builder(), 
-//													builderMetaClassRegistry, 
-//													processedForeignKeyRegistry);
-//			
-//		});
-		//TODO: this need to be filtered to exclude join tables
+		//TODO:Fix join table (if possible or let for a "future release" of pojo maven.
+//		joinMetaClasses
+//		.forEach(joinMetaClass ->
+//								  processJoinTableRelations(joinMetaClass, builderMetaClassRegistry));
 		ArrayList<Class<?>> theList = new ArrayList<>();
-		metaClasses.forEach(mc->{
+		entityMetaClasses.forEach(mc->{
 			try {
 					String key = mc.getTableName();
 					BuilderMetaClass bmc= builderMetaClassRegistry.getBuilderMetaClass(key);
@@ -108,8 +109,50 @@ public interface ApplicationInitializer {
 	}
 	
 	
-	
-	
+	public static void processJoinTableRelations( RdbmsMetaClass joinMetaClass,
+												  BuilderMetaClassRegistry buildermetaclassregistry2) {
+		
+		RdbmsMetaClassForeignKey rmc = joinMetaClass.getRdbmsForeignKeys().get(0);
+		RdbmsMetaClassForeignKey lmc = joinMetaClass.getRdbmsForeignKeys().get(1);
+		
+		BuilderMetaClass rightMc = buildermetaclassregistry2.getBuilderMetaClass(rmc.getTableName());
+		BuilderMetaClass leftMc = buildermetaclassregistry2.getBuilderMetaClass(lmc.getTableName());
+		ForeignKeyMetaClassRecord rmcr = new ForeignKeyMetaClassRecord(rmc, rightMc.metaClass(),buildermetaclassregistry2);
+		ForeignKeyMetaClassRecord lrmc = new ForeignKeyMetaClassRecord(rmc, leftMc.metaClass(),buildermetaclassregistry2);
+		String mappedby =  leftMc.metaClass().getClassName().toLowerCase();
+		AnnotationDescription rad = ManyToManyAnnotationDescriptionFactory.on().buildAnnotationDescription(rmcr,mappedby).get();
+		AnnotationDescription lad = ManyToManyAnnotationDescriptionFactory.on().buildAnnotationDescription(lrmc).get();
+		AnnotationDescription jcad = JoinTableAnnotationDescriptionFactory.on().buildAnnotationDescription(joinMetaClass).get();
+		
+		
+		TypeDescription setTypeDescription = new TypeDescription.ForLoadedType(java.util.Set.class );
+		//Here the type definition is relative to the foreign key class (the holder of the fk attribute)
+		TypeDescription.Generic rgenericTypeDef = TypeDescription.Generic
+											.Builder
+											.parameterizedType(setTypeDescription  ,leftMc.builder().toTypeDescription()).build();
+		TypeDescription.Generic lgenericTypeDef = TypeDescription.Generic
+				.Builder
+				.parameterizedType(setTypeDescription  ,rightMc.builder().toTypeDescription()).build();
+		
+		Builder<?> rb = rightMc.builder()
+							.defineProperty(leftMc.metaClass().getClassName().toLowerCase(), rgenericTypeDef)
+							.annotateField(new AnnotationDescription[] {rad});
+		
+		
+		Builder<?> lb = leftMc.builder()
+				.defineProperty(rightMc.metaClass().getClassName().toLowerCase(), lgenericTypeDef)
+				.annotateField(new AnnotationDescription[] {lad,jcad});
+
+		
+		BuilderMetaClass rn = new BuilderMetaClass(rb,rightMc.metaClass());
+		BuilderMetaClass ln = new BuilderMetaClass(lb,leftMc.metaClass());
+		buildermetaclassregistry2.registryBuilderMetaClass(rightMc.metaClass().getTableName(), rn);
+		buildermetaclassregistry2.registryBuilderMetaClass(leftMc.metaClass().getTableName(), ln);
+	}
+
+
+
+
 	public static void prepareSimpleAttributes(RdbmsMetaClass mc) {
 	
 				
