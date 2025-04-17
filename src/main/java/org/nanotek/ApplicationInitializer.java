@@ -49,8 +49,13 @@ public interface ApplicationInitializer {
 											,MetaClassVFSURLClassLoader byteArrayClassLoader,
 											 MetaClassRegistry<?> metaClassRegistry ) throws Exception{
 		
-		List<RdbmsMetaClass> metaClasses = getMetaClasses(uriEndpont); 
+		List<RdbmsMetaClass> resultMetaClasses = getMetaClasses(uriEndpont); 
 		//TODO?need data structures for metaclasses and join tables (represented as metaclasses)
+		List<RdbmsMetaClass> metaClasses = 	resultMetaClasses
+												.stream()
+												.filter(mc -> !mc.isJoinMetaClass())
+												.collect(Collectors.toList());
+
 		metaClasses.
 		stream()
 		.forEach(mc ->{
