@@ -128,17 +128,16 @@ public interface ApplicationInitializer {
 		
 	}
 
-	public static JoinTableRelationType classifyRelationType(List<RdbmsIndex> indexes) {
-		long count = indexes.stream().filter(idx -> idx.getIsUnique()).count();
-		return  count > 0 && count == indexes.size()?JoinTableRelationType.ONEONE:count>0?JoinTableRelationType.ONEMANY:JoinTableRelationType.MANYMANY;
-	}
-
 	enum JoinTableRelationType {
 		ONEONE,
 		ONEMANY,
 		MANYMANY;
 	}
 
+	public static JoinTableRelationType classifyRelationType(List<RdbmsIndex> indexes) {
+		long count = indexes.stream().filter(idx -> idx.getIsUnique()).count();
+		return  count > 0 && count == indexes.size()?JoinTableRelationType.ONEONE:count>0?JoinTableRelationType.ONEMANY:JoinTableRelationType.MANYMANY;
+	}
 
 	public static void processManyToManyRelations(RdbmsMetaClass joinMetaClass,
 			BuilderMetaClassRegistry buildermetaclassregistry2) {
