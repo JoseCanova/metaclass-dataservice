@@ -47,4 +47,3 @@
 ##### For example 2 simple indexes (many-many)
 ##### 1 of the attributes of a jointable having an unique index (one-many)
 ##### Both attributes of the jointable  holding an unique index (one-one)
-##### this probably will be the next sprint for the generator before starting to evaluate a maven-plugin to generate the class and jar files.
