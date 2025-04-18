@@ -27,6 +27,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.persistence.CascadeType;
 import net.bytebuddy.description.annotation.AnnotationDescription;
 import net.bytebuddy.description.type.TypeDefinition;
 import net.bytebuddy.description.type.TypeDescription;
@@ -85,9 +86,10 @@ public interface ApplicationInitializer {
 		});
 		
 		//TODO:Fix join table (if possible or let for a "future release" of pojo maven.
-//		joinMetaClasses
-//		.forEach(joinMetaClass ->
-//								  processJoinTableRelations(joinMetaClass, builderMetaClassRegistry));
+		joinMetaClasses
+		.forEach(joinMetaClass ->
+								  processJoinTableRelations(joinMetaClass, builderMetaClassRegistry));
+		
 		ArrayList<Class<?>> theList = new ArrayList<>();
 		entityMetaClasses.forEach(mc->{
 			try {
@@ -119,9 +121,9 @@ public interface ApplicationInitializer {
 		BuilderMetaClass leftMc = buildermetaclassregistry2.getBuilderMetaClass(lmc.getTableName());
 		ForeignKeyMetaClassRecord rmcr = new ForeignKeyMetaClassRecord(rmc, rightMc.metaClass(),buildermetaclassregistry2);
 		ForeignKeyMetaClassRecord lrmc = new ForeignKeyMetaClassRecord(rmc, leftMc.metaClass(),buildermetaclassregistry2);
-		String mappedby =  leftMc.metaClass().getClassName().toLowerCase();
+		String mappedby =  rightMc.metaClass().getClassName().toLowerCase();
 		AnnotationDescription rad = ManyToManyAnnotationDescriptionFactory.on().buildAnnotationDescription(rmcr,mappedby).get();
-		AnnotationDescription lad = ManyToManyAnnotationDescriptionFactory.on().buildAnnotationDescription(lrmc).get();
+		AnnotationDescription lad = ManyToManyAnnotationDescriptionFactory.on().buildAnnotationDescription(lrmc,CascadeType.ALL).get();
 		AnnotationDescription jcad = JoinTableAnnotationDescriptionFactory.on().buildAnnotationDescription(joinMetaClass).get();
 		
 		
