@@ -42,4 +42,9 @@
 ##### But first define a "join table", a Join Table can be identified as a table that holds 2 foreign key attributes only, which means the number of fk`s are equals to the number of columns in the table, and each column may have an index (unique or not) and the primary key can be a "composed pk" or not (no pk). It also may contain a primary key that is one of the columns of one the foreign keys. 
 ##### By the end is, at beginning scan the metaclasses to identify "join tables" crate a new object that holds this metaclass that by the end of the generation process crate the OneOne,OneMany,ManyMany relations based on a "join_table" annotation.
 
-##### Simple Many-Many implemented, using "natural order" of table name to determine which side will be the "parent of the relation" considering that witl JoinTables, the mapping is slight different from "JoinColumns" mapping (bidirectional case), now mode the AnnotationDefinitions algorithm and define a new DataStructure to hold the the "right-left" definition(considering the "coordinates" as a simple mental visualuzation.
+##### Simple Many-Many implemented, using "natural order" of table index in "foreign keys index" to determine which side will be the "parent of the relation" considering that with JoinTables, the mapping is slight different from "JoinColumns" mapping (bidirectional case), now need to model the AnnotationDefinitions algorithm and define a new DataStructure to hold the "right-left" definition  (considering the "coordinates" as a simple mental visualuzation.
+##### But first need to determine type of relation based on index structure.
+##### For example 2 simple indexes (many-many)
+##### 1 of the attributes of jointable having a unique index (one-many)
+##### Both table attributes holding an unique index each-one (one-one)
+##### this probably will be the next sprint for the generator before starting to evaluate a maven-plugin to generate the class and jar files.
