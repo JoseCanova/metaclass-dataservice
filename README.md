@@ -45,6 +45,6 @@
 ##### Simple Many-Many implemented, using "natural order" of table index in "foreign keys index" to determine which side will be the "parent of the relation" considering that with JoinTables, the mapping is slight different from "JoinColumns" mapping (bidirectional case), now need to model the AnnotationDefinitions algorithm and define a new DataStructure to hold the "right-left" definition  (considering the "coordinates" as a simple mental visualuzation.
 ##### But first need to determine type of relation based on index structure.
 ##### For example 2 simple indexes (many-many)
-##### 1 of the attributes of jointable having a unique index (one-many)
-##### Both table attributes holding an unique index each-one (one-one)
+##### 1 of the attributes of a jointable having an unique index (one-many)
+##### Both attributes of the jointable  holding an unique index (one-one)
 ##### this probably will be the next sprint for the generator before starting to evaluate a maven-plugin to generate the class and jar files.
