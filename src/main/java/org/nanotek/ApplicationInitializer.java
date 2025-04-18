@@ -12,6 +12,7 @@ import org.nanotek.config.MetaClassRegistry;
 import org.nanotek.config.MetaClassVFSURLClassLoader;
 import org.nanotek.config.RepositoryClassBuilder;
 import org.nanotek.config.RepositoryPair;
+import org.nanotek.meta.model.rdbms.RdbmsIndex;
 import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
 import org.nanotek.meta.model.rdbms.RdbmsMetaClassForeignKey;
 import org.nanotek.metaclass.BuilderMetaClass;
@@ -29,7 +30,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.persistence.CascadeType;
 import net.bytebuddy.description.annotation.AnnotationDescription;
-import net.bytebuddy.description.type.TypeDefinition;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType.Builder;
 import net.bytebuddy.dynamic.DynamicType.Unloaded;
@@ -109,12 +109,39 @@ public interface ApplicationInitializer {
 		theList.forEach(clazz ->{
     		metaClassRegistry.registryEntityClass(Class.class.<Class<Base<?>>>cast(clazz));
     		prepareRepositoryClass(clazz, byteArrayClassLoader, metaClassRegistry);});
+		System.exit(0);
 	}
 	
-	
+	//TODO: implement oneone and onemany with join table indexes.
 	public static void processJoinTableRelations( RdbmsMetaClass joinMetaClass,
 												  BuilderMetaClassRegistry buildermetaclassregistry2) {
 		
+		List<RdbmsIndex> indexes = joinMetaClass.getRdbmsIndexes();
+		JoinTableRelationType relationType = classifyRelationType(indexes);
+		switch(relationType) {
+			case MANYMANY:
+				processManyToManyRelations(joinMetaClass,buildermetaclassregistry2);
+				break;
+			default:
+				throw new RuntimeException("other join table indexes not yet implemented");
+		}
+		
+	}
+
+	public static JoinTableRelationType classifyRelationType(List<RdbmsIndex> indexes) {
+		long count = indexes.stream().filter(idx -> idx.getIsUnique()).count();
+		return  count > 0 && count == indexes.size()?JoinTableRelationType.ONEONE:count>0?JoinTableRelationType.ONEMANY:JoinTableRelationType.MANYMANY;
+	}
+
+	enum JoinTableRelationType {
+		ONEONE,
+		ONEMANY,
+		MANYMANY;
+	}
+
+
+	public static void processManyToManyRelations(RdbmsMetaClass joinMetaClass,
+			BuilderMetaClassRegistry buildermetaclassregistry2) {
 		RdbmsMetaClassForeignKey rmc = joinMetaClass.getRdbmsForeignKeys().get(0);
 		RdbmsMetaClassForeignKey lmc = joinMetaClass.getRdbmsForeignKeys().get(1);
 		
@@ -150,10 +177,8 @@ public interface ApplicationInitializer {
 		BuilderMetaClass rn = new BuilderMetaClass(rb,rightMc.metaClass());
 		BuilderMetaClass ln = new BuilderMetaClass(lb,leftMc.metaClass());
 		buildermetaclassregistry2.registryBuilderMetaClass(rightMc.metaClass().getTableName(), rn);
-		buildermetaclassregistry2.registryBuilderMetaClass(leftMc.metaClass().getTableName(), ln);
+		buildermetaclassregistry2.registryBuilderMetaClass(leftMc.metaClass().getTableName(), ln);		
 	}
-
-
 
 
 	public static void prepareSimpleAttributes(RdbmsMetaClass mc) {
