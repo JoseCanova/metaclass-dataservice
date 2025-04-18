@@ -48,4 +48,4 @@
 ##### 1 of the attributes of a jointable having an unique index (one-many)
 ##### Both attributes of the jointable  holding an unique index (one-one)
 
-####### Interesting side effect of stream.allMatch() if stream is empty, it returns true, need to take care of such behavior in future.
+####### Interesting side effect of stream.allMatch() if stream is empty, it comprises with the condition of vacous truth, that's why i used the stream method rarely. 
