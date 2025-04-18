@@ -85,7 +85,8 @@ public interface ApplicationInitializer {
 												builderMetaClassRegistry);
 		});
 		
-		//TODO:Fix join table (if possible or let for a "future release" of pojo maven.
+		//TODO: implement relation classification based on index defined for fk's
+		//TODO: move the code to metaclass-bytebuddy.
 		joinMetaClasses
 		.forEach(joinMetaClass ->
 								  processJoinTableRelations(joinMetaClass, builderMetaClassRegistry));
