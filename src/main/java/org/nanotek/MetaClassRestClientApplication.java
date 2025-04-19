@@ -61,7 +61,7 @@ public class MetaClassRestClientApplication{
 	
 	
 	public static void main(String[] args) throws Exception {
-		ClassConfigurationInitializer initializer = new ClassConfigurationInitializer() {
+		ApplicationInitializer initializer = new ApplicationInitializer() {
 			@Override
 			public List<RdbmsMetaClass> getMetaClasses(String uriEndpont) {
 				List<RdbmsMetaClass> resultList = null;
@@ -82,8 +82,10 @@ public class MetaClassRestClientApplication{
 				return resultList;
 			}
 		};
-		initializer.configureMetaClasses("http://localhost:8086/meta-class",byteArrayClassLoader,metaClassRegistry);
-//    	List<RdbmsMetaClass> resultList = getMetaClasses("http://localhost:8086/meta-class");
+		List<Class<?>> theList =	initializer.configureMetaClasses("http://localhost:8086/meta-class",byteArrayClassLoader,metaClassRegistry);
+		initializer.configureRepositoryClasses(theList, byteArrayClassLoader, metaClassRegistry); 
+		
+		//    	List<RdbmsMetaClass> resultList = getMetaClasses("http://localhost:8086/meta-class");
 //    	resultList.forEach(r ->{
 //    		Class<?> theClass = metaClass(r, byteArrayClassLoader,metaClassRegistry);
 //    		prepareRepositoryClass(theClass, byteArrayClassLoader,metaClassRegistry);
