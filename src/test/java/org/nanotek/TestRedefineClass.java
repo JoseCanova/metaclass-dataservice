@@ -2,13 +2,10 @@ package org.nanotek;
 
 import java.nio.file.FileSystem;
 
-import org.nanotek.config.MetaClassVFSURLClassLoader;
-
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 
 import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.description.type.TypeDefinition;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType.Builder;
 import net.bytebuddy.jar.asm.Opcodes;

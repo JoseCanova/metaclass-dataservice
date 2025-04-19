@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 
 import org.hibernate.jpa.HibernatePersistenceProvider;
-import org.nanotek.config.MetaClassRegistry;
-import org.nanotek.config.MetaClassVFSURLClassLoader;
+import org.nanotek.MetaClassRegistry;
+import org.nanotek.MetaClassVFSURLClassLoader;
 import org.nanotek.repository.data.MetaClassJpaTransactionManager;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;

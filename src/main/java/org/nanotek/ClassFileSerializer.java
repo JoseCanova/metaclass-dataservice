@@ -8,8 +8,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 
-import org.nanotek.config.MetaClassVFSURLClassLoader;
-
 public interface ClassFileSerializer {
 
 public static void saveEntityFile(Class<?> c, MetaClassVFSURLClassLoader bytearrayclassloader2) {

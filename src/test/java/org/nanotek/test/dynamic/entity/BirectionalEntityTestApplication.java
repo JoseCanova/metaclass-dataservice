@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.nanotek.Base;
+import org.nanotek.MetaClassRegistry;
+import org.nanotek.MetaClassVFSURLClassLoader;
 import org.nanotek.TestRedefineClass;
-import org.nanotek.config.MetaClassRegistry;
-import org.nanotek.config.MetaClassVFSURLClassLoader;
 import org.nanotek.config.RepositoryClassBuilder;
 import org.nanotek.config.RepositoryPair;
 import org.springframework.beans.factory.annotation.Qualifier;

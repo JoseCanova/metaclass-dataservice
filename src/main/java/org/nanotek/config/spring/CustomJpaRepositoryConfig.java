@@ -1,5 +1,5 @@
 package org.nanotek.config.spring;
-import org.nanotek.config.MetaClassVFSURLClassLoader;
+import org.nanotek.MetaClassVFSURLClassLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

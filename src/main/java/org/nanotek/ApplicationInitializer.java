@@ -8,29 +8,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.nanotek.config.MetaClassRegistry;
-import org.nanotek.config.MetaClassVFSURLClassLoader;
 import org.nanotek.config.RepositoryClassBuilder;
 import org.nanotek.config.RepositoryPair;
 import org.nanotek.meta.model.rdbms.RdbmsIndex;
 import org.nanotek.meta.model.rdbms.RdbmsMetaClass;
-import org.nanotek.meta.model.rdbms.RdbmsMetaClassForeignKey;
 import org.nanotek.metaclass.BuilderMetaClass;
 import org.nanotek.metaclass.BuilderMetaClassRegistry;
 import org.nanotek.metaclass.ProcessedForeignKeyRegistry;
 import org.nanotek.metaclass.bytebuddy.RdbmsEntityBaseBuddy;
-import org.nanotek.metaclass.bytebuddy.annotations.orm.relation.ForeignKeyMetaClassRecord;
-import org.nanotek.metaclass.bytebuddy.annotations.orm.relation.JoinTableAnnotationDescriptionFactory;
-import org.nanotek.metaclass.bytebuddy.annotations.orm.relation.ManyToManyAnnotationDescriptionFactory;
 import org.nanotek.metaclass.bytebuddy.attributes.AttributeBaseBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.persistence.CascadeType;
-import net.bytebuddy.description.annotation.AnnotationDescription;
-import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType.Builder;
 import net.bytebuddy.dynamic.DynamicType.Unloaded;
 
@@ -81,8 +72,7 @@ public interface ApplicationInitializer {
 		.forEach(fk ->{
 			AttributeBaseBuilder
 			.on()
-			.generateParentRelationAttribute(fk,
-												builderMetaClassRegistry);
+			.generateParentRelationAttribute(fk,builderMetaClassRegistry);
 		});
 		
 		//TODO: implement relation classification based on index defined for fk's
@@ -134,6 +124,12 @@ public interface ApplicationInitializer {
 		MANYMANY;
 	}
 
+	/**
+	 * This method classify the relation type between to classes in a relation-table considering the happy path
+	 * which means the indexes were properly defined by the relational model administrator.
+	 * @param indexes
+	 * @return
+	 */
 	public static JoinTableRelationType classifyRelationType(List<RdbmsIndex> indexes) {
 		long count = indexes.stream().filter(idx -> idx.getIsUnique()).count();
 		return  count > 0 && count == indexes.size()?JoinTableRelationType.ONEONE:count>0?JoinTableRelationType.ONEMANY:JoinTableRelationType.MANYMANY;
@@ -141,43 +137,7 @@ public interface ApplicationInitializer {
 
 	public static void processManyToManyRelations(RdbmsMetaClass joinMetaClass,
 			BuilderMetaClassRegistry buildermetaclassregistry2) {
-		RdbmsMetaClassForeignKey rmc = joinMetaClass.getRdbmsForeignKeys().get(0);
-		RdbmsMetaClassForeignKey lmc = joinMetaClass.getRdbmsForeignKeys().get(1);
-		
-		BuilderMetaClass rightMc = buildermetaclassregistry2.getBuilderMetaClass(rmc.getTableName());
-		BuilderMetaClass leftMc = buildermetaclassregistry2.getBuilderMetaClass(lmc.getTableName());
-		ForeignKeyMetaClassRecord rmcr = new ForeignKeyMetaClassRecord(rmc, rightMc.metaClass(),buildermetaclassregistry2);
-		ForeignKeyMetaClassRecord lrmc = new ForeignKeyMetaClassRecord(rmc, leftMc.metaClass(),buildermetaclassregistry2);
-		String mappedby =  rightMc.metaClass().getClassName().toLowerCase();
-		AnnotationDescription rad = ManyToManyAnnotationDescriptionFactory.on().buildAnnotationDescription(rmcr,mappedby).get();
-		AnnotationDescription lad = ManyToManyAnnotationDescriptionFactory.on().buildAnnotationDescription(lrmc,CascadeType.ALL).get();
-		AnnotationDescription jcad = JoinTableAnnotationDescriptionFactory.on().buildAnnotationDescription(joinMetaClass).get();
-		
-		
-		TypeDescription setTypeDescription = new TypeDescription.ForLoadedType(java.util.Set.class );
-		//Here the type definition is relative to the foreign key class (the holder of the fk attribute)
-		TypeDescription.Generic rgenericTypeDef = TypeDescription.Generic
-											.Builder
-											.parameterizedType(setTypeDescription  ,leftMc.builder().toTypeDescription()).build();
-		TypeDescription.Generic lgenericTypeDef = TypeDescription.Generic
-				.Builder
-				.parameterizedType(setTypeDescription  ,rightMc.builder().toTypeDescription()).build();
-		
-		Builder<?> rb = rightMc.builder()
-							.defineProperty(leftMc.metaClass().getClassName().toLowerCase(), rgenericTypeDef)
-							.annotateField(new AnnotationDescription[] {rad});
-		
-		
-		Builder<?> lb = leftMc.builder()
-				.defineProperty(rightMc.metaClass().getClassName().toLowerCase(), lgenericTypeDef)
-				.annotateField(new AnnotationDescription[] {lad,jcad});
-
-		
-		BuilderMetaClass rn = new BuilderMetaClass(rb,rightMc.metaClass());
-		BuilderMetaClass ln = new BuilderMetaClass(lb,leftMc.metaClass());
-		buildermetaclassregistry2.registryBuilderMetaClass(rightMc.metaClass().getTableName(), rn);
-		buildermetaclassregistry2.registryBuilderMetaClass(leftMc.metaClass().getTableName(), ln);		
-	}
+		AttributeBaseBuilder.on().processManyToManyRelations(joinMetaClass, buildermetaclassregistry2);}
 
 
 	public static void prepareSimpleAttributes(RdbmsMetaClass mc) {

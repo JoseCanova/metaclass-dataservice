@@ -2,6 +2,7 @@ package org.nanotek.config;
 
 import java.util.Optional;
 
+import org.nanotek.MetaClassVFSURLClassLoader;
 import org.nanotek.repository.data.EntityBaseRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
