@@ -49,3 +49,5 @@
 ##### Both attributes of the jointable  holding an unique index (one-one)
 
 ####### Interesting side effect of stream.allMatch() if stream is empty, it comprises with the condition of vacous truth, that's why i used the stream method rarely. 
+
+##### Moving to one-one , one-many with join tables and then after Moving now to embedded id`s definition, then back to relations to modify code to apply over complex "id`s" it`s a rare case in ORM but in RDBMS design is often used. 
