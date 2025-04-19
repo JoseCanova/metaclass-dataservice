@@ -67,9 +67,7 @@ public class MetaClassRestClientApplication{
 				List<RdbmsMetaClass> resultList = null;
 				try {
 						ObjectMapper mapper = new ObjectMapper();
-						URI serverUri;
-							serverUri = new URI(uriEndpont);
-							serverUri.toURL();
+						URI serverUri = new URI(uriEndpont);
 						RestTemplate restTemplate = new RestTemplate();
 						ResponseEntity<List> response = restTemplate.getForEntity(serverUri, List.class);
 						List<?>	responseBody = response.getBody();
