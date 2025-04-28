@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.nanotek.test.jpa.data.Person;
-import org.nanotek.test.jpa.data.Pet;
+import org.nanotek.config.spring.data.Person;
+import org.nanotek.config.spring.data.Pet;
 import org.nanotek.test.jpa.repositories.PersonRepository;
 import org.nanotek.test.jpa.repositories.PetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +37,8 @@ public class JpaDataServiceConfigurationTest {
 				person ->{
 					assertNotNull(person);
 					Optional<Person> casperPersonAgain = personRepository.findById("p_key");
-					Optional<Pet> optionalPirineusKiller = casperPersonAgain.get().pet();
-					assertTrue(optionalPirineusKiller.isPresent());
+					Pet optionalPirineusKiller = casperPersonAgain.get().getPet();
+					assertNotNull(optionalPirineusKiller);
 					System.out.println("Pirineus Killer is present");
 				}, 
 				() -> new RuntimeException());

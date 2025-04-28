@@ -79,6 +79,12 @@
                 <artifactId>vavr</artifactId>
                 <version>0.10.5</version>
          </dependency>
+         <dependency>
+             <groupId>org.nanotek</groupId>
+            <artifactId>metaclass.test.plugin</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

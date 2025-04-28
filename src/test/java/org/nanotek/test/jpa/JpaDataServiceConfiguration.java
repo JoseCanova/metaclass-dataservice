@@ -51,7 +51,7 @@ public class JpaDataServiceConfiguration implements ApplicationContextAware{
 		MergingPersistenceUnitManager pum = new  MergingPersistenceUnitManager();
 		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");
-		pum.setPackagesToScan("org.nanotek.test.jpa.data");
+		pum.setPackagesToScan("org.nanotek.config.spring.data");
 		pum.setDefaultDataSource(dataSource);
 		return pum;
 	}
