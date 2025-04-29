@@ -61,30 +61,30 @@ public class MetaClassRestClientApplication{
 	
 	
 	public static void main(String[] args) throws Exception {
-		ApplicationInitializer initializer = new ApplicationInitializer() {
-			@Override
-			public List<RdbmsMetaClass> getMetaClasses(String uriEndpont) {
-				List<RdbmsMetaClass> resultList = null;
-				try {
-						ObjectMapper mapper = new ObjectMapper();
-						URI serverUri = new URI(uriEndpont);
-						RestTemplate restTemplate = new RestTemplate();
-						ResponseEntity<List> response = restTemplate.getForEntity(serverUri, List.class);
-						List<?>	responseBody = response.getBody();
-						resultList = responseBody
-							.stream()
-							.map(e ->{
-								return mapper.convertValue(e, RdbmsMetaClass.class);
-							}).collect(Collectors.toList());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				return resultList;
-			}
-		};
-		List<Class<?>> theList =	initializer.configureMetaClasses("http://localhost:8086/meta-class",byteArrayClassLoader,metaClassRegistry);
-		initializer.configureRepositoryClasses(theList, byteArrayClassLoader, metaClassRegistry); 
-		
+//		ApplicationInitializer initializer = new ApplicationInitializer() {
+//			@Override
+//			public List<RdbmsMetaClass> getMetaClasses(String uriEndpont) {
+//				List<RdbmsMetaClass> resultList = null;
+//				try {
+//						ObjectMapper mapper = new ObjectMapper();
+//						URI serverUri = new URI(uriEndpont);
+//						RestTemplate restTemplate = new RestTemplate();
+//						ResponseEntity<List> response = restTemplate.getForEntity(serverUri, List.class);
+//						List<?>	responseBody = response.getBody();
+//						resultList = responseBody
+//							.stream()
+//							.map(e ->{
+//								return mapper.convertValue(e, RdbmsMetaClass.class);
+//							}).collect(Collectors.toList());
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//				return resultList;
+//			}
+//		};
+//		List<Class<?>> theList =	initializer.configureMetaClasses("http://localhost:8086/meta-class",byteArrayClassLoader,metaClassRegistry);
+//		initializer.configureRepositoryClasses(theList, byteArrayClassLoader, metaClassRegistry); 
+//		
 		//    	List<RdbmsMetaClass> resultList = getMetaClasses("http://localhost:8086/meta-class");
 //    	resultList.forEach(r ->{
 //    		Class<?> theClass = metaClass(r, byteArrayClassLoader,metaClassRegistry);
@@ -92,7 +92,7 @@ public class MetaClassRestClientApplication{
 //    	});
     	AnnotationConfigServletWebServerApplicationContext context  = 
         		(AnnotationConfigServletWebServerApplicationContext) 
-        		new SpringApplication(new PathMatchingResourcePatternResolver(MetaClassRestClientApplication.byteArrayClassLoader),
+        		new SpringApplication(new PathMatchingResourcePatternResolver(MetaClassRestClientApplication.class.getClassLoader()),
         				MetaClassRestClientApplication.class,MetaClassCustomBean.class , MetaClassJpaDataServiceConfiguration.class , CustomJpaRepositoryConfig.class).run(args);
 	}
 

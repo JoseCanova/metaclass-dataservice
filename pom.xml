@@ -87,7 +87,13 @@
         </dependency>
     </dependencies>
     <build>
+    <pluginManagement>
         <plugins>
+        <plugin>
+                <groupId>io.spring.javaformat</groupId>
+                <artifactId>spring-javaformat-maven-plugin</artifactId>
+                <version>0.0.43</version>
+            </plugin>
             <plugin>
             <groupId>org.nanotek</groupId>
             <artifactId>metaclass.plugin</artifactId>
@@ -110,7 +116,10 @@
                     <configuration>
                            <dataSourceConfiguration>/home/jose/git/metaclass.plugin.support/src/main/resources/datasource.json</dataSourceConfiguration>
                            <generateSources>true</generateSources>
-                    </configuration>
+                           <entityPackage>org/nanotek/metaclass/entity</entityPackage>
+                           <repositoryPackage>org/nanotek/metaclass/repository</repositoryPackage>
+                           <createSpringRepositories>true</createSpringRepositories>
+                     </configuration>
                 </execution>
             </executions>
         </plugin>
@@ -137,5 +146,6 @@
                 </configuration>
             </plugin>
         </plugins>
+        </pluginManagement>
    </build>
 </project>

@@ -72,13 +72,7 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 		MergingPersistenceUnitManager pum = new  MergingPersistenceUnitManager();
 		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");
-		pum.setPackagesToScan("org.nanotek.config.spring.data");
-		String[] entityNames = metaClassRegistry
-				.getEntityClasses()
-				.stream()
-				.map(c->c.getName())
-				.collect(Collectors.toList()).toArray(new String[0]);
-		pum.setManagedTypes(PersistenceManagedTypes.of(entityNames));
+		pum.setPackagesToScan("org.nanotek.metaclass.entity");
 		pum.setDefaultDataSource(dataSource);
 		pum.setResourceLoader(new PathMatchingResourcePatternResolver(classLoader));
 		return pum;
@@ -132,7 +126,6 @@ public class MetaClassJpaDataServiceConfiguration implements ApplicationContextA
 	      transactionManager.setJpaPropertyMap(factory.getObject().getProperties());
 	      transactionManager.setDataSource(dataSource);
 	      transactionManager.setNestedTransactionAllowed(true);
-//		return new HibernateTransactionManager(factory.unwrap(SessionFactory.class));
 		return transactionManager;//new DataSourceTransactionManager(dataSource);
 	}
 
