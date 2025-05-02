@@ -15,6 +15,12 @@
     <properties>
         <java.version>22</java.version>
         <swagger.version>3.0.0</swagger.version>
+		<logstash-gelf.version>1.12.0</logstash-gelf.version>
+		<log4j2.version>2.17.1</log4j2.version>
+		<admin.version>2.6.7</admin.version>
+		<querydsl.version>5.0.0</querydsl.version>
+		<instancio.version>5.3.0</instancio.version>
+		<schema-crawler-version>16.25.1</schema-crawler-version>
     </properties>
     <dependencies>
         <dependency>
@@ -100,8 +106,23 @@
             <version>0.0.1-SNAPSHOT</version>
                     <configuration>
                            <dataSourceConfiguration>/home/jose/git/metaclass.plugin.support/src/main/resources/datasource.json</dataSourceConfiguration>
+                           <dataSourceConfiguration>/home/jose/git/metaclass.plugin.support/src/main/resources/datasource.json</dataSourceConfiguration>
+                           <generateSources>true</generateSources>
+                           <entityPackage>org/nanotek/metaclass/entity</entityPackage>
+                           <repositoryPackage>org/nanotek/metaclass/repository</repositoryPackage>
+                           <createSpringRepositories>true</createSpringRepositories>
                     </configuration>
                     <dependencies>
+                    <dependency>
+							<groupId>us.fatehi</groupId>
+							<artifactId>schemacrawler</artifactId>
+							<version>${schema-crawler-version}</version>
+						</dependency>
+						<dependency>
+							<groupId>us.fatehi</groupId>
+							<artifactId>schemacrawler-postgresql</artifactId>
+							<version>${schema-crawler-version}</version>
+						</dependency>
                         <dependency>
                             <groupId>org.postgresql</groupId>
                             <artifactId>postgresql</artifactId>

@@ -28,7 +28,7 @@ import com.zaxxer.hikari.HikariConfig;
 import jakarta.persistence.ValidationMode;
 
 @SpringBootConfiguration
-@EnableJpaRepositories(basePackages = "org.nanotek.test.entity.repositories")
+@EnableJpaRepositories(basePackages = "org.nanotek.metaclass.repository")
 @EnableAutoConfiguration(exclude= {TransactionAutoConfiguration.class})
 public class JpaDataServiceConfiguration implements ApplicationContextAware{
 
@@ -51,7 +51,7 @@ public class JpaDataServiceConfiguration implements ApplicationContextAware{
 		MergingPersistenceUnitManager pum = new  MergingPersistenceUnitManager();
 		pum.setValidationMode(ValidationMode.NONE);
 		pum.setDefaultPersistenceUnitName("buddyPU");
-		pum.setPackagesToScan("org.nanotek.test.entity.data");
+		pum.setPackagesToScan("org.nanotek.metaclass.entity");
 		pum.setDefaultDataSource(dataSource);
 		return pum;
 	}

@@ -3,63 +3,72 @@ package org.nanotek.test.entity;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.nanotek.test.entity.data.SimpleForeignTableEntity;
-import org.nanotek.test.entity.data.SimpleTableEntity;
-import org.nanotek.test.entity.repositories.SimpleForeignTableEntityRepository;
-import org.nanotek.test.entity.repositories.SimpleTableEntityRepository;
+import org.nanotek.metaclass.entity.Family;
+import org.nanotek.metaclass.entity.FamilyDog;
+import org.nanotek.metaclass.repository.FamilyDogRepository;
+import org.nanotek.metaclass.repository.FamilyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import jakarta.transaction.Transactional;
 
 @SpringBootTest(classes = {JpaDataServiceConfiguration.class})
 public class JpaDataServiceConfigurationTest {
 
 	@Autowired
-	SimpleTableEntityRepository simpleTableEntityRepository;
+	FamilyRepository familyRepository;
 	
 	@Autowired
-	SimpleForeignTableEntityRepository simpleForeignTableEntityRepository;
+	FamilyDogRepository familyDogRepository;
 	
 	
 	public JpaDataServiceConfigurationTest() {
 	}
 
 	@Test
+	@Transactional
 	void testEntityModel() {
-		assertNotNull(simpleTableEntityRepository);
-		assertNotNull(simpleForeignTableEntityRepository);
-		simpleTableEntityRepository.deleteAll();
-		var ste = createSimpleTableEntity();
-		var savedSte = simpleTableEntityRepository.save(ste);
+		assertNotNull(familyRepository);
+		assertNotNull(familyDogRepository);
+		Optional<Family> theFamilyOpt = familyRepository.findById("family_key");
+		theFamilyOpt.ifPresent(f ->{
+			System.err.println("Family is present");
+			familyRepository.deleteById("family_key");
+			familyDogRepository.deleteById("simplefdkey");
+		});
+		var ste = createFamilyEntity();
+		var savedSte = familyRepository.save(ste);
+		familyRepository.flush();
 		assertNotNull(savedSte);
-		var sfte = createSimpleForeignTableEntity(savedSte);
-		var savedSfte = simpleForeignTableEntityRepository.save (sfte);
+		var sfte = createFamilyDogEntity();
+		var savedSfte = familyDogRepository.save (sfte);
+		familyDogRepository.flush();
 		assertNotNull(savedSfte);
-		simpleTableEntityRepository.deleteAll();
-		List<?> list = simpleTableEntityRepository.findAll();
-		assertTrue(list.size()==0);
+		Optional.ofNullable(savedSte.getFamilydog())
+		.ifPresentOrElse(fd ->fd.add(savedSfte), ()->{
+			savedSte.setFamilydog(new HashSet<>());
+			savedSte.getFamilydog().add(savedSfte);
+		});
+		familyRepository.save(savedSte);
+		familyRepository.flush();
+		assertTrue(savedSte.getFamilydog().size()==1);
 	}
 	
-	SimpleTableEntity createSimpleTableEntity() {
-		SimpleTableEntity ste = new SimpleTableEntity();
-		ste.setSimpleKey("simple_key");
-		Date dt = new Date();
-		ste.setSimpleDate(dt);
-		Timestamp ts = new Timestamp(dt.getTime());
-		ste.setSimpleTimestamp(ts);
-		ste.setSimpleColumn("simple_column");
+	Family createFamilyEntity() {
+		Family ste = new Family();
+		ste.setFKey("family_key");
+		ste.setFName("Family Name");
 		return ste;
 	}
 	
-	SimpleForeignTableEntity createSimpleForeignTableEntity(SimpleTableEntity ste) {
-		SimpleForeignTableEntity sfte = new SimpleForeignTableEntity();
-		sfte.setSimpleForeignKey("simplefkey");
-		sfte.setSimpleForeignColumn("simple column");
-		sfte.setSimpleTableEntity(ste);
+	FamilyDog createFamilyDogEntity() {
+		FamilyDog sfte = new FamilyDog();
+		sfte.setFdKey("simplefdkey");
+		sfte.setFdName("simple fdkey dog");
 		return sfte;
 	}
 	
