@@ -21,6 +21,7 @@
 		<querydsl.version>5.0.0</querydsl.version>
 		<instancio.version>5.3.0</instancio.version>
 		<schema-crawler-version>16.25.1</schema-crawler-version>
+		<hibernate.version>6.6.5.Final</hibernate.version>
     </properties>
     <dependencies>
         <dependency>
@@ -85,16 +86,29 @@
                 <artifactId>vavr</artifactId>
                 <version>0.10.5</version>
          </dependency>
-         <dependency>
-             <groupId>org.nanotek</groupId>
-            <artifactId>metaclass.test.plugin</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     <build>
     <pluginManagement>
         <plugins>
+			<plugin>
+	            <groupId>org.hibernate.orm.tooling</groupId>
+	            <artifactId>hibernate-enhance-maven-plugin</artifactId>
+	            <version>${hibernate.version}</version>
+	            <executions>
+	                <execution>
+	                    <configuration>
+	                        <failOnError>true</failOnError>
+	                        <enableLazyInitialization>true</enableLazyInitialization>
+	                        <enableDirtyTracking>true</enableDirtyTracking>
+	                        <enableAssociationManagement>true</enableAssociationManagement>
+	                        <enableExtendedEnhancement>false</enableExtendedEnhancement>
+	                    </configuration>
+	                    <goals>
+	                        <goal>enhance</goal>
+	                    </goals>
+	                </execution>
+	            </executions>
+	        </plugin>
         <plugin>
                 <groupId>io.spring.javaformat</groupId>
                 <artifactId>spring-javaformat-maven-plugin</artifactId>
